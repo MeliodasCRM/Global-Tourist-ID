@@ -21,7 +21,7 @@ def signup():
 
         email = data.get('email')
         password = data.get('password')
-        print("Datos procesados - Name:", name, "Email:", email)
+        print("Datos procesados Email:", email)
 
         if not email or not password:
             print("Datos incompletos")
@@ -91,7 +91,6 @@ def get_user(user_id=None):
 def create_user():
     try:
         data = request.get_json()
-        name = data.get('name')
         email = data.get('email')
         password = data.get('password')
 
@@ -106,7 +105,7 @@ def create_user():
         hashed_password = generate_password_hash(password)
 
         # Crear nuevo usuario
-        new_user = User(name=name, email=email, password=hashed_password, is_active=True)
+        new_user = User( email=email, password=hashed_password, is_active=True)
         db.session.add(new_user)
         db.session.commit()
 
@@ -124,7 +123,6 @@ def modify_user(user_id):  # Nombre único para la función
             return jsonify({"message": "Usuario no encontrado"}), 404
 
         data = request.get_json()
-        user.name = data.get('name', user.name)
         user.email = data.get('email', user.email)
         user.is_active = data.get('is_active', user.is_active)
 
