@@ -19,12 +19,11 @@ def signup():
         data = request.get_json()
         print("Datos recibidos:", data)
 
-        name = data.get('name')
         email = data.get('email')
         password = data.get('password')
         print("Datos procesados - Name:", name, "Email:", email)
 
-        if not name or not email or not password:
+        if not email or not password:
             print("Datos incompletos")
             return jsonify({"message": "Todos los campos son requeridos"}), 400
 
@@ -35,7 +34,7 @@ def signup():
         hashed_password = generate_password_hash(password)
         print("Contraseña hasheada correctamente")
 
-        new_user = User(name=name, email=email, password=hashed_password, is_active=True)
+        new_user = User(email=email, password=hashed_password, is_active=True)
         print("Intentando guardar el usuario en la base de datos...")
 
         db.session.add(new_user)
