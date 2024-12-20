@@ -15,7 +15,8 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            # do not serialize the password, its a security breach
+            "empresas": [empresa.serialize() for empresa in self.empresas],
+            "transacciones": [transaccion.serialize() for transaccion in self.transacciones],
         }
 
 class Empresa(db.Model):
@@ -28,6 +29,15 @@ class Empresa(db.Model):
 
     user = db.relationship('User', backref=db.backref('empresas', lazy=True))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "razon_social": self.razon_social,
+            "cif": self.cif,
+            "nombre_comercial": self.nombre_comercial,
+            "domicilio": self.domicilio,
+            "user_id": self.user_id
+        }
 
 class Alojamientos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +47,15 @@ class Alojamientos(db.Model):
     finca_nombre = db.Column(db.String(200), nullable=False)
     domicilio = db.Column(db.String(200), nullable=False)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "ref": self.ref,
+            "estado_finca": self.estado_finca,
+            "clase_finca": self.clase_finca,
+            "finca_nombre": self.finca_nombre,
+            "domicilio": self.domicilio
+        }
 
 class MediosPago(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +64,14 @@ class MediosPago(db.Model):
     fecha = db.Column(db.Date, nullable=False)
     codigo_secreto = db.Column(db.Integer, nullable=False)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre_medio_pago": self.nombre_medio_pago,
+            "numero": self.numero,
+            "fecha": self.fecha
+            # código_secreto excluido por seguridad
+        }
 
 class Preguntas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +79,13 @@ class Preguntas(db.Model):
     pregunta2 = db.Column(db.String(500), nullable=False)
     pregunta10 = db.Column(db.String(500), nullable=False)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "pregunta1": self.pregunta1,
+            "pregunta2": self.pregunta2,
+            "pregunta10": self.pregunta10
+        }
 
 class Transacciones(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,6 +95,13 @@ class Transacciones(db.Model):
 
     user = db.relationship('User', backref=db.backref('transacciones', lazy=True))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "fecha": self.fecha,
+            "user_id": self.user_id,
+            "tipo_transaccion": self.tipo_transaccion
+        }
 
 class TipoTransacciones(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -69,6 +110,12 @@ class TipoTransacciones(db.Model):
 
     transaccion = db.relationship('Transacciones', backref=db.backref('tipos_transaccion', lazy=True))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "transaccion_id": self.transaccion_id,
+            "nombre": self.nombre
+        }
 
 class QRDatabase(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -77,6 +124,12 @@ class QRDatabase(db.Model):
 
     user = db.relationship('User', backref=db.backref('qr_databases', lazy=True))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "archivo": self.archivo
+        }
 
 class Reservas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -94,6 +147,18 @@ class Reservas(db.Model):
     medio_pago = db.relationship('MediosPago', backref=db.backref('reservas', lazy=True))
     transaccion = db.relationship('Transacciones', backref=db.backref('reservas', lazy=True))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "numero_res": self.numero_res,
+            "fecha_res": self.fecha_res,
+            "fecha_ini": self.fecha_ini,
+            "fecha_fin": self.fecha_fin,
+            "user": self.user.serialize() if self.user else None,
+            "alojamiento": self.alojamiento.serialize() if self.alojamiento else None,
+            "medio_pago": self.medio_pago.serialize() if self.medio_pago else None,
+            "transaccion": self.transaccion.serialize() if self.transaccion else None
+        }
 
 class GuardiaCivil(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -106,3 +171,12 @@ class GuardiaCivil(db.Model):
     qr = db.relationship('QRDatabase', backref=db.backref('guardia_civil', lazy=True))
     reserva = db.relationship('Reservas', backref=db.backref('guardia_civil', lazy=True))
     empresa = db.relationship('Empresa', backref=db.backref('guardia_civil', lazy=True))
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user": self.user.serialize() if self.user else None,
+            "qr": self.qr.serialize() if self.qr else None,
+            "reserva": self.reserva.serialize() if self.reserva else None,
+            "empresa": self.empresa.serialize() if self.empresa else None
+        }

@@ -156,3 +156,13 @@ def delete_user(user_id):
         # Manejar cualquier error inesperado
         db.session.rollback()
         return jsonify({"message": "Error al eliminar el usuario", "error": str(e)}), 500
+
+@api.route('/empresa', methods=['GET'])
+@api.route('/empresa/<int:empresa_id>', methods=['GET'])
+def get_empresa(empresa_id=None):
+    try:
+        if empresa_id:
+            empresa = Empresa.query.get(empresa_id)
+            if not empresa:
+                return jsonify({"message": "Empresa no encontrada"}), 404
+            return jsonify(empresa.serialize())
