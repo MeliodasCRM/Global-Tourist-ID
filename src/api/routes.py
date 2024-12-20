@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Empresa
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -21,7 +21,7 @@ def signup():
 
         email = data.get('email')
         password = data.get('password')
-        print("Datos procesados Email:", email)
+        print("Datos procesados - Name:", name, "Email:", email)
 
         if not email or not password:
             print("Datos incompletos")
@@ -91,6 +91,7 @@ def get_user(user_id=None):
 def create_user():
     try:
         data = request.get_json()
+        name = data.get('name')
         email = data.get('email')
         password = data.get('password')
 
@@ -105,7 +106,7 @@ def create_user():
         hashed_password = generate_password_hash(password)
 
         # Crear nuevo usuario
-        new_user = User( email=email, password=hashed_password, is_active=True)
+        new_user = User(name=name, email=email, password=hashed_password, is_active=True)
         db.session.add(new_user)
         db.session.commit()
 
@@ -123,6 +124,7 @@ def modify_user(user_id):  # Nombre único para la función
             return jsonify({"message": "Usuario no encontrado"}), 404
 
         data = request.get_json()
+        user.name = data.get('name', user.name)
         user.email = data.get('email', user.email)
         user.is_active = data.get('is_active', user.is_active)
 
@@ -157,12 +159,48 @@ def delete_user(user_id):
         db.session.rollback()
         return jsonify({"message": "Error al eliminar el usuario", "error": str(e)}), 500
 
+# OBTENER TODAS LAS EMPRESAS O UNA EN CONCRETO
 @api.route('/empresa', methods=['GET'])
 @api.route('/empresa/<int:empresa_id>', methods=['GET'])
 def get_empresa(empresa_id=None):
     try:
         if empresa_id:
+            # Obtener una empresa específica
             empresa = Empresa.query.get(empresa_id)
             if not empresa:
-                return jsonify({"message": "Empresa no encontrada"}), 404
-            return jsonify(empresa.serialize())
+                return jsonify({"message": "Empresa no encontrado"}), 404
+            return jsonify(empresa.serialize()), 200
+        else:
+            # Obtener todos los usuarios
+            empresas = Empresa.query.all()
+            return jsonify([empresa.serialize() for empresa in empresas]), 200
+    except Exception as e:
+        return jsonify({"message": "Error al obtener las empresas", "error": str(e)}), 500
+    
+# Crear una nueva empresa
+@api.route('/empresa', methods=['POST'])
+def create_empresa():
+    try:
+        data = request.get_json()
+        razon_social = data.get('razon_social')
+        cif = data.get('cif')
+        nombre_comercial = data.get('nombre_comercial')
+        domicilio = data.get('domicilio')
+        user_id = data.get('user_id')
+
+        if not razon_social or not cif or not nombre_comercial or not domicilio or not user_id:
+            return jsonify({"message": "Es necesario rellenar todos los campos"}), 400
+        
+        new_empresa = Empresa(
+            razon_social = razon_social,
+            cif = cif,
+            nombre_comercial = nombre_comercial,
+            domicilio = domicilio,
+            user_id = user_id
+        )
+        db.session.add(new_empresa)
+        db.session.commit()
+
+        return jsonify({"message": "Empresa creada con éxito", "empresa": new_empresa.serialize()}), 201
+    except Exception as e:
+        return jsonify({"message": "Error al crear la empresa", "error": str(e)}), 500
