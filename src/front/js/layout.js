@@ -21,6 +21,8 @@ import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
 import UserForm from "./pages/UserForm.js";
 
+import PublicView from "./pages/publicView";
+import UserView from "./pages/userView";
 
 //create your first component
 const Layout = () => {
