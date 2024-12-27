@@ -23,6 +23,8 @@ export const Navbar = () => {
       <div className="container-fluid">
         <Link to="/userhome">
           <span className="navbar-brand" href="#"> userhome </span>
+        <Link to="/">
+          <span className="navbar-brand" href="#"> Global Turist </span>
         </Link>
         <button
           className="navbar-toggler"
