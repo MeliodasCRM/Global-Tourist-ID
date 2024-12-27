@@ -2,6 +2,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
+			authToken: localStorage.getItem("authToken") || null,
+			role: null, //user o admin
+			user: null, // dato del usuario autenticado
 			demo: [
 				{
 					title: "FIRST",

@@ -22,7 +22,7 @@ export const Navbar = () => {
     <nav className="navbar navbar-expand-lg bg-body-tertiary custom-navbar">
       <div className="container-fluid">
         <Link to="/">
-          <span className="navbar-brand" href="#"> StarWars </span>
+          <span className="navbar-brand" href="#"> Global Turist </span>
         </Link>
         <button
           className="navbar-toggler"
@@ -38,13 +38,14 @@ export const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link to="/">
-                <span className="nav-link active" aria-current="page"> Home </span>
+              <Link to="/User">
+                <span className="nav-link active" aria-current="page"> User </span>
               </Link>
             </li>
+         
             <li className="nav-item">
-            <Link to="/databank">
-                <span className="nav-link active" aria-current="page"> Databank </span>
+            <Link to="/Publica">
+                <span className="nav-link active" aria-current="page"> Publica </span>
               </Link>
             </li>
             <li className="nav-item">
