@@ -419,10 +419,10 @@ def update_reserva(reserva_id):
         return jsonify({"message": "Error al actualizar la reserva", "error": str(e)}), 500
 
 # Eliminar una reserva
-@api.route('/reserva/<int:reserva_id>', methods['DELETE'])
+@api.route('/reserva/<int:reserva_id>', methods=['DELETE'])
 def delete_reserva(reserva_id):
     try:
-        reserva = Reserva.query.get(reserva_id)
+        reserva = Reservas.query.get(reserva_id)
 
         if not reserva:
             return jsonify({"message": "Reserva no encontrada"}), 404
