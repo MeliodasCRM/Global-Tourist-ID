@@ -419,11 +419,19 @@ def delete_user(user_id):
 #     except Exception as e:
 #         return jsonify({"message": "Error al actualizar la reserva", "error": str(e)}), 500
 
+<<<<<<< HEAD
 # # Eliminar una reserva
 # @api.route('/reserva/<int:reserva_id>', methods['DELETE'])
 # def delete_reserva(reserva_id):
 #     try:
 #         reserva = Reserva.query.get(reserva_id)
+=======
+# Eliminar una reserva
+@api.route('/reserva/<int:reserva_id>', methods=['DELETE'])
+def delete_reserva(reserva_id):
+    try:
+        reserva = Reservas.query.get(reserva_id)
+>>>>>>> origin/develop
 
 #         if not reserva:
 #             return jsonify({"message": "Reserva no encontrada"}), 404
