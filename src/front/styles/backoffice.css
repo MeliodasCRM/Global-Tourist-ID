@@ -1,0 +1,47 @@
+/* Eliminar los puntos de la lista en los submenús */
+.submenu-users,
+.submenu-users li,
+.submenu-empresas,
+.submenu-empresas li,
+.submenu-settings,
+.submenu-settings li {
+    list-style-type: none;  /* Eliminar puntos */
+    margin: 0;              /* Eliminar márgenes por defecto */
+    padding: 0;             /* Eliminar padding por defecto */
+}
+
+/* Submenú con padding-left */
+.submenu-users,
+.submenu-empresas,
+.submenu-settings {
+    padding-left: 1rem; /* Espacio entre los iconos y el borde */
+}
+
+/* Alineación de los iconos de los submenús */
+.submenu-users li .nav-link,
+.submenu-empresas li .nav-link,
+.submenu-settings li .nav-link {
+    padding-left: 0; /* Asegurar que el padding a la izquierda es 0 */
+    display: flex; /* Usar flexbox para alinear los iconos */
+    align-items: center; /* Centrar los iconos verticalmente */
+}
+
+/* Espacio entre el icono y el texto */
+.submenu-users li .nav-link .fs-5,
+.submenu-empresas li .nav-link .fs-5,
+.submenu-settings li .nav-link .fs-5 {
+    margin-right: 10px;  /* Añadir separación entre el icono y el texto */
+}
+
+/* Mostrar submenú cuando se hace clic */
+.submenu-users.show,
+.submenu-empresas.show,
+.submenu-settings.show {
+    display: block;
+}
+
+/* Para el enlace inactivo de Settings */
+.nav-link.disabled {
+    pointer-events: none; /* Deshabilitar clics */
+    opacity: 0.6; /* Reducción de la opacidad para hacerlo ver inactivo */
+}
