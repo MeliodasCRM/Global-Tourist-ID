@@ -21,7 +21,7 @@ def signup():
 
         email = data.get('email')
         password = data.get('password')
-        print("Datos procesados - Name:", name, "Email:", email)
+        print("Datos procesados - Name:", "Email:", email)
 
         if not email or not password:
             print("Datos incompletos")
@@ -159,6 +159,10 @@ def delete_user(user_id):
         db.session.rollback()
         return jsonify({"message": "Error al eliminar el usuario", "error": str(e)}), 500
 
+@api.route('/backoffice')
+@jwt_required()  # Asegura que el usuario esté autenticado
+def backoffice():
+    return jsonify({"message": "Acceso al Backoffice permitido."})
 
 # # OBTENER TODAS LAS EMPRESAS O UNA EN CONCRETO
 # @api.route('/empresa', methods=['GET'])

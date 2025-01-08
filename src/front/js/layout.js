@@ -10,9 +10,11 @@ import injectContext from "./store/appContext";
 import BackOffice from "./pages/backoffice";
 import Contacts from "./component/Contacts.jsx";
 import Empresas from "./component/Empresas.jsx";
+import ContactTable from "./component/ContactTable.jsx";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+
 
 //create your first component
 const Layout = () => {
@@ -31,6 +33,7 @@ const Layout = () => {
                         <Route path="/backoffice" element={<BackOffice />}>
                             {/* Definir las rutas hijas que cargarán en el Outlet */}
                             <Route path="contacts" element={<Contacts />} />
+                            <Route path="contactTable" element={<ContactTable />} />
                             <Route path="tourpass" element={<h2>Traveler Information Page</h2>} />
                             <Route path="groups" element={<h2>Groups Page</h2>} />
                             <Route path="roles" element={<h2>Roles de Usuario Page</h2>} />

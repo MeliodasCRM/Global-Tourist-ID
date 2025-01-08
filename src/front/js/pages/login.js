@@ -9,7 +9,7 @@ export const Login = () => {
 
   // Redirige al usuario si ya está autenticado
   if (store.authToken) {
-    return <Navigate to="/" />;
+    return <Navigate to="/backoffice" />;
   }
 
   return (
