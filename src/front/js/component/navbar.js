@@ -22,7 +22,7 @@ export const Navbar = () => {
     <nav className="navbar navbar-expand-lg bg-body-tertiary custom-navbar">
       <div className="container-fluid">
         <Link to="/">
-          <span className="navbar-brand" href="#"> StarWars </span>
+          <span className="navbar-brand" href="#"> GTID </span>
         </Link>
         <button
           className="navbar-toggler"
@@ -44,12 +44,12 @@ export const Navbar = () => {
             </li>
             <li className="nav-item">
             <Link to="/databank">
-                <span className="nav-link active" aria-current="page"> Databank </span>
+                <span className="nav-link active" aria-current="page"> Reservas </span>
               </Link>
             </li>
             <li className="nav-item">
               <a className="nav-link disabled" aria-disabled="true">
-                Private Area
+                BackOffice
               </a>
             </li>
           </ul>
