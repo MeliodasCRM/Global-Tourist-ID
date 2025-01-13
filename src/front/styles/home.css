@@ -5,3 +5,60 @@
     one more css for each page that will contain the selected used 
     on that page only (the ones not reused in other pages).
 */
+
+/* Estilos Generales */
+.info-section {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f8f9fa; /* Color de fondo claro */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.info-section h1 {
+    font-size: 2.5rem; /* Tamaño grande para el encabezado */
+    font-weight: bold; /* Negrita */
+    color: #007bff; /* Azul primario */
+    margin-bottom: 20px;
+}
+
+.info-section p {
+    font-size: 1.2rem; /* Tamaño de fuente moderado */
+    color: #6c757d; /* Gris */
+    line-height: 1.6; /* Espaciado entre líneas */
+}
+
+.general-info {
+    margin-top: 40px;
+    padding: 30px 20px;
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.general-info h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #343a40; /* Negro/gris oscuro */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.general-info ul {
+    list-style: none; /* Quitar puntos de lista */
+    padding-left: 0;
+}
+
+.general-info li {
+    font-size: 1.1rem;
+    color: #495057; /* Gris oscuro */
+    padding: 10px 0;
+    display: flex;
+    align-items: center; /* Alinea texto con íconos */
+}
+
+.general-info li i {
+    font-size: 1.5rem; /* Tamaño del ícono */
+    color: #007bff; /* Azul primario */
+    margin-right: 10px; /* Espaciado entre ícono y texto */
+}

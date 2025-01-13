@@ -164,6 +164,7 @@ def delete_user(user_id):
 def backoffice():
     return jsonify({"message": "Acceso al Backoffice permitido."})
 
+
 # # OBTENER TODAS LAS EMPRESAS O UNA EN CONCRETO
 # @api.route('/empresa', methods=['GET'])
 # @api.route('/empresa/<int:empresa_id>', methods=['GET'])

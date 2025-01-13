@@ -1,0 +1,27 @@
+/* Estilo para la vista pública */
+.public-view .welcome-section {
+    background-color: #f8f9fa; /* Fondo claro */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    text-align: center; /* Centra el texto */
+}
+
+.public-view .welcome-section h2 {
+    font-size: 2.5rem; /* Tamaño del encabezado */
+    font-weight: bold; /* Negrita */
+    color: #007bff; /* Azul primario */
+    margin-bottom: 20px;
+}
+
+.public-view .welcome-section p {
+    font-size: 1.2rem; /* Tamaño del texto */
+    color: #6c757d; /* Gris */
+    line-height: 1.6; /* Espaciado entre líneas */
+    margin-bottom: 30px;
+}
+
+.public-view .welcome-section .btn-primary {
+    font-size: 1.2rem; /* Botón más grande */
+    padding: 10px 20px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+}

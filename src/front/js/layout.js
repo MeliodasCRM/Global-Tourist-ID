@@ -14,6 +14,8 @@ import ContactTable from "./component/ContactTable.jsx";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import PublicView from "./pages/publicView";
+import UserView from "./pages/userView";
 
 
 //create your first component
@@ -45,11 +47,12 @@ const Layout = () => {
                             <Route path="api" element={<h2>API Manager Page</h2>} />
                             <Route path="permits" element={<h2>Permisos de Usuario Page</h2>} />
                         </Route>
-
                         {/* Rutas adicionales */}
                         <Route element={<Home />} path="/" />
+                        <Route element={<PublicView />} path="/publica" />
+                        <Route element={<UserView />} path="/user" />
                         <Route element={<Login />} path="/login" />
-                        <Route path="*" element={<h1>404 Not Found</h1>} />
+                        <Route path="*" element={<h1>404 Not Found</h1>} />p
                     </Routes>
                     <Footer />
                 </ScrollToTop>
