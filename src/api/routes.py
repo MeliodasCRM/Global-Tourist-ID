@@ -21,7 +21,7 @@ def signup():
 
         email = data.get('email')
         password = data.get('password')
-        print("Datos procesados - Name:", name, "Email:", email)
+        print("Datos procesados - Name:", "Email:", email)
 
         if not email or not password:
             print("Datos incompletos")
@@ -158,6 +158,11 @@ def delete_user(user_id):
         # Manejar cualquier error inesperado
         db.session.rollback()
         return jsonify({"message": "Error al eliminar el usuario", "error": str(e)}), 500
+
+@api.route('/backoffice')
+@jwt_required()  # Asegura que el usuario esté autenticado
+def backoffice():
+    return jsonify({"message": "Acceso al Backoffice permitido."})
 
 
 # # OBTENER TODAS LAS EMPRESAS O UNA EN CONCRETO
@@ -419,11 +424,11 @@ def delete_user(user_id):
 #     except Exception as e:
 #         return jsonify({"message": "Error al actualizar la reserva", "error": str(e)}), 500
 
-# # Eliminar una reserva
-# @api.route('/reserva/<int:reserva_id>', methods['DELETE'])
+# Eliminar una reserva
+# @api.route('/reserva/<int:reserva_id>', methods=['DELETE'])
 # def delete_reserva(reserva_id):
 #     try:
-#         reserva = Reserva.query.get(reserva_id)
+#         reserva = Reservas.query.get(reserva_id)
 
 #         if not reserva:
 #             return jsonify({"message": "Reserva no encontrada"}), 404

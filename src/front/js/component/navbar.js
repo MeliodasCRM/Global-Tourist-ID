@@ -23,6 +23,7 @@ export const Navbar = () => {
       <div className="container-fluid">
         <Link to="/">
           <span className="navbar-brand" href="#"> Global Turist </span>
+
         </Link>
         <button
           className="navbar-toggler"
@@ -44,13 +45,14 @@ export const Navbar = () => {
             </li>
          
             <li className="nav-item">
+
             <Link to="/Publica">
                 <span className="nav-link active" aria-current="page"> Publica </span>
               </Link>
             </li>
             <li className="nav-item">
               <a className="nav-link disabled" aria-disabled="true">
-                Private Area
+                BackOffice
               </a>
             </li>
           </ul>
