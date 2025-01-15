@@ -9,7 +9,7 @@ i18n
     fallbackLng: "es", // Idioma por defecto
     lng: "es", // Idioma inicial
     backend: {
-      loadPath: '/Languages/{{lng}}/language.json',
+      loadPath: '/public/languages/{{lng}}/language.json',
     },
     interpolation: {
       escapeValue: false, 

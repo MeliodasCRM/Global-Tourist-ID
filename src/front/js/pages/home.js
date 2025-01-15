@@ -2,19 +2,19 @@ import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import "../../styles/home.css";
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
 
-	const { t } = useTranslation();
+	// const { t } = useTranslation();
 
 
 	return (
 		<div className="container my-5">
 			{/* infomacion general para todos */}
 			<div className="info-section">
-			<h1> {t('titulo')} </h1>
+			<h1> Home Public </h1>
 			<p>
 			    Esta es una plataforma de gestión de check-ins para turistas y
                 administradores de hoteles. Aquí encontrarás toda la información
