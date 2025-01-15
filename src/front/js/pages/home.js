@@ -2,29 +2,19 @@ import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import "../../styles/home.css";
+import { useTranslation } from 'react-i18next';
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
-	{/*const navigate = useNavigate();
 
-	useEffect(() => {
-		// Redirigir segun el estado de autenticacion
-		if(store.authToken) {
-			if(store.role === "user") {
-				navigate("/user");
-			}else if(store.role === "admin") {
-				navigate("/admin");
-			}
-		}else{
-			navigate("/public");
-		}
-	}, [store.authToken, store.role, navigate]);*/}
+	const { t } = useTranslation();
+
 
 	return (
 		<div className="container my-5">
 			{/* infomacion general para todos */}
 			<div className="info-section">
-			<h1> Bienvenidos a Global Turist</h1>
+			<h1> {t('titulo')} </h1>
 			<p>
 			    Esta es una plataforma de gestión de check-ins para turistas y
                 administradores de hoteles. Aquí encontrarás toda la información

@@ -2,21 +2,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
-			authToken: localStorage.getItem("authToken") || null,
+			authToken: localStorage.getItem("authToken") || null, // Inicializamos con el token del localStorage
 			role: null, //user o admin
 			user: null, // dato del usuario autenticado
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -29,7 +18,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				  });
 			  
 				  if (resp.ok) {
-					const token = await resp.text(); // Procesa la respuesta como texto, no como JSON
+					const token = await resp.text(); 
 					localStorage.setItem("authToken", token);
 					setStore({ authToken: token });
 					return { success: true, message: "Login exitoso" };
@@ -44,8 +33,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			  },
 		
 			  logout: () => {
-				localStorage.removeItem("authToken");
-				setStore({ authToken: null });
+				localStorage.removeItem("authToken");  // Eliminamos el token del localStorage
+				setStore({ authToken: null });  // Actualizamos el store para eliminar el token
 				console.log("Usuario deslogueado exitosamente.");
 			  },
 		

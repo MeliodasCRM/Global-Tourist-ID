@@ -2,20 +2,22 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
+import i18n from '../../i18n';
 
 import { Home } from "./pages/home";
 import { Login } from "./pages/login";
 import injectContext from "./store/appContext";
 
+
 import BackOffice from "./pages/backoffice";
 import Contacts from "./component/Contacts.jsx";
-import Empresas from "./component/Empresas.jsx";
 import ContactTable from "./component/ContactTable.jsx";
-
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import PublicView from "./pages/publicView";
 import UserView from "./pages/userView";
+import UserHome from "./pages/UserHome.js";
+import PrivateRoute from "./component/PrivateRoute.jsx";
 
 
 //create your first component
@@ -28,12 +30,13 @@ const Layout = () => {
 
     return (
         <div>
-            <BrowserRouter basename={basename}>
+            <BrowserRouter>
                 <ScrollToTop>
-                    <Navbar />
+                <Navbar /> {/* Navbar global */}
                     <Routes>
+                        {/* Rutas para el BackOffice */}
                         <Route path="/backoffice" element={<BackOffice />}>
-                            {/* Definir las rutas hijas que cargarán en el Outlet */}
+                            {/* Rutas hijas que cargarán en el Outlet */}
                             <Route path="contacts" element={<Contacts />} />
                             <Route path="contactTable" element={<ContactTable />} />
                             <Route path="tourpass" element={<h2>Traveler Information Page</h2>} />
@@ -47,14 +50,23 @@ const Layout = () => {
                             <Route path="api" element={<h2>API Manager Page</h2>} />
                             <Route path="permits" element={<h2>Permisos de Usuario Page</h2>} />
                         </Route>
-                        {/* Rutas adicionales */}
-                        <Route element={<Home />} path="/" />
-                        <Route element={<PublicView />} path="/publica" />
-                        <Route element={<UserView />} path="/user" />
-                        <Route element={<Login />} path="/login" />
-                        <Route path="*" element={<h1>404 Not Found</h1>} />p
+
+                        {/* Rutas generales */}
+                        <Route path="/" element={<Home />} />
+                        <Route path="/publica" element={<PublicView />} />
+                        <Route path="/user" element={<UserView />} />
+                        <Route path="/login" element={<Login />} />
+
+                        {/* Ruta protegida para UserHome */}
+                        <Route path="/userhome" element={<PrivateRoute element={UserHome} />} />
+
+                        {/* Ruta para manejar 404 */}
+                        <Route path="*" element={<h1>404 Not Found</h1>} />
                     </Routes>
-                    <Footer />
+
+                    {/* Navbar y Footer solo se muestran en las rutas generales */}
+
+                    <Footer /> {/* Footer global */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>
