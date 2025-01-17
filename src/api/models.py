@@ -1,212 +1,224 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import JSON
 
 db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(255), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50))
+    plan_id = db.Column(db.Integer, db.ForeignKey('plan.id'))
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     
-    # Relaciones
-    datos_viajero = db.relationship('DatosViajero', backref='user', lazy=True)
-    qr_codes = db.relationship('QRDatabase', backref='user', lazy=True)
-    transacciones = db.relationship('Transaccion', backref='user', lazy=True)
-
-    def __repr__(self):
-        return '<User %r>' % self.email
+    contacts = db.relationship('Contact', backref='user', lazy=True)
+    groups = db.relationship('Group', backref='user', lazy=True)
+    empresas = db.relationship('Empresa', backref='user', lazy=True)
+    permissions = db.relationship('UserPermission', backref='user', lazy=True)
 
     def serialize(self):
         return {
-            "id": self.id,
-            "email": self.email,
+            'id': self.id,
+            'email': self.email,
+            'role': self.role,
+            'plan_id': self.plan_id,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'account_id': self.account_id
         }
 
-class DatosViajero(db.Model):
+class Plan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    nombre = db.Column(db.String(100), nullable=False)
-    primer_apellido = db.Column(db.String(100), nullable=False)
-    segundo_apellido = db.Column(db.String(100), nullable=False)
-    sexo = db.Column(db.String(10), nullable=False)
-    nif = db.Column(db.String(20), nullable=False, unique=True, index=True)
-    numero_soporte_documento = db.Column(db.String(20), nullable=False)
-    tipo_documento = db.Column(db.String(20), nullable=False)
-    nacionalidad = db.Column(db.String(100), nullable=False)
-    fecha_nacimiento = db.Column(db.Date, nullable=False)
-    direccion = db.Column(db.String(200), nullable=False)
-    localidad = db.Column(db.String(100), nullable=False)
-    pais = db.Column(db.String(100), nullable=False)
-    telefono_fijo = db.Column(db.String(20), nullable=True)
-    telefono_movil = db.Column(db.String(20), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    numero_viajeros = db.Column(db.Integer, nullable=False)
-    parentesco_viajeros = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    transaction_limit = db.Column(db.Integer)
+    features = db.Column(db.String(255))
+    permissions = db.Column(JSON)
+    price = db.Column(db.String(50))
+    duration = db.Column(db.Integer)
     
-    # Relaciones
-    transacciones = db.relationship('Transaccion', backref='viajero', lazy=True)
+    users = db.relationship('User', backref='plan', lazy=True)
 
     def serialize(self):
         return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "nombre": self.nombre,
-            "primer_apellido": self.primer_apellido,
-            "segundo_apellido": self.segundo_apellido,
-            "sexo": self.sexo,
-            "nif": self.nif,
-            "numero_soporte_documento": self.numero_soporte_documento,
-            "tipo_documento": self.tipo_documento,
-            "nacionalidad": self.nacionalidad,
-            "fecha_nacimiento": self.fecha_nacimiento,
-            "direccion": self.direccion,
-            "localidad": self.localidad,
-            "pais": self.pais,
-            "telefono_fijo": self.telefono_fijo,
-            "telefono_movil": self.telefono_movil,
-            "email": self.email,
-            "numero_viajeros": self.numero_viajeros,
-            "parentesco_viajeros": self.parentesco_viajeros
+            'id': self.id,
+            'name': self.name,
+            'transaction_limit': self.transaction_limit,
+            'features': self.features,
+            'permissions': self.permissions,
+            'price': self.price,
+            'duration': self.duration
         }
-    
-class Transaccion(db.Model):
+
+class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    viajero_id = db.Column(db.Integer, db.ForeignKey('datos_viajero.id'), nullable=False)
-    referencia = db.Column(db.String(100), nullable=False, index=True)
-    fecha_transaccion = db.Column(db.Date, nullable=False)
-    firmas = db.Column(db.String(100), nullable=False)
-    fecha_hora_entrada = db.Column(db.DateTime, nullable=False)
-    fecha_hora_salida = db.Column(db.DateTime, nullable=False)
-    direccion = db.Column(db.String(200), nullable=False)
-    numero_habitaciones = db.Column(db.Integer, nullable=False)
-    conexion_internet = db.Column(db.Boolean(), nullable=False)
-    tipo = db.Column(db.String(100), nullable=False)
-    identificacion_medio_pago = db.Column(db.String(100), nullable=False)
-    titular_medio_pago = db.Column(db.String(100), nullable=False)
-    fecha_caducidad_tarjeta = db.Column(db.Date, nullable=False)
-    fecha_pago = db.Column(db.Date, nullable=False)
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "viajero_id": self.viajero_id,
-            "referencia": self.referencia,
-            "fecha_transaccion": self.fecha_transaccion,
-            "firmas": self.firmas,
-            "fecha_hora_entrada": self.fecha_hora_entrada,
-            "fecha_hora_salida": self.fecha_hora_salida,
-            "direccion": self.direccion,
-            "numero_habitaciones": self.numero_habitaciones,
-            "conexion_internet": self.conexion_internet,
-            "tipo": self.tipo,
-            "identificacion_medio_pago": self.identificacion_medio_pago,
-            "titular_medio_pago": self.titular_medio_pago,
-            "fecha_caducidad_tarjeta": self.fecha_caducidad_tarjeta,
-            "fecha_pago": self.fecha_pago
-        }
+    nombres = db.Column(db.String(255), nullable=False)
+    primer_apellido = db.Column(db.String(255), nullable=False)
+    segundo_apellido = db.Column(db.String(255))
+    nacionalidad = db.Column(db.String(100))
+    fecha_nacimiento = db.Column(db.Date)
+    direccion = db.Column(db.String(255))
+    localidad = db.Column(db.String(255))
+    pais = db.Column(db.String(100))
+    email = db.Column(db.String(120))
+    telefono_movil = db.Column(db.String(20))
+    telefono_fijo = db.Column(db.String(20))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     
-class QRDatabase(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    archivo = db.Column(db.String(200), nullable=False)
+    sensible_data = db.relationship('SensibleData', backref='contact', uselist=False, lazy=True)
+    groups_as_traveler1 = db.relationship('Group', backref='traveler01', foreign_keys='Group.traveler01_id', lazy=True)
+    groups_as_traveler2 = db.relationship('Group', backref='traveler02', foreign_keys='Group.traveler02_id', lazy=True)
+    reservas = db.relationship('Reserva', backref='traveler', lazy=True)
 
     def serialize(self):
         return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "archivo": self.archivo
+            'id': self.id,
+            'nombres': self.nombres,
+            'primer_apellido': self.primer_apellido,
+            'segundo_apellido': self.segundo_apellido,
+            'nacionalidad': self.nacionalidad,
+            'fecha_nacimiento': self.fecha_nacimiento.isoformat() if self.fecha_nacimiento else None,
+            'direccion': self.direccion,
+            'localidad': self.localidad,
+            'pais': self.pais,
+            'email': self.email,
+            'telefono_movil': self.telefono_movil,
+            'telefono_fijo': self.telefono_fijo,
+            'user_id': self.user_id
         }
-        
-# class Empresa(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     razon_social = db.Column(db.String(60), nullable=False)
-#     cif = db.Column(db.String(20), nullable=False, unique=True, index=True)
-#     nombre_comercial = db.Column(db.String(60), nullable=False)
-#     domicilio = db.Column(db.String(200), nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "razon_social": self.razon_social,
-#             "cif": self.cif,
-#             "nombre_comercial": self.nombre_comercial,
-#             "domicilio": self.domicilio,
-#             "user_id": self.user_id,
-#         }
+class SensibleData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nif_tipo = db.Column(db.String(50))
+    nif_nunero = db.Column(db.String(50))
+    nif_country = db.Column(db.String(100))
+    firmas = db.Column(db.String(255))
+    medio_pago_tipo = db.Column(db.String(50))
+    medio_pago_nro = db.Column(db.Integer)
+    medio_pago_expira = db.Column(db.Date)
+    fecha_pago = db.Column(db.Date)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
 
-# class DatosEmpresa(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
-#     razon_social = db.Column(db.String(200), nullable=False)
-#     cif = db.Column(db.String(20), nullable=False)
-#     municipio = db.Column(db.String(100), nullable=False)
-#     provincia = db.Column(db.String(100), nullable=False)
-#     telefono = db.Column(db.String(20), nullable=False)
-#     email = db.Column(db.String(120), nullable=False)
-#     web = db.Column(db.String(200), nullable=False)
-#     url_anuncio = db.Column(db.String(200), nullable=False)
+    def serialize(self):
+        return {
+            'id': self.id,
+            'nif_tipo': self.nif_tipo,
+            'nif_nunero': self.nif_nunero,
+            'nif_country': self.nif_country,
+            'firmas': self.firmas,
+            'medio_pago_tipo': self.medio_pago_tipo,
+            'medio_pago_nro': self.medio_pago_nro,
+            'medio_pago_expira': self.medio_pago_expira.isoformat() if self.medio_pago_expira else None,
+            'fecha_pago': self.fecha_pago.isoformat() if self.fecha_pago else None,
+            'contact_id': self.contact_id
+        }
 
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "razon_social": self.razon_social,
-#             "cif": self.cif,
-#             "municipio": self.municipio,
-#             "provincia": self.provincia,
-#             "telefono": self.telefono,
-#             "email": self.email,
-#             "web": self.web,
-#             "url_anuncio": self.url_anuncio
-#         }
+class Group(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.String(255))
+    traveler01_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    traveler01_relac = db.Column(db.String(100))
+    traveler02_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    traveler02_relac = db.Column(db.String(100))
 
-# class DatosEstablecimiento(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     establecimiento_id = db.Column(db.Integer, db.ForeignKey('establecimiento.id'), nullable=False)
-#     tipo_establecimiento = db.Column(db.String(20), nullable=False)
-#     denominacion = db.Column(db.String(200), nullable=False)
-#     direccion = db.Column(db.String(200), nullable=False)
-#     cod_postal = db.Column(db.String(200), nullable=False)
-#     localidad_y_provincia = db.Column(db.Integer, nullable=False)
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'traveler01_id': self.traveler01_id,
+            'traveler01_relac': self.traveler01_relac,
+            'traveler02_id': self.traveler02_id,
+            'traveler02_relac': self.traveler02_relac
+        }
 
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "tipo_establecimiento": self.tipo_establecimiento,
-#             "denominacion": self.denominacion,
-#             "direccion": self.direccion,
-#             "cod_postal": self.cod_postal,
-#             "localidad_y_provincia": self.localidad_y_provincia
-#         }
+class Reserva(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha_entrada = db.Column(db.Date)
+    fecha_salida = db.Column(db.Date)
+    alojamiento = db.Column(db.Integer, db.ForeignKey('empresa.id'))
+    nro_rooms = db.Column(db.Integer)
+    nro_viajeros = db.Column(db.String(50))
+    metodo_pago = db.Column(db.String(50))
+    traveler_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    created = db.Column(db.Date, default=datetime.utcnow)
+    
+    empresa = db.relationship('Empresa', backref='reservas', lazy=True)
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'fecha_entrada': self.fecha_entrada.isoformat() if self.fecha_entrada else None,
+            'fecha_salida': self.fecha_salida.isoformat() if self.fecha_salida else None,
+            'alojamiento': self.alojamiento,
+            'nro_rooms': self.nro_rooms,
+            'nro_viajeros': self.nro_viajeros,
+            'metodo_pago': self.metodo_pago,
+            'traveler_id': self.traveler_id,
+            'created': self.created.isoformat() if self.created else None
+        }
 
-# class Reservas(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     numero_res = db.Column(db.Integer, nullable=False, index=True)
-#     fecha_res = db.Column(db.Date, nullable=False)
-#     fecha_ini = db.Column(db.Date, nullable=False)
-#     fecha_fin = db.Column(db.Date, nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     alojamiento_id = db.Column(db.Integer, db.ForeignKey('alojamientos.id'), nullable=False)
-#     medio_pago_id = db.Column(db.Integer, db.ForeignKey('medios_pago.id'), nullable=False)
-#     transaccion_id = db.Column(db.Integer, db.ForeignKey('transaccion.id'), nullable=False)  
+class Empresa(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    razon_social = db.Column(db.String(255))
+    cif = db.Column(db.String(50))
+    tipo = db.Column(db.String(50))
+    domicilio = db.Column(db.String(255))
+    municipio = db.Column(db.String(255))
+    provincia = db.Column(db.String(255))
+    cod_postal = db.Column(db.Integer)
+    email = db.Column(db.String(120))
+    web = db.Column(db.String(255))
+    url_anuncio = db.Column(db.String(255))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    reserva_id = db.Column(db.Integer)
 
-#     alojamiento = db.relationship('Alojamientos', backref=db.backref('reservas', lazy=True))
-#     medio_pago = db.relationship('MediosPago', backref=db.backref('reservas', lazy=True))
-#     transaccion = db.relationship('Transaccion', backref=db.backref('reservas', lazy=True))  
+    def serialize(self):
+        return {
+            'id': self.id,
+            'razon_social': self.razon_social,
+            'cif': self.cif,
+            'tipo': self.tipo,
+            'domicilio': self.domicilio,
+            'municipio': self.municipio,
+            'provincia': self.provincia,
+            'cod_postal': self.cod_postal,
+            'email': self.email,
+            'web': self.web,
+            'url_anuncio': self.url_anuncio,
+            'user_id': self.user_id,
+            'reserva_id': self.reserva_id
+        }
 
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "numero_res": self.numero_res,
-#             "fecha_res": self.fecha_res,
-#             "fecha_ini": self.fecha_ini,
-#             "fecha_fin": self.fecha_fin,
-#             "user": self.user.serialize() if self.user else None,
-#             "alojamiento": self.alojamiento.serialize() if self.alojamiento else None,
-#             "medio_pago": self.medio_pago.serialize() if self.medio_pago else None,
-#             "transaccion": self.transaccion.serialize() if self.transaccion else None
-#         }
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    account_type = db.Column(db.String(50))
+    permissions = db.Column(JSON)
+    
+    users = db.relationship('User', backref='account', lazy=True)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'account_type': self.account_type,
+            'permissions': self.permissions
+        }
+
+class UserPermission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    permissions = db.Column(JSON)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'permissions': self.permissions
+        }
