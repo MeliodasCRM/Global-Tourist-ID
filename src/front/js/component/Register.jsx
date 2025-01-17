@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext"; // Importar el contexto de Flux
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import "../../styles/register.css";
 
 export const Register = () => {
@@ -10,13 +11,21 @@ export const Register = () => {
   });
   const [activeTab, setActiveTab] = useState("login"); // Controlar si es login o signup
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // Inicializar useNavigate para redirección
 
-  // Controlar si el componente está montado
+  // Para prevenir la actualización de estado en un componente desmontado
   const [isMounted, setIsMounted] = useState(true);
 
+  // Usamos un ref para evitar actualizar el estado cuando el componente se desmonta
+  const isMountedRef = React.useRef(true);
+
   useEffect(() => {
-    setIsMounted(true); // Marcar como montado
-    return () => setIsMounted(false); // Marcar como desmontado
+    // Marca el componente como montado
+    isMountedRef.current = true;
+    return () => {
+      // Cuando el componente se desmonta, actualizamos el ref
+      isMountedRef.current = false;
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -29,17 +38,17 @@ export const Register = () => {
 
     if (activeTab === "login") {
       const result = await actions.login(formData.email, formData.password);
-      if (isMounted) setMessage(result.message);
+      // Usamos el ref para evitar actualizaciones cuando el componente se haya desmontado
+      if (isMountedRef.current) setMessage(result.message);
     } else {
-      const result = await actions.signup(
-        formData.email,
-        formData.password
-      );
-      if (isMounted) {
+      const result = await actions.signup(formData.email, formData.password);
+      // Usamos el ref para evitar actualizaciones cuando el componente se haya desmontado
+      if (isMountedRef.current) {
         if (result.success) {
           alert("Usuario registrado exitosamente.");
           setFormData({ email: "", password: "" }); // Limpiar formulario
           setActiveTab("login"); // Cambiar a login
+          navigate("/userhome"); // Redirigir a /userhome después del registro
         } else {
           setMessage(result.message);
         }
