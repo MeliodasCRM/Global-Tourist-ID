@@ -13,7 +13,7 @@ const handleGenerateQR = async () => {
       }
    }
 
-   const response = await fetch('/api/datos-viajero/qr/generate', {
+const response = await fetch('/api/datos-viajero/qr/generate', {
       method: 'POST',
       headers: {
          'Content-Type': 'application/json',
