@@ -3,6 +3,7 @@ import { Dropdown } from "react-bootstrap"; // Importa react-bootstrap Dropdown
 import { FaUser, FaBriefcase, FaQrcode, FaBuilding, FaCog } from "react-icons/fa"; // Usamos react-icons
 import '../../styles/userHome.css'; // Asegúrate de tener tus estilos específicos
 import { Context } from "../store/appContext";
+import { Link } from "react-router-dom";
 
 const UserHome = () => {
   const [showDropdown, setShowDropdown] = useState(false);  // Maneja el estado del dropdown
@@ -18,12 +19,10 @@ const UserHome = () => {
 
   return (
     <div className="user-home">
-      {/* Header fijo al top con Bootstrap */}
       <header className="user-navbar fixed-top">
         <button className="back-button">&#8592; Back</button>
         <h1 className="m-0">Home User</h1>
 
-        {/* Icono como botón de perfil con el dropdown */}
         <div className="d-flex align-items-center ms-auto">
           <Dropdown align="start" show={showDropdown} onToggle={handleDropdownToggle}>
             <Dropdown.Toggle variant="link" id="dropdown-custom-components" className="profile-button">
@@ -49,8 +48,10 @@ const UserHome = () => {
 
         <div className="icon-container">
           <div className="icon">
+          <Link to="/userInfo">
             <FaUser size={40} color="#333" />
             <p>Users</p>
+          </Link>
           </div>
           <div className="icon">
             <FaBriefcase size={40} color="#333" />

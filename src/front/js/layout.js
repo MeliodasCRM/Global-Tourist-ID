@@ -17,6 +17,7 @@ import { Footer } from "./component/footer";
 import PublicView from "./pages/publicView";
 import UserView from "./pages/userView";
 import UserHome from "./pages/UserHome.js";
+import UserInfo from "./pages/UserInfo.js";
 import PrivateRoute from "./component/PrivateRoute.jsx";
 
 
@@ -59,6 +60,7 @@ const Layout = () => {
 
                         {/* Ruta protegida para UserHome */}
                         <Route path="/userhome" element={<PrivateRoute element={UserHome} />} />
+                        <Route path="/userinfo" element={<PrivateRoute element={UserInfo} />} />
 
                         {/* Ruta para manejar 404 */}
                         <Route path="*" element={<h1>404 Not Found</h1>} />
