@@ -1,11 +1,10 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
-import qrcode
+from flask import Flask, request, jsonify, Blueprint
 import json
 import os
-from api.models import db, User, DatosViajero, Transaccion, QRDatabase
+from api.models import db, User, Contact, SensibleData, Reserva # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
