@@ -19,7 +19,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    # Relaciones
+    # Relaciones# Relaciones
     contacts = db.relationship('Contact', backref='user', lazy=True)
     groups = db.relationship('Group', backref='user', lazy=True)
     empresas = db.relationship('Empresa', backref='user', lazy=True)
@@ -44,7 +44,18 @@ contact_group = db.Model('contact_group',
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), nullable=False)
+    nombre = db.Column(db.String(255), nullable=False)
     primer_apellido = db.Column(db.String(255), nullable=False)
+    segundo_apellido = db.Column(db.String(255), nullable=False)
+    sexo = db.Column(db.String(50), nullable=False)
+    nacionalidad = db.Column(db.String(100), nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    direccion = db.Column(db.String(255), nullable=False)
+    localidad = db.Column(db.String(255), nullable=False)
+    pais = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    telefono_movil = db.Column(db.String(20), nullable=False)
+    telefono_fijo = db.Column(db.String(20), nullable=False)
     segundo_apellido = db.Column(db.String(255), nullable=False)
     sexo = db.Column(db.String(50), nullable=False)
     nacionalidad = db.Column(db.String(100), nullable=False)
@@ -67,6 +78,7 @@ class Contact(db.Model):
         return {
             'id': self.id,
             'nombres': self.nombre,
+            'nombres': self.nombre,
             'primer_apellido': self.primer_apellido,
             'segundo_apellido': self.segundo_apellido,
             'nacionalidad': self.nacionalidad,
@@ -86,7 +98,16 @@ class TipoNif(Enum):
     PASAPORTE = 'Pasaporte'
 
 class SensitiveData(db.Model):
+class TipoNif(Enum):
+    DNI = 'DNI'
+    TIE = 'TIE'
+    PASAPORTE = 'Pasaporte'
+
+class SensitiveData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nif_tipo = db.Column(db.Enum(TipoNif), nullable=False)
+    nif_numero = db.Column(db.String(50), nullable=False)
+    nif_country = db.Column(db.String(100), nullable=False)
     nif_tipo = db.Column(db.Enum(TipoNif), nullable=False)
     nif_numero = db.Column(db.String(50), nullable=False)
     nif_country = db.Column(db.String(100), nullable=False)
@@ -96,6 +117,7 @@ class SensitiveData(db.Model):
         return {
             'id': self.id,
             'nif_tipo': self.nif_tipo,
+            'nif_numero': self.nif_numero,
             'nif_numero': self.nif_numero,
             'nif_country': self.nif_country,
             'contact_id': self.contact_id
@@ -123,6 +145,20 @@ class MedioPagoTipo(Enum):
     TARJETA = 'Tarjeta'
     PLATAFORMA_DE_PAGO = 'Plataforma de Pago'
     TRANSFERENCIA = 'Transferencia'
+            'name': self.name,
+            'traveler01_id': self.traveler01_id,
+            'traveler01_relac': self.traveler01_relac,
+            'traveler02_id': self.traveler02_id,
+            'traveler02_relac': self.traveler02_relac,
+            'traveler03_id': self.traveler03_id,
+            'traveler03_relac': self.traveler03_relac
+        }
+
+class MedioPagoTipo(Enum):
+    EFECTIVO = 'Efectivo'
+    TARJETA = 'Tarjeta'
+    PLATAFORMA_DE_PAGO = 'Plataforma de Pago'
+    TRANSFERENCIA = 'Transferencia'
 
 class Reserva(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -130,6 +166,12 @@ class Reserva(db.Model):
     fecha_salida = db.Column(db.Date)
     alojamiento = db.Column(db.Integer, db.ForeignKey('empresa.id'))
     nro_rooms = db.Column(db.Integer)
+    nro_viajeros = db.Column(db.Integer)
+    titular_medio_pago = db.Column(db.String(255))
+    medio_pago_tipo = db.Column(db.Enum(MedioPagoTipo, name="mediopagotipo"), nullable=False)
+    medio_pago_nro = db.Column(db.Integer)
+    medio_pago_expira = db.Column(db.Date)
+    fecha_pago = db.Column(db.Date)
     nro_viajeros = db.Column(db.Integer)
     titular_medio_pago = db.Column(db.String(255))
     medio_pago_tipo = db.Column(db.Enum(MedioPagoTipo, name="mediopagotipo"), nullable=False)
@@ -148,6 +190,11 @@ class Reserva(db.Model):
             'fecha_salida': self.fecha_salida.isoformat() if self.fecha_salida else None,
             'alojamiento': self.alojamiento,
             'nro_rooms': self.nro_rooms,
+            'titular_medio_pago': self.titular_medio_pago,
+            'medio_pago_tipo': self.medio_pago_tipo.value if self.medio_pago_tipo else None,
+            'medio_pago_nro': self.medio_pago_nro,
+            'medio_pago_expira': self.medio_pago_expira.isoformat() if self.medio_pago_expira else None,
+            'fecha_pago': self.fecha_pago.isoformat() if self.fecha_pago else None,
             'titular_medio_pago': self.titular_medio_pago,
             'medio_pago_tipo': self.medio_pago_tipo.value if self.medio_pago_tipo else None,
             'medio_pago_nro': self.medio_pago_nro,
