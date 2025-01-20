@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from enum import Enum
+from enum import Enum
 from sqlalchemy.dialects.postgresql import JSON
 from flask import send_file
 import qrcode
