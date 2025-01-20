@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, Blueprint
+from datetime import datetime
 import json
 import os
 from api.models import db, User, Contact, SensibleData, Reserva # Importar los modelos de la base de datos
@@ -19,14 +20,14 @@ CORS(api)
 def signup():
     try:
         data = request.get_json()
-        print("Datos recibidos:", data)
+        print("Datos recibidos:", data)  # Esto te ayudará a verificar los datos recibidos
 
         email = data.get('email')
         password = data.get('password')
-        print("Datos procesados - Name:", "Email:", email)
+        language = data.get('language')
 
-        if not email or not password:
-            print("Datos incompletos")
+        if not email or not password or not language:
+            print("Datos incompletos")  # Asegúrate de que 'language' esté presente
             return jsonify({"message": "Todos los campos son requeridos"}), 400
 
         if User.query.filter_by(email=email).first():
@@ -36,7 +37,15 @@ def signup():
         hashed_password = generate_password_hash(password)
         print("Contraseña hasheada correctamente")
 
-        new_user = User(email=email, password=hashed_password, is_active=True)
+        new_user = User(
+            email=email,
+            password=hashed_password,
+            language=language,  # Verifica que 'language' se asigne correctamente
+            role=None,
+            is_active=True,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
         print("Intentando guardar el usuario en la base de datos...")
 
         db.session.add(new_user)
@@ -45,7 +54,8 @@ def signup():
 
         return jsonify({"message": "Usuario registrado exitosamente"}), 201
     except Exception as e:
-        print(f"Error en el endpoint /signup: {str(e)}")
+        db.session.rollback()
+        print(f"Error en el endpoint /signup: {str(e)}")  # Imprime el error completo
         return jsonify({"message": "Error interno en el servidor", "error": str(e)}), 500
 
 @api.route ('/login', methods=['POST'])
@@ -96,9 +106,10 @@ def create_user():
         name = data.get('name')
         email = data.get('email')
         password = data.get('password')
+        language = data.get('language')
 
-        if not email or not password:
-            return jsonify({"message": "El email y password son requeridos"}), 400
+        if not email or not password or not language:
+            return jsonify({"message": "El email,password e idioma son requeridos"}), 400
 
         # Verificar si el usuario ya existe
         if User.query.filter_by(email=email).first():
@@ -108,7 +119,7 @@ def create_user():
         hashed_password = generate_password_hash(password)
 
         # Crear nuevo usuario
-        new_user = User(name=name, email=email, password=hashed_password, is_active=True)
+        new_user = User(name=name, email=email, password=hashed_password, language=language ,is_active=True)
         db.session.add(new_user)
         db.session.commit()
 
@@ -128,6 +139,7 @@ def modify_user(user_id):  # Nombre único para la función
         data = request.get_json()
         user.name = data.get('name', user.name)
         user.email = data.get('email', user.email)
+        user.language = data.get('language', user.language)
         user.is_active = data.get('is_active', user.is_active)
 
         db.session.commit()

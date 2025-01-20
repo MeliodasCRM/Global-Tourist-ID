@@ -14,11 +14,12 @@ import Contacts from "./component/Contacts.jsx";
 import ContactTable from "./component/ContactTable.jsx";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import PrivateRoute from "./component/PrivateRoute.jsx";
 import PublicView from "./pages/publicView";
 import UserView from "./pages/userView";
 import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
-import PrivateRoute from "./component/PrivateRoute.jsx";
+import UserForm from "./pages/UserForm.js";
 
 
 //create your first component
@@ -61,6 +62,7 @@ const Layout = () => {
                         {/* Ruta protegida para UserHome */}
                         <Route path="/userhome" element={<PrivateRoute element={UserHome} />} />
                         <Route path="/userinfo" element={<PrivateRoute element={UserInfo} />} />
+                        <Route path="/userform" element={<PrivateRoute element={UserForm} />} />
 
                         {/* Ruta para manejar 404 */}
                         <Route path="*" element={<h1>404 Not Found</h1>} />
