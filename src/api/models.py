@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from enum import Enum
 from sqlalchemy.dialects.postgresql import JSON
 
 db = SQLAlchemy()
@@ -13,7 +14,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    # Relaciones
     contacts = db.relationship('Contact', backref='user', lazy=True)
     groups = db.relationship('Group', backref='user', lazy=True)
     empresas = db.relationship('Empresa', backref='user', lazy=True)
@@ -32,20 +33,21 @@ class User(db.Model):
 
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nombres = db.Column(db.String(255), nullable=False)
+    nombre = db.Column(db.String(255), nullable=False)
     primer_apellido = db.Column(db.String(255), nullable=False)
-    segundo_apellido = db.Column(db.String(255))
-    nacionalidad = db.Column(db.String(100))
-    fecha_nacimiento = db.Column(db.Date)
-    direccion = db.Column(db.String(255))
-    localidad = db.Column(db.String(255))
-    pais = db.Column(db.String(100))
-    email = db.Column(db.String(120))
-    telefono_movil = db.Column(db.String(20))
-    telefono_fijo = db.Column(db.String(20))
+    segundo_apellido = db.Column(db.String(255), nullable=False)
+    sexo = db.Column(db.String(50), nullable=False)
+    nacionalidad = db.Column(db.String(100), nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    direccion = db.Column(db.String(255), nullable=False)
+    localidad = db.Column(db.String(255), nullable=False)
+    pais = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    telefono_movil = db.Column(db.String(20), nullable=False)
+    telefono_fijo = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    
-    sensible_data = db.relationship('SensibleData', backref='contact', uselist=False, lazy=True)
+    # Relaciones
+    sensitive_data = db.relationship('SensitiveData', backref='contact', uselist=False, lazy=True)
     groups_as_traveler1 = db.relationship('Group', backref='traveler01', foreign_keys='Group.traveler01_id', lazy=True)
     groups_as_traveler2 = db.relationship('Group', backref='traveler02', foreign_keys='Group.traveler02_id', lazy=True)
     reservas = db.relationship('Reserva', backref='traveler', lazy=True)
@@ -53,7 +55,7 @@ class Contact(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'nombres': self.nombres,
+            'nombres': self.nombre,
             'primer_apellido': self.primer_apellido,
             'segundo_apellido': self.segundo_apellido,
             'nacionalidad': self.nacionalidad,
@@ -67,29 +69,24 @@ class Contact(db.Model):
             'user_id': self.user_id
         }
 
-class SensibleData(db.Model):
+class TipoNif(Enum):
+    DNI = 'DNI'
+    TIE = 'TIE'
+    PASAPORTE = 'Pasaporte'
+
+class SensitiveData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nif_tipo = db.Column(db.String(50))
-    nif_nunero = db.Column(db.String(50))
-    nif_country = db.Column(db.String(100))
-    firmas = db.Column(db.String(255))
-    medio_pago_tipo = db.Column(db.String(50))
-    medio_pago_nro = db.Column(db.Integer)
-    medio_pago_expira = db.Column(db.Date)
-    fecha_pago = db.Column(db.Date)
+    nif_tipo = db.Column(db.Enum(TipoNif), nullable=False)
+    nif_numero = db.Column(db.String(50), nullable=False)
+    nif_country = db.Column(db.String(100), nullable=False)
     contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
 
     def serialize(self):
         return {
             'id': self.id,
             'nif_tipo': self.nif_tipo,
-            'nif_nunero': self.nif_nunero,
+            'nif_numero': self.nif_numero,
             'nif_country': self.nif_country,
-            'firmas': self.firmas,
-            'medio_pago_tipo': self.medio_pago_tipo,
-            'medio_pago_nro': self.medio_pago_nro,
-            'medio_pago_expira': self.medio_pago_expira.isoformat() if self.medio_pago_expira else None,
-            'fecha_pago': self.fecha_pago.isoformat() if self.fecha_pago else None,
             'contact_id': self.contact_id
         }
 
@@ -101,6 +98,8 @@ class Group(db.Model):
     traveler01_relac = db.Column(db.String(100))
     traveler02_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     traveler02_relac = db.Column(db.String(100))
+    traveler03_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    traveler03_relac = db.Column(db.String(100))
 
     def serialize(self):
         return {
@@ -110,8 +109,16 @@ class Group(db.Model):
             'traveler01_id': self.traveler01_id,
             'traveler01_relac': self.traveler01_relac,
             'traveler02_id': self.traveler02_id,
-            'traveler02_relac': self.traveler02_relac
+            'traveler02_relac': self.traveler02_relac,
+            'traveler03_id': self.traveler03_id,
+            'traveler03_relac': self.traveler03_relac
         }
+
+class MedioPagoTipo(Enum):
+    EFECTIVO = 'Efectivo'
+    TARJETA = 'Tarjeta'
+    PLATAFORMA_DE_PAGO = 'Plataforma de Pago'
+    TRANSFERENCIA = 'Transferencia'
 
 class Reserva(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -119,8 +126,12 @@ class Reserva(db.Model):
     fecha_salida = db.Column(db.Date)
     alojamiento = db.Column(db.Integer, db.ForeignKey('empresa.id'))
     nro_rooms = db.Column(db.Integer)
-    nro_viajeros = db.Column(db.String(50))
-    metodo_pago = db.Column(db.String(50))
+    nro_viajeros = db.Column(db.Integer)
+    titular_medio_pago = db.Column(db.String(255))
+    medio_pago_tipo = db.Column(db.Enum(MedioPagoTipo, name="mediopagotipo"), nullable=False)
+    medio_pago_nro = db.Column(db.Integer)
+    medio_pago_expira = db.Column(db.Date)
+    fecha_pago = db.Column(db.Date)
     traveler_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     created = db.Column(db.Date, default=datetime.utcnow)
     
@@ -133,8 +144,12 @@ class Reserva(db.Model):
             'fecha_salida': self.fecha_salida.isoformat() if self.fecha_salida else None,
             'alojamiento': self.alojamiento,
             'nro_rooms': self.nro_rooms,
+            'titular_medio_pago': self.titular_medio_pago,
+            'medio_pago_tipo': self.medio_pago_tipo.value if self.medio_pago_tipo else None,
+            'medio_pago_nro': self.medio_pago_nro,
+            'medio_pago_expira': self.medio_pago_expira.isoformat() if self.medio_pago_expira else None,
+            'fecha_pago': self.fecha_pago.isoformat() if self.fecha_pago else None,
             'nro_viajeros': self.nro_viajeros,
-            'metodo_pago': self.metodo_pago,
             'traveler_id': self.traveler_id,
             'created': self.created.isoformat() if self.created else None
         }

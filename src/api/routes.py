@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, Blueprint
 from datetime import datetime
 import json
 import os
-from api.models import db, User, Contact, SensibleData, Reserva # Importar los modelos de la base de datos
+from api.models import MedioPagoTipo, db, User, Contact, SensitiveData, Reserva # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -178,64 +178,165 @@ def delete_user(user_id):
 def backoffice():
     return jsonify({"message": "Acceso al Backoffice permitido."})
 
-@api.route('/contacto', methods=['POST'])
-def crear_contacto():
+# FUNCION PARA CREAR UN CONTACTO
+@api.route('/contact', methods=['POST'])
+@jwt_required()
+def create_contact():
     try:
-        datos = request.get_json()
-        nuevo_contacto = Contacto(
-            nombre=datos.get('nombre'),
-            apellido=datos.get('apellido'),
-            telefono=datos.get('telefono'),
-            email=datos.get('email'),
-            id_usuario=datos.get('id_usuario')
+        # Obtener usuario actual del token JWT
+        current_user_id = get_jwt_identity()
+        
+        data = request.get_json()
+        
+        # Crear nuevo contacto con los campos requeridos
+        new_contact = Contact(
+            nombre=data['nombre'],
+            primer_apellido=data['primer_apellido'],
+            segundo_apellido=data['segundo_apellido'],
+            sexo=data['sexo'],
+            nacionalidad=data['nacionalidad'],
+            fecha_nacimiento=datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d').date(),
+            direccion=data['direccion'],
+            localidad=data['localidad'],
+            pais=data['pais'],
+            email=data['email'],
+            telefono_movil=data['telefono_movil'],
+            telefono_fijo=data['telefono_fijo'],
+            user_id=current_user_id
         )
         
-        db.session.add(nuevo_contacto)
+        db.session.add(new_contact)
         db.session.commit()
         
-        return jsonify({"mensaje": "Contacto creado exitosamente", "contacto": nuevo_contacto.serializar()}), 201
+        return jsonify({
+            "message": "Contacto creado exitosamente",
+            "contact": new_contact.serialize()
+        }), 201
+        
+    except KeyError as e:
+        return jsonify({
+            "message": "Datos incompletos",
+            "error": f"Falta el campo {str(e)}"
+        }), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({"mensaje": "Error al crear el contacto", "error": str(e)}), 500
+        return jsonify({
+            "message": "Error al crear el contacto",
+            "error": str(e)
+        }), 500
 
-@api.route('/datos-sensibles', methods=['POST'])
-def crear_datos_sensibles():
+# FUNCION PARA GUARDAR LOS DATOS SENSIBLES
+@api.route('/sensitive-data', methods=['POST'])
+@jwt_required()
+def create_sensitive_data():
     try:
-        datos = request.get_json()
-        nuevos_datos_sensibles = DatosSensibles(
-            tipo_documento=datos.get('tipo_documento'),
-            numero_documento=datos.get('numero_documento'),
-            fecha_nacimiento=datos.get('fecha_nacimiento'),
-            nacionalidad=datos.get('nacionalidad'),
-            id_usuario=datos.get('id_usuario')
+        data = request.get_json()
+        
+        # Verificar que el contacto existe y pertenece al usuario actual
+        contact = Contact.query.filter_by(
+            id=data['contact_id'],
+            user_id=get_jwt_identity()
+        ).first()
+        
+        if not contact:
+            return jsonify({
+                "message": "Contacto no encontrado o no autorizado"
+            }), 404
+        
+        # Validar tipo de NIF
+        try:
+            nif_tipo = TipoNif[data['nif_tipo']]
+        except KeyError:
+            return jsonify({
+                "message": "Tipo de NIF inválido",
+                "valid_types": [tipo.name for tipo in TipoNif]
+            }), 400
+        
+        new_sensitive_data = SensitiveData(
+            nif_tipo=nif_tipo,
+            nif_numero=data['nif_numero'],
+            nif_country=data['nif_country'],
+            contact_id=data['contact_id']
         )
         
-        db.session.add(nuevos_datos_sensibles)
+        db.session.add(new_sensitive_data)
         db.session.commit()
         
-        return jsonify({"mensaje": "Datos sensibles guardados exitosamente", 
-                       "datos_sensibles": nuevos_datos_sensibles.serializar()}), 201
+        return jsonify({
+            "message": "Datos sensibles guardados exitosamente",
+            "sensitive_data": new_sensitive_data.serialize()
+        }), 201
+        
+    except KeyError as e:
+        return jsonify({
+            "message": "Datos incompletos",
+            "error": f"Falta el campo {str(e)}"
+        }), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({"mensaje": "Error al guardar los datos sensibles", "error": str(e)}), 500
+        return jsonify({
+            "message": "Error al guardar los datos sensibles",
+            "error": str(e)
+        }), 500
 
+
+# FUNCION PARA GUARDAR LOS DATOS RESERVA
 @api.route('/reserva', methods=['POST'])
-def crear_reserva():
+@jwt_required()
+def create_reserva():
     try:
-        datos = request.get_json()
+        data = request.get_json()
+        
+        # Verificar que el viajero existe y pertenece al usuario actual
+        traveler = Contact.query.filter_by(
+            id=data['traveler_id'],
+            user_id=get_jwt_identity()
+        ).first()
+        
+        if not traveler:
+            return jsonify({
+                "message": "Viajero no encontrado o no autorizado"
+            }), 404
+            
+        # Validar tipo de medio de pago
+        try:
+            medio_pago = MedioPagoTipo[data['medio_pago_tipo']]
+        except KeyError:
+            return jsonify({
+                "message": "Tipo de medio de pago inválido",
+                "valid_types": [tipo.name for tipo in MedioPagoTipo]
+            }), 400
+        
         nueva_reserva = Reserva(
-            fecha_entrada=datetime.strptime(datos.get('fecha_entrada'), '%Y-%m-%d'),
-            fecha_salida=datetime.strptime(datos.get('fecha_salida'), '%Y-%m-%d'),
-            numero_habitacion=datos.get('numero_habitacion'),
-            tipo_habitacion=datos.get('tipo_habitacion'),
-            numero_huespedes=datos.get('numero_huespedes'),
-            id_usuario=datos.get('id_usuario')
+            fecha_entrada=datetime.strptime(data['fecha_entrada'], '%Y-%m-%d').date(),
+            fecha_salida=datetime.strptime(data['fecha_salida'], '%Y-%m-%d').date(),
+            alojamiento=data['alojamiento'],
+            nro_rooms=data['nro_rooms'],
+            nro_viajeros=data['nro_viajeros'],
+            titular_medio_pago=data['titular_medio_pago'],
+            medio_pago_tipo=medio_pago,
+            medio_pago_nro=data.get('medio_pago_nro'),
+            medio_pago_expira=datetime.strptime(data['medio_pago_expira'], '%Y-%m-%d').date() if data.get('medio_pago_expira') else None,
+            fecha_pago=datetime.strptime(data['fecha_pago'], '%Y-%m-%d').date() if data.get('fecha_pago') else None,
+            traveler_id=data['traveler_id']
         )
         
         db.session.add(nueva_reserva)
         db.session.commit()
         
-        return jsonify({"mensaje": "Reserva creada exitosamente", "reserva": nueva_reserva.serializar()}), 201
+        return jsonify({
+            "message": "Reserva creada exitosamente",
+            "reserva": nueva_reserva.serialize()
+        }), 201
+        
+    except KeyError as e:
+        return jsonify({
+            "message": "Datos incompletos",
+            "error": f"Falta el campo {str(e)}"
+        }), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({"mensaje": "Error al crear la reserva", "error": str(e)}), 500
+        return jsonify({
+            "message": "Error al crear la reserva",
+            "error": str(e)
+        }), 500
