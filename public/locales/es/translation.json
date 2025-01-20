@@ -1,0 +1,18 @@
+{
+    "welcome_message": "Bienvenido a la Página de Permisos de Usuario",
+    "basic_info": "Información Básica",
+    "name": "Nombre",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "edit": "Editar",
+    "sensitive_info": "Datos Sensibles",
+    "dni": "DNI",
+    "bank": "Banco",
+    "reservation_info": "Información de la Reserva",
+    "destination": "Destino",
+    "dates": "Fechas",
+    "edit_reservation": "Editar Reserva",
+    "new_reservation": "Nueva Reserva",
+    "generate_qr": "Generar QR",
+    "qr_code": "Código QR"
+  }

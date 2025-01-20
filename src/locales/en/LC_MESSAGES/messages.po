@@ -1,0 +1,2 @@
+msgid "welcome_message"
+msgstr "Welcome to the User Permits Page"

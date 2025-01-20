@@ -7,13 +7,21 @@ import { BackendURL } from "./component/backendURL";
 import { Home } from "./pages/home";
 import { Login } from "./pages/login";
 import injectContext from "./store/appContext";
-
+import {UserReservas} from "./pages/UserReservas.js";
 
 import BackOffice from "./pages/backoffice";
 import Contacts from "./component/Contacts.jsx";
+//import Empresas from "./component/Empresas.jsx";
 import ContactTable from "./component/ContactTable.jsx";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import { NuevaReservaForm } from "./pages/NuevaReserva.js";
+import { EditarReservaForm } from "./pages/EditarReservas.js";
+import { DetallesReserva } from "./pages/DetallesReserva.js";
+import {UserInfo} from "./pages/UserInfo.js";
+
+
+
 import PrivateRoute from "./component/PrivateRoute.jsx";
 import PublicView from "./pages/publicView";
 import UserView from "./pages/userView";
@@ -67,6 +75,14 @@ const Layout = () => {
                         <Route path="/userform" element={<PrivateRoute element={UserForm} />} />
 
                         {/* Ruta para manejar 404 */}
+                        {/* Rutas adicionales */}
+                        <Route element={<Home />} path="/" />
+                        <Route element={<Login />} path="/login" />
+                        <Route path="/reservas" element={<UserReservas />} />
+                        <Route path="/nueva-reserva" element={<NuevaReservaForm />} />
+                        <Route path="/editar-reserva/:id" element={<EditarReservaForm />} />
+                        <Route path="/reserva/:id" element={<DetallesReserva />} />
+                        <Route path="/user-info" element={<UserInfo />} />
                         <Route path="*" element={<h1>404 Not Found</h1>} />
                     </Routes>
 
