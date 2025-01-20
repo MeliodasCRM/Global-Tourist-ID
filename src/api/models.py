@@ -30,6 +30,11 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
 
+# Add association table for Contact-Group relationship
+contact_group = db.Table('contact_group',
+    db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'), primary_key=True),
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True)
+)
 
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -48,8 +53,9 @@ class Contact(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Relaciones
     sensitive_data = db.relationship('SensitiveData', backref='contact', uselist=False, lazy=True)
-    groups_as_traveler1 = db.relationship('Group', backref='traveler01', foreign_keys='Group.traveler01_id', lazy=True)
-    groups_as_traveler2 = db.relationship('Group', backref='traveler02', foreign_keys='Group.traveler02_id', lazy=True)
+    grupos = db.relationship('Group', 
+                           secondary=contact_group,
+                           back_populates='contacts')
     reservas = db.relationship('Reserva', backref='traveler', lazy=True)
 
     def serialize(self):
@@ -93,25 +99,18 @@ class SensitiveData(db.Model):
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    name = db.Column(db.String(255))
-    traveler01_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    traveler01_relac = db.Column(db.String(100))
-    traveler02_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    traveler02_relac = db.Column(db.String(100))
-    traveler03_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    traveler03_relac = db.Column(db.String(100))
+    group_name = db.Column(db.String(255))
+    is_admin = db.Column(db.Boolean, default=False)
+    contacts = db.relationship('Contact',
+                             secondary=contact_group,
+                             back_populates='grupos')
 
     def serialize(self):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'name': self.name,
-            'traveler01_id': self.traveler01_id,
-            'traveler01_relac': self.traveler01_relac,
-            'traveler02_id': self.traveler02_id,
-            'traveler02_relac': self.traveler02_relac,
-            'traveler03_id': self.traveler03_id,
-            'traveler03_relac': self.traveler03_relac
+            'group_name': self.group_name,
+            'is_admin': self.is_admin
         }
 
 class MedioPagoTipo(Enum):
