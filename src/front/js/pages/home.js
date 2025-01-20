@@ -25,9 +25,7 @@ export const Home = () => {
 					<button onClick={() => changeLanguage('es')}>Español</button>
 				</div>
 				<p>
-					Esta es una plataforma de gestión de check-ins para turistas y
-					administradores de hoteles. Aquí encontrarás toda la información
-					necesaria para facilitar tu experiencia.
+					{t('text_home')}
 				</p>
 			</div>
 			{/* seccion accesible para todos */}

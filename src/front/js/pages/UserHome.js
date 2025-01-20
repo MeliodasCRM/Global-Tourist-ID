@@ -20,10 +20,9 @@ const UserHome = () => {
   return (
     <div className="user-home">
       <header className="user-navbar fixed-top">
-        <button className="back-button">&#8592; Back</button>
         <h1 className="m-0">Home User</h1>
 
-        <div className="d-flex align-items-center ms-auto">
+        <div className="d-flex align-items-center ms-auto mt-5">
           <Dropdown align="start" show={showDropdown} onToggle={handleDropdownToggle}>
             <Dropdown.Toggle variant="link" id="dropdown-custom-components" className="profile-button">
               <FaCog size={30} color="white" /> {/* Icono dentro del botón */}

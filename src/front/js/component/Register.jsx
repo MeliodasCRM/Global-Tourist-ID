@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext"; // Importar el contexto de Flux
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
+import { AiOutlineMail, AiOutlineLock } from "react-icons/ai"; // React Icons
+import { BsArrowRight } from "react-icons/bs"; // React Icons
 import "../../styles/register.css";
 
 export const Register = () => {
@@ -8,6 +10,8 @@ export const Register = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    language: "es",
+
   });
   const [activeTab, setActiveTab] = useState("login"); // Controlar si es login o signup
   const [message, setMessage] = useState("");
@@ -35,20 +39,21 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    const { email, password, language } = formData;
+  
     if (activeTab === "login") {
-      const result = await actions.login(formData.email, formData.password);
-      // Usamos el ref para evitar actualizaciones cuando el componente se haya desmontado
+      const result = await actions.login(email, password);
       if (isMountedRef.current) setMessage(result.message);
     } else {
-      const result = await actions.signup(formData.email, formData.password);
-      // Usamos el ref para evitar actualizaciones cuando el componente se haya desmontado
+      // Incluye 'language' al enviar la solicitud de registro
+      const result = await actions.signup(email, password, language); // Añadir 'language' aquí
       if (isMountedRef.current) {
         if (result.success) {
           alert("Usuario registrado exitosamente.");
-          setFormData({ email: "", password: "" }); // Limpiar formulario
-          setActiveTab("login"); // Cambiar a login
-          navigate("/userhome"); // Redirigir a /userhome después del registro
+          setFormData({ email: "", password: "", language: "es" }); // Limpiar el formulario y resetear 'language'
+          setActiveTab("login");
+          navigate("/userhome");
         } else {
           setMessage(result.message);
         }
@@ -95,7 +100,7 @@ export const Register = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                               />
-                              <i className="input-icon uil uil-at"></i>
+                              <AiOutlineMail className="input-icon" />
                             </div>
                             <div className="form-group mt-2">
                               <input
@@ -107,10 +112,10 @@ export const Register = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                               />
-                              <i className="input-icon uil uil-lock-alt"></i>
+                              <AiOutlineLock className="input-icon" />
                             </div>
                             <button type="submit" className="btn mt-4">
-                              Submit
+                              <BsArrowRight className="arrow-icon" />
                             </button>
                             <p className="mb-0 mt-4 text-center">
                               <a href="#0" className="link">
@@ -136,7 +141,7 @@ export const Register = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                               />
-                              <i className="input-icon uil uil-at"></i>
+                              <AiOutlineMail className="input-icon" />
                             </div>
                             <div className="form-group mt-2">
                               <input
@@ -148,10 +153,22 @@ export const Register = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                               />
-                              <i className="input-icon uil uil-lock-alt"></i>
+                              <AiOutlineLock className="input-icon" />
+                            </div>
+                            <div className="form-group mt-2">
+                              <select
+                                className="form-style"
+                                id='language'
+                                name= "language"
+                                value={formData.language}
+                                onChange={handleChange}
+                                >
+                                  <option value="es"> Español (es)</option>
+                                  <option value="en"> Inglés (en)</option>
+                              </select>
                             </div>
                             <button type="submit" className="btn mt-4">
-                              Submit
+                              <BsArrowRight className="arrow-icon" />
                             </button>
                           </form>
                         </div>

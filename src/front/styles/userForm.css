@@ -1,0 +1,52 @@
+/* Estilos generales para el formulario */
+.user-form-container {
+    padding-top: 60px; /* Aseguramos que no esté debajo del navbar */
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  /* Header con botón de regresar */
+  .user-navbar {
+    background-color: #333;
+    color: white;
+    padding: 10px 15px;
+    font-size: 18px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .user-navbar h1 {
+    margin: 0;
+  }
+  
+  /* Centrado de los formularios y campos */
+  .form-group label {
+    text-align: left;
+  }
+  
+  .row {
+    margin-bottom: 15px;
+  }
+  
+  /* Botón de guardar y actualizar */
+  button {
+    margin-top: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .user-form-container {
+      max-width: 100%;
+    }
+  }

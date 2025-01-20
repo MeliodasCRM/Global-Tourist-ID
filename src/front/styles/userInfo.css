@@ -49,24 +49,38 @@
     cursor: pointer;
   }
   
-  /* Pestañas de navegación: ahora ocupan el 100% y están distribuidas proporcionalmente */
-  .nav-pills .nav-link {
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    flex: 1; /* Hace que las pestañas ocupen el espacio proporcional */
-    text-align: center; /* Centra el texto dentro de las pestañas */
-    margin: 2px; /* Da un pequeño espacio entre pestañas */
-    font-size: 1rem; /* Ajuste del tamaño de las pestañas para hacerlas más proporcionales */
+  .nav-underline .nav-link {
+    border-bottom: 2px solid #007bff; /* Cambia el color de la línea */
   }
   
-  /* Estilo de las tarjetas */
-  .card {
-    margin: 5px; /* Margen de 5px alrededor de las tarjetas */
-    display: flex;
-    flex-direction: column;
-    width: 100%; /* Ajuste del tamaño para que las tarjetas sean más responsivas */
+  .nav-underline .nav-link.active {
+    border-bottom: 3px solid #0056b3; /* Resalta la línea para la pestaña activa */
   }
+  
+  /* Centrar las pestañas */
+.nav {
+  display: flex;
+  justify-content: center;
+}
+
+/* Asegúrate de que la línea debajo de las pestañas sea visible solo en la activa */
+.nav-underline .nav-link {
+  border-bottom: 0; /* Sin línea por defecto */
+}
+
+.nav-underline .nav-link.active {
+  border-bottom: 2px solid #007bff; /* Línea visible solo en la pestaña activa */
+}
+
+/* Para mejorar la apariencia de las pestañas inactivas */
+.nav-link {
+  color: #007bff; /* Cambia el color de las pestañas inactivas si lo deseas */
+}
+
+/* Cambia el color de las pestañas activas */
+.nav-link.active {
+  color: #0056b3;
+}
   
   .card-title {
     font-size: 1.25rem;
@@ -166,3 +180,4 @@
       margin-bottom: 10px;
     }
   }
+

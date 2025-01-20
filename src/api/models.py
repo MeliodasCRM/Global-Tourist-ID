@@ -8,12 +8,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
     role = db.Column(db.String(50))
-    plan_id = db.Column(db.Integer, db.ForeignKey('plan.id'))
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     
     contacts = db.relationship('Contact', backref='user', lazy=True)
     groups = db.relationship('Group', backref='user', lazy=True)
@@ -24,35 +23,12 @@ class User(db.Model):
         return {
             'id': self.id,
             'email': self.email,
-            'role': self.role,
-            'plan_id': self.plan_id,
+            'language': self.language,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'account_id': self.account_id
         }
 
-class Plan(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    transaction_limit = db.Column(db.Integer)
-    features = db.Column(db.String(255))
-    permissions = db.Column(JSON)
-    price = db.Column(db.String(50))
-    duration = db.Column(db.Integer)
-    
-    users = db.relationship('User', backref='plan', lazy=True)
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'transaction_limit': self.transaction_limit,
-            'features': self.features,
-            'permissions': self.permissions,
-            'price': self.price,
-            'duration': self.duration
-        }
 
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -193,22 +169,6 @@ class Empresa(db.Model):
             'url_anuncio': self.url_anuncio,
             'user_id': self.user_id,
             'reserva_id': self.reserva_id
-        }
-
-class Account(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    account_type = db.Column(db.String(50))
-    permissions = db.Column(JSON)
-    
-    users = db.relationship('User', backref='account', lazy=True)
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'account_type': self.account_type,
-            'permissions': self.permissions
         }
 
 class UserPermission(db.Model):

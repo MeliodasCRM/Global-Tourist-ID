@@ -3,6 +3,7 @@ import { Button, Tab, Nav, Card, Form } from "react-bootstrap"; // Importamos re
 import { FaPlus } from "react-icons/fa"; // Icono de más
 import { useNavigate } from "react-router-dom"; // Para navegación
 import '../../styles/userInfo.css'; // Asegúrate de que este archivo CSS esté importado correctamente
+import { Link } from 'react-router-dom';
 
 const UserInfo = () => {
   const [key, setKey] = useState("user01"); // Estado para las pestañas
@@ -18,22 +19,23 @@ const UserInfo = () => {
       <header className="user-navbar fixed-top">
         <Button variant="link" className="back-button" onClick={handleBack}>&#8592; Back</Button>
         <h1 className="m-0">User Info</h1>
+       <Link to="/userForm">
         <Button variant="success" className="profile-button">
           <FaPlus size={20} color="white" />
-        </Button>
+        </Button></Link>
       </header>
 
-      {/* Pestañas debajo del header */}
+      {/* Pestañas debajo del header con Underline */}
       <Tab.Container id="left-tabs-example" defaultActiveKey="user01" activeKey={key} onSelect={(k) => setKey(k)}>
-        <Nav variant="pills" className="mt-5">
-          <Nav.Item>
-            <Nav.Link eventKey="user01">User 01</Nav.Link>
+        <Nav variant="underline" className="mt-5 d-flex justify-content-center">
+          <Nav.Item className="flex-grow-1">
+            <Nav.Link eventKey="user01" className="text-center">User 01</Nav.Link>
           </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="user02">User 02</Nav.Link>
+          <Nav.Item className="flex-grow-1">
+            <Nav.Link eventKey="user02" className="text-center">User 02</Nav.Link>
           </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="user03">User 03</Nav.Link>
+          <Nav.Item className="flex-grow-1">
+            <Nav.Link eventKey="user03" className="text-center">User 03</Nav.Link>
           </Nav.Item>
         </Nav>
         <Tab.Content>
@@ -66,7 +68,6 @@ const UserInfo = () => {
                 </Card.Text>
               </Card.Body>
             </Card>
-
             {/* Campo de fecha y botones */}
             <Form.Group className="mb-3">
               <Form.Label>Card Expiration Date</Form.Label>
