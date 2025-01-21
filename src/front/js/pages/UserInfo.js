@@ -75,6 +75,7 @@ const UserInfo = () => {
             </Form.Group>
             <Button variant="primary" className="me-2">Generate QR</Button>
             <Button variant="primary">Generate All</Button>
+            <Button variant="primary" className="mt-3" onClick={() => navigate("/reservas")}>Proximas Reservas</Button>
           </Tab.Pane>
           <Tab.Pane eventKey="user02">
             <h4>Información para el Usuario 02</h4>

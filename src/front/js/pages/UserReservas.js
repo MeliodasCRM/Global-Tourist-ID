@@ -15,6 +15,7 @@ import "../../styles/ReservaUser.css"
      return(
     <div className="container my-4">
        {/* Navbar */}
+       <button className="btn btn-primary" onClick={() => navigate("/userInfo")}>Volver</button>
        <div className="d-flex justify-content-between align-items-center mb-3">
             <h2>Proximas Reservas</h2>
             <button className="btn btn-success" onClick={() => navigate("/nueva-reserva")}>

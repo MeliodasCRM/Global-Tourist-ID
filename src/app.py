@@ -75,9 +75,7 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
-@babel.localeselector
-def get_locale():
-    return request.accept_languages.best_match(['en', 'es'])
+
 
 @app.route('/')
 def index():

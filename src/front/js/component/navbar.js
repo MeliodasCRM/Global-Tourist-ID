@@ -21,9 +21,8 @@ export const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary custom-navbar">
       <div className="container-fluid">
-        <Link to="/">
-          <span className="navbar-brand" href="#"> Global Turist </span>
-
+        <Link to="/userhome">
+          <span className="navbar-brand" href="#"> userhome </span>
         </Link>
         <button
           className="navbar-toggler"
