@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 6bba4c86fd2f
+Revision ID: b615958d832d
 Revises: 
-Create Date: 2025-01-20 19:38:39.608516
+Create Date: 2025-01-22 14:08:03.004897
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '6bba4c86fd2f'
+revision = 'b615958d832d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -32,17 +32,18 @@ def upgrade():
     )
     op.create_table('contact',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('nombres', sa.String(length=255), nullable=False),
+    sa.Column('nombre', sa.String(length=255), nullable=False),
     sa.Column('primer_apellido', sa.String(length=255), nullable=False),
-    sa.Column('segundo_apellido', sa.String(length=255), nullable=True),
-    sa.Column('nacionalidad', sa.String(length=100), nullable=True),
-    sa.Column('fecha_nacimiento', sa.Date(), nullable=True),
-    sa.Column('direccion', sa.String(length=255), nullable=True),
-    sa.Column('localidad', sa.String(length=255), nullable=True),
-    sa.Column('pais', sa.String(length=100), nullable=True),
-    sa.Column('email', sa.String(length=120), nullable=True),
-    sa.Column('telefono_movil', sa.String(length=20), nullable=True),
-    sa.Column('telefono_fijo', sa.String(length=20), nullable=True),
+    sa.Column('segundo_apellido', sa.String(length=255), nullable=False),
+    sa.Column('sexo', sa.String(length=50), nullable=False),
+    sa.Column('nacionalidad', sa.String(length=100), nullable=False),
+    sa.Column('fecha_nacimiento', sa.Date(), nullable=False),
+    sa.Column('direccion', sa.String(length=255), nullable=False),
+    sa.Column('localidad', sa.String(length=255), nullable=False),
+    sa.Column('pais', sa.String(length=100), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('telefono_movil', sa.String(length=20), nullable=False),
+    sa.Column('telefono_fijo', sa.String(length=20), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -64,6 +65,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('group',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('group_name', sa.String(length=255), nullable=True),
+    sa.Column('is_admin', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('user_permission',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
@@ -71,18 +80,12 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('group',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('name', sa.String(length=255), nullable=True),
-    sa.Column('traveler01_id', sa.Integer(), nullable=True),
-    sa.Column('traveler01_relac', sa.String(length=100), nullable=True),
-    sa.Column('traveler02_id', sa.Integer(), nullable=True),
-    sa.Column('traveler02_relac', sa.String(length=100), nullable=True),
-    sa.ForeignKeyConstraint(['traveler01_id'], ['contact.id'], ),
-    sa.ForeignKeyConstraint(['traveler02_id'], ['contact.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table('contact_group',
+    sa.Column('contact_id', sa.Integer(), nullable=False),
+    sa.Column('group_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['contact_id'], ['contact.id'], ),
+    sa.ForeignKeyConstraint(['group_id'], ['group.id'], ),
+    sa.PrimaryKeyConstraint('contact_id', 'group_id')
     )
     op.create_table('reserva',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -90,24 +93,23 @@ def upgrade():
     sa.Column('fecha_salida', sa.Date(), nullable=True),
     sa.Column('alojamiento', sa.Integer(), nullable=True),
     sa.Column('nro_rooms', sa.Integer(), nullable=True),
-    sa.Column('nro_viajeros', sa.String(length=50), nullable=True),
-    sa.Column('metodo_pago', sa.String(length=50), nullable=True),
+    sa.Column('nro_viajeros', sa.Integer(), nullable=True),
+    sa.Column('titular_medio_pago', sa.String(length=255), nullable=True),
+    sa.Column('medio_pago_tipo', sa.Enum('EFECTIVO', 'TARJETA', 'PLATAFORMA_DE_PAGO', 'TRANSFERENCIA', name='mediopagotipo'), nullable=False),
+    sa.Column('medio_pago_nro', sa.Integer(), nullable=True),
+    sa.Column('medio_pago_expira', sa.Date(), nullable=True),
+    sa.Column('fecha_pago', sa.Date(), nullable=True),
     sa.Column('traveler_id', sa.Integer(), nullable=True),
     sa.Column('created', sa.Date(), nullable=True),
     sa.ForeignKeyConstraint(['alojamiento'], ['empresa.id'], ),
     sa.ForeignKeyConstraint(['traveler_id'], ['contact.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('sensible_data',
+    op.create_table('sensitive_data',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('nif_tipo', sa.String(length=50), nullable=True),
-    sa.Column('nif_nunero', sa.String(length=50), nullable=True),
-    sa.Column('nif_country', sa.String(length=100), nullable=True),
-    sa.Column('firmas', sa.String(length=255), nullable=True),
-    sa.Column('medio_pago_tipo', sa.String(length=50), nullable=True),
-    sa.Column('medio_pago_nro', sa.Integer(), nullable=True),
-    sa.Column('medio_pago_expira', sa.Date(), nullable=True),
-    sa.Column('fecha_pago', sa.Date(), nullable=True),
+    sa.Column('nif_tipo', sa.Enum('DNI', 'TIE', 'PASAPORTE', name='tiponif'), nullable=False),
+    sa.Column('nif_numero', sa.String(length=50), nullable=False),
+    sa.Column('nif_country', sa.String(length=100), nullable=False),
     sa.Column('contact_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['contact_id'], ['contact.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -117,10 +119,11 @@ def upgrade():
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('sensible_data')
+    op.drop_table('sensitive_data')
     op.drop_table('reserva')
-    op.drop_table('group')
+    op.drop_table('contact_group')
     op.drop_table('user_permission')
+    op.drop_table('group')
     op.drop_table('empresa')
     op.drop_table('contact')
     op.drop_table('user')
