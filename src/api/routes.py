@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, Blueprint, send_file
 from datetime import datetime
 import json
 import os
+import qrcode
 from api.models import MedioPagoTipo, db, User, Contact, SensitiveData, Reserva # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS

@@ -13,7 +13,7 @@ const resources = {
     translation: {
       welcome: "Bienvenido a la aplicación",
       logout: "Cerrar sesión",
-      text_home: "Esta es una plataforma de gestión de check-ins para turistas y administradores de hoteles. Aquí encontrarás toda la información necesaria para facilitar tu experiencia"
+      git: "Esta es una plataforma de gestión de check-ins para turistas y administradores de hoteles. Aquí encontrarás toda la información necesaria para facilitar tu experiencia"
     },
   },
 };

@@ -3,7 +3,6 @@ from datetime import datetime
 from enum import Enum
 from sqlalchemy.dialects.postgresql import JSON
 
-
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -102,9 +101,7 @@ class Group(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     group_name = db.Column(db.String(255))
     is_admin = db.Column(db.Boolean, default=False)
-    contacts = db.relationship('Contact',
-                             secondary=contact_group,
-                             back_populates='grupos')
+    contacts = db.relationship('Contact', secondary=contact_group, back_populates='grupos')
 
     def serialize(self):
         return {
