@@ -18,7 +18,9 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
-app.url_map.strict_slashes = False
+app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'locales'
+
 
 # Setup the Flask-JWT-Extended extension
 app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
@@ -70,6 +72,11 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
+
+
+@app.route('/')
+def index():
+    return jsonify(message=_("welcome_message"))
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

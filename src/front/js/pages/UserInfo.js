@@ -73,10 +73,9 @@ const UserInfo = () => {
               <Form.Label>QR Expiration Date</Form.Label>
               <Form.Control type="date" />
             </Form.Group>
-            <div className="buttons-container">
-              <Button variant="primary" className="me-2">Generate QR</Button>
-              <Button variant="primary">Generate All</Button>
-            </div>
+            <Button variant="primary" className="me-2">Generate QR</Button>
+            <Button variant="primary">Generate All</Button>
+            <Button variant="primary" className="mt-3" onClick={() => navigate("/reservas")}>Proximas Reservas</Button>
           </Tab.Pane>
           <Tab.Pane eventKey="user02">
             <h4>Información para el Usuario 02</h4>
