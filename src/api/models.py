@@ -2,10 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from enum import Enum
 from sqlalchemy.dialects.postgresql import JSON
-from flask import send_file
-import qrcode
-from io import BytesIO
-import json
+
 
 db = SQLAlchemy()
 
@@ -201,59 +198,3 @@ class UserPermission(db.Model):
             'permissions': self.permissions
         }
     
-    @api.route('/contact/<int:contact_id>/qr', methods=['GET'])
-@jwt_required()
-def generate_contact_qr(contact_id):
-    try:
-        # Verificar que el contacto existe y pertenece al usuario actual
-        contact = Contact.query.filter_by(
-            id=contact_id,
-            user_id=get_jwt_identity()
-        ).first()
-        
-        if not contact:
-            return jsonify({
-                "message": "Contacto no encontrado o no autorizado"
-            }), 404
-            
-        # Obtener datos sensibles
-        sensitive_data = SensitiveData.query.filter_by(contact_id=contact_id).first()
-        
-        # Crear diccionario con todos los datos
-        contact_data = contact.serialize()
-        if sensitive_data:
-            contact_data['sensitive_data'] = sensitive_data.serialize()
-        
-        # Convertir datos a JSON
-        qr_data = json.dumps(contact_data)
-        
-        # Generar QR
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(qr_data)
-        qr.make(fit=True)
-
-        # Crear imagen
-        img = qr.make_image(fill_color="black", back_color="white")
-        
-        # Guardar imagen en buffer
-        img_buffer = BytesIO()
-        img.save(img_buffer, format='PNG')
-        img_buffer.seek(0)
-        
-        return send_file(
-            img_buffer,
-            mimetype='image/png',
-            as_attachment=True,
-            download_name=f'contact_{contact_id}_qr.png'
-        )
-        
-    except Exception as e:
-        return jsonify({
-            "message": "Error al generar el código QR",
-            "error": str(e)
-        }), 500
