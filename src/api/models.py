@@ -32,7 +32,7 @@ class User(db.Model):
         }
 
 # Add association table for Contact-Group relationship
-contact_group = db.Model('contact_group',
+contact_group = db.Table('contact_group',
     db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'), primary_key=True),
     db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True)
 )
