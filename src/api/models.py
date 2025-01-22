@@ -15,9 +15,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    # Relaciones# Relaciones
-
-    # Relationships
+    # Relaciones
     contacts = db.relationship('Contact', backref='user', lazy=True)
     groups = db.relationship('Group', backref='user', lazy=True)
     empresas = db.relationship('Empresa', backref='user', lazy=True)
@@ -201,3 +199,4 @@ class UserPermission(db.Model):
             'user_id': self.user_id,
             'permissions': self.permissions
         }
+    

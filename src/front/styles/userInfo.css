@@ -1,183 +1,184 @@
 /* Reset básico para eliminar márgenes y paddings por defecto */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Estilos para el contenedor principal */
-  .user-info {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  
-  /* Estilo del header */
-  .user-navbar {
-    background-color: #333;
-    color: white;
-    padding: 10px 15px;
-    font-size: 18px;
-    z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-  
-  /* Botón de regreso */
-  .back-button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  /* Estilo para el título del Header */
-  .user-navbar h1 {
-    margin: 0;
-  }
-  
-  /* Botón circular verde con icono */
-  .profile-button {
-    background-color: #28a745;
-    border: none;
-    color: white;
-    border-radius: 50%;
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  .nav-underline .nav-link {
-    border-bottom: 2px solid #007bff; /* Cambia el color de la línea */
-  }
-  
-  .nav-underline .nav-link.active {
-    border-bottom: 3px solid #0056b3; /* Resalta la línea para la pestaña activa */
-  }
-  
-  /* Centrar las pestañas */
-.nav {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilos para el contenedor principal */
+.user-info {
   display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Estilo del header */
+.user-navbar {
+  background-color: #333;
+  color: white;
+  padding: 10px 15px;
+  font-size: 18px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Botón de regreso y de nuevo centrados verticalmente en el header */
+.back-button,
+.profile-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-/* Asegúrate de que la línea debajo de las pestañas sea visible solo en la activa */
+.profile-button {
+  background-color: #28a745;
+}
+
+/* Título del Header centrado */
+.user-title {
+  margin: 0;
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* Estilo para las pestañas */
 .nav-underline .nav-link {
-  border-bottom: 0; /* Sin línea por defecto */
+  border-bottom: 2px solid #007bff; /* Cambia el color de la línea */
+  padding: 5px; /* Padding de 5px horizontal y vertical */
 }
 
 .nav-underline .nav-link.active {
-  border-bottom: 2px solid #007bff; /* Línea visible solo en la pestaña activa */
+  border-bottom: 3px solid #0056b3; /* Resalta la línea para la pestaña activa */
 }
 
-/* Para mejorar la apariencia de las pestañas inactivas */
-.nav-link {
-  color: #007bff; /* Cambia el color de las pestañas inactivas si lo deseas */
+/* Separación de las pestañas del navbar */
+.nav {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
 }
 
-/* Cambia el color de las pestañas activas */
-.nav-link.active {
-  color: #0056b3;
+/* Estilos del Accordion */
+.accordion-button {
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 5px 15px;  /* Padding vertical de 5px y horizontal de 5px */
 }
-  
-  .card-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-  }
-  
-  .card-text {
-    font-size: 1rem;
-  }
-  
-  /* Estilo del footer */
-  .user-footer {
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-  
-  .banner-image {
-    width: 100%;
-    height: 50px;
-    object-fit: cover;
-  }
-  
-  /* Ajustes de la barra de búsqueda */
-  .form-control {
-    width: 200px;
-    margin: 0 auto; /* Centra la barra de búsqueda */
-    display: block;
-  }
-  
-  /* Estilo para los botones de fecha y generación */
-  button {
-    margin-right: 10px;
-    margin-left: 10px;
-    padding: 10px 20px; /* Ajuste del padding para los botones */
-  }
-  
-  /* Centrado del campo de fecha */
-  .date-input {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  .date-input input {
-    text-align: center;
-    margin: 0 5px;
-    width: 150px; /* Ajusta el tamaño del campo de fecha */
-  }
-  
-  /* Centrado de los botones de generar QR */
-  .buttons-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  .buttons-container button {
-    margin: 0 10px;
-  }
-  
-  /* Centrado del título "Card Expiration Date" */
-  .card-expiration-title {
-    display: flex;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-top: 20px;
-  }
-  
-  /* Centrado de los botones "Generate QR" y "Generate All" */
-  .generate-buttons-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  /* Ajustes generales responsivos */
-  @media (max-width: 768px) {
-    .nav-pills .nav-link {
+
+/* Estilo cuando el acordeón está expandido */
+.accordion-button:not(.collapsed) {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Acordeón con margen de 5px a la izquierda y derecha */
+.accordion {
+  margin: 5px;
+}
+
+/* Separación del acordeón de las tabs */
+.accordion-item {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+/* Formulario: label e input */
+.form-label,
+input {
+  max-width: 250px;  /* Máximo de 250px de ancho */
+  width: 100%;  /* Para que ocupen todo el ancho disponible hasta ese máximo */
+  margin: 0 auto 15px; /* Separación de 15px verticalmente y centrado horizontalmente */
+}
+
+/* Estilo para los botones */
+button {
+  margin-right: 10px;
+  margin-left: 10px;
+  padding: 10px 20px; /* Ajuste del padding para los botones */
+}
+
+/* Centrado del label "QR Expiration Date" */
+.card-expiration-title {
+  display: flex;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 20px;
+  padding: 5px; /* Padding de 5px horizontal y vertical */
+  width: 100%; /* Asegura que el título ocupe todo el ancho disponible */
+  text-align: center; /* Centra el texto */
+}
+
+
+/* Centrado del campo de fecha */
+.date-input {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.date-input input {
+  text-align: center;
+  margin: 0 5px;
+  width: 150px; /* Ajusta el tamaño del campo de fecha */
+  padding: 0 5px; /* Padding horizontal de 5px */
+}
+
+/* Centrado de los botones de generar QR */
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Los botones "Generate QR" y "Generate All" en la misma línea con margen */
+.buttons-container button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+/* Estilo del footer */
+.user-footer {
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.banner-image {
+  width: 100%;
+  height: 50px;
+  object-fit: cover;
+}
+
+/* Ajustes generales responsivos */
+@media (max-width: 768px) {
+  .nav-pills .nav-link {
       font-size: 0.9rem; /* Ajuste del tamaño de las pestañas en pantallas pequeñas */
-    }
-  
-    .buttons-container {
+  }
+
+  .buttons-container {
       flex-direction: column; /* Los botones se apilan en pantallas pequeñas */
       margin-top: 10px;
-    }
-  
-    .buttons-container button {
-      margin-bottom: 10px;
-    }
   }
 
+  .buttons-container button {
+      margin-bottom: 10px;
+  }
+}

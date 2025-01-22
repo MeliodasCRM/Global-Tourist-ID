@@ -1,17 +1,19 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, Blueprint
+from flask import Flask, request, jsonify, Blueprint, send_file
 from datetime import datetime
 import qrcode
 import json
 import os
-from api.models import MedioPagoTipo, db, User, Contact, SensitiveData, Reserva # Importar los modelos de la base de datos
+import qrcode
 from api.models import MedioPagoTipo, db, User, Contact, SensitiveData, Reserva # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash #(Libreria que sirve para guardar una constraseña segura)
+import qrcode
+from io import BytesIO
 
 api = Blueprint('api', __name__)
 
@@ -180,8 +182,6 @@ def delete_user(user_id):
 def backoffice():
     return jsonify({"message": "Acceso al Backoffice permitido."})
 
-
-
 # FUNCION PARA CREAR UN CONTACTO
 @api.route('/contact', methods=['POST'])
 @jwt_required()
@@ -189,8 +189,9 @@ def create_contact():
     try:
         # Obtener usuario actual del token JWT
         current_user_id = get_jwt_identity()
+        
         data = request.get_json()
-
+        
         # Crear nuevo contacto con los campos requeridos
         new_contact = Contact(
             nombre=data['nombre'],
@@ -207,21 +208,20 @@ def create_contact():
             telefono_fijo=data['telefono_fijo'],
             user_id=current_user_id
         )
-
+        
         db.session.add(new_contact)
         db.session.commit()
-
+        
         return jsonify({
             "message": "Contacto creado exitosamente",
             "contact": new_contact.serialize()
         }), 201
-
+        
     except KeyError as e:
         return jsonify({
             "message": "Datos incompletos",
             "error": f"Falta el campo {str(e)}"
         }), 400
-
     except Exception as e:
         db.session.rollback()
         return jsonify({
@@ -229,22 +229,24 @@ def create_contact():
             "error": str(e)
         }), 500
 
-
+# FUNCION PARA GUARDAR LOS DATOS SENSIBLES
 @api.route('/sensitive-data', methods=['POST'])
 @jwt_required()
 def create_sensitive_data():
     try:
         data = request.get_json()
-
+        
         # Verificar que el contacto existe y pertenece al usuario actual
         contact = Contact.query.filter_by(
             id=data['contact_id'],
             user_id=get_jwt_identity()
         ).first()
-
+        
         if not contact:
-            return jsonify({"message": "Contacto no encontrado o no autorizado"}), 404
-
+            return jsonify({
+                "message": "Contacto no encontrado o no autorizado"
+            }), 404
+        
         # Validar tipo de NIF
         try:
             nif_tipo = TipoNif[data['nif_tipo']]
@@ -253,28 +255,27 @@ def create_sensitive_data():
                 "message": "Tipo de NIF inválido",
                 "valid_types": [tipo.name for tipo in TipoNif]
             }), 400
-
+        
         new_sensitive_data = SensitiveData(
             nif_tipo=nif_tipo,
             nif_numero=data['nif_numero'],
             nif_country=data['nif_country'],
             contact_id=data['contact_id']
         )
-
+        
         db.session.add(new_sensitive_data)
         db.session.commit()
-
+        
         return jsonify({
             "message": "Datos sensibles guardados exitosamente",
             "sensitive_data": new_sensitive_data.serialize()
         }), 201
-
+        
     except KeyError as e:
         return jsonify({
             "message": "Datos incompletos",
             "error": f"Falta el campo {str(e)}"
         }), 400
-
     except Exception as e:
         db.session.rollback()
         return jsonify({
@@ -283,12 +284,12 @@ def create_sensitive_data():
         }), 500
 
 
+# FUNCION PARA GUARDAR LOS DATOS RESERVA
 @api.route('/reserva', methods=['POST'])
 @jwt_required()
 def create_reserva():
     try:
         data = request.get_json()
-
         # Verificar que el viajero existe y pertenece al usuario actual
         traveler = Contact.query.filter_by(
             id=data['traveler_id'],
@@ -306,7 +307,6 @@ def create_reserva():
                 "message": "Tipo de medio de pago inválido",
                 "valid_types": [tipo.name for tipo in MedioPagoTipo]
             }), 400
-
         nueva_reserva = Reserva(
             fecha_entrada=datetime.strptime(data['fecha_entrada'], '%Y-%m-%d').date(),
             fecha_salida=datetime.strptime(data['fecha_salida'], '%Y-%m-%d').date(),
@@ -323,21 +323,75 @@ def create_reserva():
 
         db.session.add(nueva_reserva)
         db.session.commit()
-
         return jsonify({
             "message": "Reserva creada exitosamente",
             "reserva": nueva_reserva.serialize()
         }), 201
-
     except KeyError as e:
         return jsonify({
             "message": "Datos incompletos",
             "error": f"Falta el campo {str(e)}"
         }), 400
-
     except Exception as e:
         db.session.rollback()
         return jsonify({
             "message": "Error al crear la reserva",
+            "error": str(e)
+        }), 500
+    
+@api.route('/contact/<int:contact_id>/qr', methods=['GET'])
+@jwt_required()
+def generate_contact_qr(contact_id):
+    try:
+        # Verificar que el contacto existe y pertenece al usuario actual
+        contact = Contact.query.filter_by(
+            id=contact_id,
+            user_id=get_jwt_identity()
+        ).first()
+        
+        if not contact:
+            return jsonify({
+                "message": "Contacto no encontrado o no autorizado"
+            }), 404
+            
+        # Obtener datos sensibles
+        sensitive_data = SensitiveData.query.filter_by(contact_id=contact_id).first()
+        
+        # Crear diccionario con todos los datos
+        contact_data = contact.serialize()
+        if sensitive_data:
+            contact_data['sensitive_data'] = sensitive_data.serialize()
+        
+        # Convertir datos a JSON
+        qr_data = json.dumps(contact_data)
+        
+        # Generar QR
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+
+        # Crear imagen
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Guardar imagen en buffer
+        img_buffer = BytesIO()
+        img.save(img_buffer, format='PNG')
+        img_buffer.seek(0)
+        
+        return send_file(
+            img_buffer,
+            mimetype='image/png',
+            as_attachment=True,
+            download_name=f'contact_{contact_id}_qr.png'
+        )
+        
+    except Exception as e:
+        return jsonify({
+            "message": "Error al generar el código QR",
             "error": str(e)
         }), 500
