@@ -3,6 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, Blueprint, send_file
 from datetime import datetime
+import qrcode
 import json
 import os
 import qrcode
@@ -289,18 +290,15 @@ def create_sensitive_data():
 def create_reserva():
     try:
         data = request.get_json()
-        
         # Verificar que el viajero existe y pertenece al usuario actual
         traveler = Contact.query.filter_by(
             id=data['traveler_id'],
             user_id=get_jwt_identity()
         ).first()
-        
+
         if not traveler:
-            return jsonify({
-                "message": "Viajero no encontrado o no autorizado"
-            }), 404
-            
+            return jsonify({"message": "Viajero no encontrado o no autorizado"}), 404
+
         # Validar tipo de medio de pago
         try:
             medio_pago = MedioPagoTipo[data['medio_pago_tipo']]
@@ -309,7 +307,6 @@ def create_reserva():
                 "message": "Tipo de medio de pago inválido",
                 "valid_types": [tipo.name for tipo in MedioPagoTipo]
             }), 400
-        
         nueva_reserva = Reserva(
             fecha_entrada=datetime.strptime(data['fecha_entrada'], '%Y-%m-%d').date(),
             fecha_salida=datetime.strptime(data['fecha_salida'], '%Y-%m-%d').date(),
@@ -323,15 +320,13 @@ def create_reserva():
             fecha_pago=datetime.strptime(data['fecha_pago'], '%Y-%m-%d').date() if data.get('fecha_pago') else None,
             traveler_id=data['traveler_id']
         )
-        
+
         db.session.add(nueva_reserva)
         db.session.commit()
-        
         return jsonify({
             "message": "Reserva creada exitosamente",
             "reserva": nueva_reserva.serialize()
         }), 201
-        
     except KeyError as e:
         return jsonify({
             "message": "Datos incompletos",

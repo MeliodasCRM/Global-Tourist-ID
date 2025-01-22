@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import JSON
 
 db = SQLAlchemy()
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -30,11 +31,14 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
 
-# Add association table for Contact-Group relationship
-contact_group = db.Table('contact_group',
+
+# Association table for Contact-Group relationship
+contact_group = db.Table(
+    'contact_group',
     db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'), primary_key=True),
     db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True)
 )
+
 
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,17 +55,16 @@ class Contact(db.Model):
     telefono_movil = db.Column(db.String(20), nullable=False)
     telefono_fijo = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # Relaciones
+
+    # Relationships
     sensitive_data = db.relationship('SensitiveData', backref='contact', uselist=False, lazy=True)
-    grupos = db.relationship('Group', 
-                           secondary=contact_group,
-                           back_populates='contacts')
+    grupos = db.relationship('Group', secondary=contact_group, back_populates='contacts')
     reservas = db.relationship('Reserva', backref='traveler', lazy=True)
 
     def serialize(self):
         return {
             'id': self.id,
-            'nombres': self.nombre,
+            'nombre': self.nombre,
             'primer_apellido': self.primer_apellido,
             'segundo_apellido': self.segundo_apellido,
             'nacionalidad': self.nacionalidad,
@@ -75,10 +78,12 @@ class Contact(db.Model):
             'user_id': self.user_id
         }
 
+
 class TipoNif(Enum):
     DNI = 'DNI'
     TIE = 'TIE'
     PASAPORTE = 'Pasaporte'
+
 
 class SensitiveData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -90,11 +95,12 @@ class SensitiveData(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'nif_tipo': self.nif_tipo,
+            'nif_tipo': self.nif_tipo.value if self.nif_tipo else None,
             'nif_numero': self.nif_numero,
             'nif_country': self.nif_country,
             'contact_id': self.contact_id
         }
+
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -117,6 +123,7 @@ class MedioPagoTipo(Enum):
     PLATAFORMA_DE_PAGO = 'Plataforma de Pago'
     TRANSFERENCIA = 'Transferencia'
 
+
 class Reserva(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha_entrada = db.Column(db.Date)
@@ -131,8 +138,6 @@ class Reserva(db.Model):
     fecha_pago = db.Column(db.Date)
     traveler_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     created = db.Column(db.Date, default=datetime.utcnow)
-    
-    empresa = db.relationship('Empresa', backref='reservas', lazy=True)
 
     def serialize(self):
         return {
@@ -151,6 +156,7 @@ class Reserva(db.Model):
             'created': self.created.isoformat() if self.created else None
         }
 
+
 class Empresa(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     razon_social = db.Column(db.String(255))
@@ -164,7 +170,6 @@ class Empresa(db.Model):
     web = db.Column(db.String(255))
     url_anuncio = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    reserva_id = db.Column(db.Integer)
 
     def serialize(self):
         return {
@@ -179,9 +184,9 @@ class Empresa(db.Model):
             'email': self.email,
             'web': self.web,
             'url_anuncio': self.url_anuncio,
-            'user_id': self.user_id,
-            'reserva_id': self.reserva_id
+            'user_id': self.user_id
         }
+
 
 class UserPermission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
