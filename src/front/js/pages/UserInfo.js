@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 const UserInfo = () => {
   const [key, setKey] = useState("user01"); // Estado para las pestañas
   const navigate = useNavigate(); // Usamos navigate para redirigir
+  const [mainContact, setMainContact] = useState(null); // Alamaceno el contacto principal
 
   const handleBack = () => {
     navigate("/userhome"); // Redirige al home de usuario
@@ -32,13 +33,13 @@ const UserInfo = () => {
       <Tab.Container id="left-tabs-example" defaultActiveKey="user01" activeKey={key} onSelect={(k) => setKey(k)}>
         <Nav variant="underline" className="mt-1 d-flex justify-content-center">
           <Nav.Item className="flex-grow-1">
-            <Nav.Link eventKey="user01" className="text-center">User 01</Nav.Link>
+            <Nav.Link eventKey="user01" className="text-center">Contacto 01</Nav.Link>
           </Nav.Item>
           <Nav.Item className="flex-grow-1">
-            <Nav.Link eventKey="user02" className="text-center">User 02</Nav.Link>
+            <Nav.Link eventKey="user02" className="text-center">Contacto 02</Nav.Link>
           </Nav.Item>
           <Nav.Item className="flex-grow-1">
-            <Nav.Link eventKey="user03" className="text-center">User 03</Nav.Link>
+            <Nav.Link eventKey="user03" className="text-center">Contacto 03</Nav.Link>
           </Nav.Item>
         </Nav>
         <Tab.Content>
