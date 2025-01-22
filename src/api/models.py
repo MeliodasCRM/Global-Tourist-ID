@@ -2,14 +2,10 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from enum import Enum
 from enum import Enum
-from enum import Enum
 from sqlalchemy.dialects.postgresql import JSON
-from flask import send_file
-
-from io import BytesIO
-import json
 
 db = SQLAlchemy()
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +17,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     # Relaciones# Relaciones
+
+    # Relationships
     contacts = db.relationship('Contact', backref='user', lazy=True)
     groups = db.relationship('Group', backref='user', lazy=True)
     empresas = db.relationship('Empresa', backref='user', lazy=True)
@@ -36,7 +34,8 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
 
-# Add association table for Contact-Group relationship
+
+# Association table for Contact-Group relationship
 contact_group = db.Table(
     'contact_group',
     db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'), primary_key=True),
@@ -46,7 +45,6 @@ contact_group = db.Table(
 
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(255), nullable=False)
     nombre = db.Column(db.String(255), nullable=False)
     primer_apellido = db.Column(db.String(255), nullable=False)
     segundo_apellido = db.Column(db.String(255), nullable=False)
@@ -59,29 +57,17 @@ class Contact(db.Model):
     email = db.Column(db.String(120), nullable=False)
     telefono_movil = db.Column(db.String(20), nullable=False)
     telefono_fijo = db.Column(db.String(20), nullable=False)
-    segundo_apellido = db.Column(db.String(255), nullable=False)
-    sexo = db.Column(db.String(50), nullable=False)
-    nacionalidad = db.Column(db.String(100), nullable=False)
-    fecha_nacimiento = db.Column(db.Date, nullable=False)
-    direccion = db.Column(db.String(255), nullable=False)
-    localidad = db.Column(db.String(255), nullable=False)
-    pais = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    telefono_movil = db.Column(db.String(20), nullable=False)
-    telefono_fijo = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # Relaciones
+
+    # Relationships
     sensitive_data = db.relationship('SensitiveData', backref='contact', uselist=False, lazy=True)
-    grupos = db.relationship('Group', 
-                           secondary=contact_group,
-                           back_populates='contacts')
+    grupos = db.relationship('Group', secondary=contact_group, back_populates='contacts')
     reservas = db.relationship('Reserva', backref='traveler', lazy=True)
 
     def serialize(self):
         return {
             'id': self.id,
-            'nombres': self.nombre,
-            'nombres': self.nombre,
+            'nombre': self.nombre,
             'primer_apellido': self.primer_apellido,
             'segundo_apellido': self.segundo_apellido,
             'nacionalidad': self.nacionalidad,
@@ -95,22 +81,15 @@ class Contact(db.Model):
             'user_id': self.user_id
         }
 
+
 class TipoNif(Enum):
     DNI = 'DNI'
     TIE = 'TIE'
     PASAPORTE = 'Pasaporte'
 
-class SensitiveData(db.Model):
-class TipoNif(Enum):
-    DNI = 'DNI'
-    TIE = 'TIE'
-    PASAPORTE = 'Pasaporte'
 
 class SensitiveData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nif_tipo = db.Column(db.Enum(TipoNif), nullable=False)
-    nif_numero = db.Column(db.String(50), nullable=False)
-    nif_country = db.Column(db.String(100), nullable=False)
     nif_tipo = db.Column(db.Enum(TipoNif), nullable=False)
     nif_numero = db.Column(db.String(50), nullable=False)
     nif_country = db.Column(db.String(100), nullable=False)
@@ -119,21 +98,19 @@ class SensitiveData(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'nif_tipo': self.nif_tipo,
-            'nif_numero': self.nif_numero,
+            'nif_tipo': self.nif_tipo.value if self.nif_tipo else None,
             'nif_numero': self.nif_numero,
             'nif_country': self.nif_country,
             'contact_id': self.contact_id
         }
+
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     group_name = db.Column(db.String(255))
     is_admin = db.Column(db.Boolean, default=False)
-    contacts = db.relationship('Contact',
-                             secondary=contact_group,
-                             back_populates='grupos')
+    contacts = db.relationship('Contact', secondary=contact_group, back_populates='grupos')
 
     def serialize(self):
         return {
@@ -148,20 +125,7 @@ class MedioPagoTipo(Enum):
     TARJETA = 'Tarjeta'
     PLATAFORMA_DE_PAGO = 'Plataforma de Pago'
     TRANSFERENCIA = 'Transferencia'
-            'name': self.name,
-            'traveler01_id': self.traveler01_id,
-            'traveler01_relac': self.traveler01_relac,
-            'traveler02_id': self.traveler02_id,
-            'traveler02_relac': self.traveler02_relac,
-            'traveler03_id': self.traveler03_id,
-            'traveler03_relac': self.traveler03_relac
-        }
 
-class MedioPagoTipo(Enum):
-    EFECTIVO = 'Efectivo'
-    TARJETA = 'Tarjeta'
-    PLATAFORMA_DE_PAGO = 'Plataforma de Pago'
-    TRANSFERENCIA = 'Transferencia'
 
 class Reserva(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -175,16 +139,8 @@ class Reserva(db.Model):
     medio_pago_nro = db.Column(db.Integer)
     medio_pago_expira = db.Column(db.Date)
     fecha_pago = db.Column(db.Date)
-    nro_viajeros = db.Column(db.Integer)
-    titular_medio_pago = db.Column(db.String(255))
-    medio_pago_tipo = db.Column(db.Enum(MedioPagoTipo, name="mediopagotipo"), nullable=False)
-    medio_pago_nro = db.Column(db.Integer)
-    medio_pago_expira = db.Column(db.Date)
-    fecha_pago = db.Column(db.Date)
     traveler_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     created = db.Column(db.Date, default=datetime.utcnow)
-    
-    empresa = db.relationship('Empresa', backref='reservas', lazy=True)
 
     def serialize(self):
         return {
@@ -198,15 +154,11 @@ class Reserva(db.Model):
             'medio_pago_nro': self.medio_pago_nro,
             'medio_pago_expira': self.medio_pago_expira.isoformat() if self.medio_pago_expira else None,
             'fecha_pago': self.fecha_pago.isoformat() if self.fecha_pago else None,
-            'titular_medio_pago': self.titular_medio_pago,
-            'medio_pago_tipo': self.medio_pago_tipo.value if self.medio_pago_tipo else None,
-            'medio_pago_nro': self.medio_pago_nro,
-            'medio_pago_expira': self.medio_pago_expira.isoformat() if self.medio_pago_expira else None,
-            'fecha_pago': self.fecha_pago.isoformat() if self.fecha_pago else None,
             'nro_viajeros': self.nro_viajeros,
             'traveler_id': self.traveler_id,
             'created': self.created.isoformat() if self.created else None
         }
+
 
 class Empresa(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -221,7 +173,6 @@ class Empresa(db.Model):
     web = db.Column(db.String(255))
     url_anuncio = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    reserva_id = db.Column(db.Integer)
 
     def serialize(self):
         return {
@@ -236,9 +187,9 @@ class Empresa(db.Model):
             'email': self.email,
             'web': self.web,
             'url_anuncio': self.url_anuncio,
-            'user_id': self.user_id,
-            'reserva_id': self.reserva_id
+            'user_id': self.user_id
         }
+
 
 class UserPermission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -251,4 +202,3 @@ class UserPermission(db.Model):
             'user_id': self.user_id,
             'permissions': self.permissions
         }
-    
