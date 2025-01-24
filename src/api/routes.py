@@ -14,6 +14,11 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from werkzeug.security import generate_password_hash, check_password_hash #(Libreria que sirve para guardar una constraseña segura)
 import qrcode
 from io import BytesIO
+import io
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 
 api = Blueprint('api', __name__)
 
@@ -339,31 +344,33 @@ def create_reserva():
             "error": str(e)
         }), 500
     
-@api.route('/contact/<int:contact_id>/qr', methods=['GET'])
+@api.route('/user/contacts-qr', methods=['GET'])
 @jwt_required()
-def generate_contact_qr(contact_id):
+def generate_user_contacts_qr():
     try:
-        # Verificar que el contacto existe y pertenece al usuario actual
-        contact = Contact.query.filter_by(
-            id=contact_id,
-            user_id=get_jwt_identity()
-        ).first()
+        # Obtiene el user actual
+        current_user_id = get_jwt_identity()
         
-        if not contact:
-            return jsonify({
-                "message": "Contacto no encontrado o no autorizado"
-            }), 404
+        # Fetch user's contacts (limit to 3)
+        contacts = Contact.query.filter_by(user_id=current_user_id).limit(3).all()
+        
+        if not contacts:
+            return jsonify({"message": "No hay contactos para generar QR"}), 404
+        
+        # Prepare contacts data
+        contacts_data = []
+        for contact in contacts:
+            contact_info = contact.serialize()
             
-        # Obtener datos sensibles
-        sensitive_data = SensitiveData.query.filter_by(contact_id=contact_id).first()
+            # Añade datos sensibles si los tiene
+            sensitive_data = SensitiveData.query.filter_by(contact_id=contact.id).first()
+            if sensitive_data:
+                contact_info['sensitive_data'] = sensitive_data.serialize()
+            
+            contacts_data.append(contact_info)
         
-        # Crear diccionario con todos los datos
-        contact_data = contact.serialize()
-        if sensitive_data:
-            contact_data['sensitive_data'] = sensitive_data.serialize()
-        
-        # Convertir datos a JSON
-        qr_data = json.dumps(contact_data)
+        # Convertir a JSON
+        qr_data = json.dumps(contacts_data)
         
         # Generar QR
         qr = qrcode.QRCode(
@@ -378,7 +385,7 @@ def generate_contact_qr(contact_id):
         # Crear imagen
         img = qr.make_image(fill_color="black", back_color="white")
         
-        # Guardar imagen en buffer
+        # Save to buffer
         img_buffer = BytesIO()
         img.save(img_buffer, format='PNG')
         img_buffer.seek(0)
@@ -387,11 +394,91 @@ def generate_contact_qr(contact_id):
             img_buffer,
             mimetype='image/png',
             as_attachment=True,
-            download_name=f'contact_{contact_id}_qr.png'
+            download_name=f'user_{current_user_id}_contacts_qr.png'
         )
         
     except Exception as e:
         return jsonify({
-            "message": "Error al generar el código QR",
+            "message": "Error al generar el código QR de contactos",
+            "error": str(e)
+        }), 500
+
+@api.route('/send-contact-qr', methods=['POST'])
+@jwt_required()
+def send_contact_qr():
+    try:
+        data = request.json
+        contact_id = data.get('contact_id')
+        recipient_email = data.get('email')
+
+        contact = Contact.query.filter_by(
+            id=contact_id, 
+            user_id=get_jwt_identity()
+        ).first()
+        
+        if not contact:
+            return jsonify({"message": "Contacto no encontrado"}), 404
+
+        # Generar QR
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        
+        # Preparar datos del contacto
+        contact_data = contact.serialize()
+        sensitive_data = SensitiveData.query.filter_by(contact_id=contact_id).first()
+        if sensitive_data:
+            contact_data['sensitive_data'] = sensitive_data.serialize()
+        
+        qr.add_data(json.dumps(contact_data))
+        qr.make(fit=True)
+
+        # Crear imagen QR
+        qr_img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Preparar correo
+        msg = MIMEMultipart()
+        msg['From'] = current_app.config['MAIL_DEFAULT_SENDER']
+        msg['To'] = recipient_email
+        msg['Subject'] = f'Código QR de Contacto {contact.nombre}'
+        
+        body = f"""
+        Estimado/a {contact.nombre},
+        
+        Adjunto encontrarás el código QR con tu información de contacto.
+        
+        Saludos cordiales
+        """
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Guardar QR en buffer
+        img_buffer = BytesIO()
+        qr_img.save(img_buffer, format='PNG')
+        img_buffer.seek(0)
+        
+        # Adjuntar imagen
+        image = MIMEImage(img_buffer.getvalue(), name=f'contacto_{contact_id}_qr.png')
+        msg.attach(image)
+        
+        # Enviar correo
+        with smtplib.SMTP(
+            current_app.config['MAIL_SERVER'], 
+            current_app.config['MAIL_PORT']
+        ) as server:
+            server.starttls()
+            server.login(
+                current_app.config['MAIL_USERNAME'], 
+                current_app.config['MAIL_PASSWORD']
+            )
+            server.send_message(msg)
+        
+        return jsonify({"message": "QR enviado correctamente"}), 200
+
+    except Exception as e:
+        return jsonify({
+            "message": "Error al enviar QR", 
             "error": str(e)
         }), 500
