@@ -53,7 +53,7 @@ const UserHome = () => {
           </Link>
           </div>
           <div className="icon">
-          <Link to="/userInfo">
+          <Link to="/reservas">
             <FaBriefcase size={40} color="#333" />
             <p>Reservas</p>
             </Link>
