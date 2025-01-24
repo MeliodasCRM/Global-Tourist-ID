@@ -11,6 +11,7 @@ from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
+from flask_babel import Babel
 
 # from models import Person
 
@@ -18,8 +19,12 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
-app.config['BABEL_DEFAULT_LOCALE'] = 'en'
-app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'locales'
+
+
+app.config['BABEL_DEFAULT_LOCALE'] = 'es' # Idioma por defecto
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'UTC' # Zona horaria por defecto
+
+babel = Babel(app)
 
 
 # Setup the Flask-JWT-Extended extension
