@@ -6,6 +6,20 @@ import { useTranslation } from 'react-i18next';
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
+	{/*const navigate = useNavigate();
+
+	useEffect(() => {
+		// Redirigir segun el estado de autenticacion
+		if(store.authToken) {
+			if(store.role === "user") {
+				navigate("/user");
+			}else if(store.role === "admin") {
+				navigate("/admin");
+			}
+		}else{
+			navigate("/public");
+		}
+	}, [store.authToken, store.role, navigate]);*/}
 
 	const { t, i18n } = useTranslation();
 
