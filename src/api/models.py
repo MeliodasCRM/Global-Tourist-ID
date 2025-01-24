@@ -54,6 +54,7 @@ class Contact(db.Model):
     email = db.Column(db.String(120), nullable=False)
     telefono_movil = db.Column(db.String(20), nullable=False)
     telefono_fijo = db.Column(db.String(20), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     # Relationships
@@ -67,6 +68,7 @@ class Contact(db.Model):
             'nombre': self.nombre,
             'primer_apellido': self.primer_apellido,
             'segundo_apellido': self.segundo_apellido,
+            'sexo': self.sexo,
             'nacionalidad': self.nacionalidad,
             'fecha_nacimiento': self.fecha_nacimiento.isoformat() if self.fecha_nacimiento else None,
             'direccion': self.direccion,
@@ -75,9 +77,25 @@ class Contact(db.Model):
             'email': self.email,
             'telefono_movil': self.telefono_movil,
             'telefono_fijo': self.telefono_fijo,
+            'is_admin': self.is_admin,
             'user_id': self.user_id
         }
 
+class Group(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    group_name = db.Column(db.String(255))
+    contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    
+    contacts = db.relationship('Contact', secondary=contact_group, back_populates='grupos')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'group_name': self.group_name,
+            'contact_id': self.contact_id
+        }
 
 class TipoNif(Enum):
     DNI = 'DNI'
@@ -101,21 +119,6 @@ class SensitiveData(db.Model):
             'contact_id': self.contact_id
         }
 
-
-class Group(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    group_name = db.Column(db.String(255))
-    is_admin = db.Column(db.Boolean, default=False)
-    contacts = db.relationship('Contact', secondary=contact_group, back_populates='grupos')
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'group_name': self.group_name,
-            'is_admin': self.is_admin
-        }
 
 class MedioPagoTipo(Enum):
     EFECTIVO = 'Efectivo'
