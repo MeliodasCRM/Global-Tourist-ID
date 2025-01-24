@@ -1,6 +1,7 @@
 """empty message
 
 <<<<<<<< HEAD:migrations/versions/bae157517f7d_.py
+<<<<<<<< HEAD:migrations/versions/bae157517f7d_.py
 Revision ID: bae157517f7d
 Revises: 
 Create Date: 2025-02-03 14:22:55.039390
@@ -9,6 +10,11 @@ Revision ID: 64b69605d490
 Revises: 
 Create Date: 2025-01-27 18:37:25.487098
 >>>>>>>> eee840e (Cambio medio pago número de integer a string, funcion de generar qr modificadas):migrations/versions/64b69605d490_.py
+========
+Revision ID: e4de9a8287e2
+Revises: 
+Create Date: 2025-01-24 19:44:16.469735
+>>>>>>>> 0813e3e (4-correccion ruta reseva para poder pintarla):migrations/versions/e4de9a8287e2_.py
 
 """
 from alembic import op
@@ -17,10 +23,14 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 <<<<<<<< HEAD:migrations/versions/bae157517f7d_.py
+<<<<<<<< HEAD:migrations/versions/bae157517f7d_.py
 revision = 'bae157517f7d'
 ========
 revision = '64b69605d490'
 >>>>>>>> eee840e (Cambio medio pago número de integer a string, funcion de generar qr modificadas):migrations/versions/64b69605d490_.py
+========
+revision = 'e4de9a8287e2'
+>>>>>>>> 0813e3e (4-correccion ruta reseva para poder pintarla):migrations/versions/e4de9a8287e2_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -76,6 +86,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
 <<<<<<<< HEAD:migrations/versions/bae157517f7d_.py
+<<<<<<<< HEAD:migrations/versions/bae157517f7d_.py
     op.create_table('group',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
@@ -85,6 +96,8 @@ def upgrade():
     )
 ========
 >>>>>>>> eee840e (Cambio medio pago número de integer a string, funcion de generar qr modificadas):migrations/versions/64b69605d490_.py
+========
+>>>>>>>> 0813e3e (4-correccion ruta reseva para poder pintarla):migrations/versions/e4de9a8287e2_.py
     op.create_table('user_permission',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
