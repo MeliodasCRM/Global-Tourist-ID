@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button, Form, Row, Col, Card, Tab, Nav } from "react-bootstrap"; 
 import { FaArrowLeft } from "react-icons/fa"; 
 import { useNavigate } from "react-router-dom"; 
+import { Context } from "../store/appContext"; // Importa el contexto
 import '../../styles/userForm.css'; 
 
 export const UserForm = ({ onSave, isEditing, isNew, user }) => {
@@ -15,6 +16,7 @@ export const UserForm = ({ onSave, isEditing, isNew, user }) => {
   });
 
   const navigate = useNavigate(); 
+  const { store } = useContext(Context);  // Obtén el store para acceder al user_id y group_id
 
   // Al cargar el componente, precargamos los datos si estamos editando
   useEffect(() => {
@@ -39,9 +41,24 @@ export const UserForm = ({ onSave, isEditing, isNew, user }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Llamamos a la función onSave pasada como prop
+
+    // Comprobamos si existe un grupo en store.groups antes de acceder
+    const groupId = store.groups && store.groups.length > 0 ? store.groups[0].id : null;
+
+    if (!groupId) {
+      console.error("No hay un grupo disponible para este usuario.");
+      return;
+    }
+
+    const dataToSave = {
+      ...formData,
+      user_id: store.user.id,  // Obtén el user_id del store
+      group_id: groupId,  // Obtén el group_id
+    };
+
+    // Llamamos a la función onSave pasada como prop con el nuevo dataToSave
     if (onSave) {
-      onSave(formData); // Pasamos formData a la función onSave
+      onSave(dataToSave); // Pasa los datos completos al backend para guardar
     } else {
       console.error("onSave no está definido");
     }
@@ -169,7 +186,7 @@ export const UserForm = ({ onSave, isEditing, isNew, user }) => {
             <Card className="mb-3">
               <Card.Body>
                 <Card.Title>Datos Sensibles</Card.Title>
-                {/* Campos de datos sensibles */}
+                {/* Aquí puedes agregar el formulario para los datos sensibles */}
                 <Button variant="primary" type="submit" className="mt-3">
                   {isEditing ? "Actualizar Datos Sensibles" : "Guardar Datos Sensibles"}
                 </Button>
