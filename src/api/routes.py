@@ -29,14 +29,14 @@ CORS(api)
 def signup():
     try:
         data = request.get_json()
-        print("Datos recibidos:", data)  # Esto te ayudará a verificar los datos recibidos
+        print("Datos recibidos:", data)
 
         email = data.get('email')
         password = data.get('password')
         language = data.get('language')
 
         if not email or not password or not language:
-            print("Datos incompletos")  # Asegúrate de que 'language' esté presente
+            print("Datos incompletos")  
             return jsonify({"message": "Todos los campos son requeridos"}), 400
 
         if User.query.filter_by(email=email).first():
@@ -49,7 +49,7 @@ def signup():
         new_user = User(
             email=email,
             password=hashed_password,
-            language=language,  # Verifica que 'language' se asigne correctamente
+            language=language, 
             role=None,
             is_active=True,
             created_at=datetime.utcnow(),
@@ -64,7 +64,7 @@ def signup():
         return jsonify({"message": "Usuario registrado exitosamente"}), 201
     except Exception as e:
         db.session.rollback()
-        print(f"Error en el endpoint /signup: {str(e)}")  # Imprime el error completo
+        print(f"Error en el endpoint /signup: {str(e)}")
         return jsonify({"message": "Error interno en el servidor", "error": str(e)}), 500
 
 @api.route ('/login', methods=['POST'])
@@ -187,17 +187,54 @@ def delete_user(user_id):
 def backoffice():
     return jsonify({"message": "Acceso al Backoffice permitido."})
 
+@api.route('/contact', methods=['GET'])
+@jwt_required()
+def get_contacts():
+    try:
+        # Obtener el email del usuario autenticado
+        email = get_jwt_identity()  # Esto devolverá el email del usuario actual
+
+        # Obtener el user_id basado en el email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
+        # Ahora, usa el user_id obtenido del usuario para filtrar los contactos
+        user_id = user.id 
+        print(f"Usuario autenticado con ID: {user_id}")  # Log para verificar
+
+        # Filtrar contactos usando el user_id
+        contacts = Contact.query.filter_by(user_id=user_id).all()
+        
+        if not contacts:
+            print("No se encontraron contactos.")
+            return jsonify({"message": "No hay contactos disponibles"}), 404
+        
+        return jsonify([contact.serialize() for contact in contacts]), 200
+    except Exception as e:
+        print(f"Error al obtener los contactos: {e}")
+        return jsonify({"message": "Error al obtener los contactos", "error": str(e)}), 500
+
 # FUNCION PARA CREAR UN CONTACTO
 @api.route('/contact', methods=['POST'])
 @jwt_required()
 def create_contact():
     try:
         # Obtener usuario actual del token JWT
-        current_user_id = get_jwt_identity()
+        email = get_jwt_identity()  # Obtener el email del usuario autenticado
         
+        # Buscar el usuario en la base de datos usando el email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
+        # Obtener el ID del usuario autenticado
+        current_user_id = user.id
+        
+        # Obtener los datos del nuevo contacto
         data = request.get_json()
         
-        # Crear nuevo contacto con los campos requeridos
+        # Crear el nuevo contacto
         new_contact = Contact(
             nombre=data['nombre'],
             primer_apellido=data['primer_apellido'],
@@ -211,7 +248,7 @@ def create_contact():
             email=data['email'],
             telefono_movil=data['telefono_movil'],
             telefono_fijo=data['telefono_fijo'],
-            user_id=current_user_id
+            user_id=current_user_id  # Aquí asignamos el ID del usuario autenticado
         )
         
         db.session.add(new_contact)
@@ -231,6 +268,101 @@ def create_contact():
         db.session.rollback()
         return jsonify({
             "message": "Error al crear el contacto",
+            "error": str(e)
+        }), 500
+    
+#FUNCION PARA EDITAR LOS DATOS DE UN CONTACTO
+@api.route('/contact/<int:contact_id>', methods=['PUT'])
+@jwt_required()
+def update_contact(contact_id):
+    try:
+        # Obtener el email del usuario autenticado
+        email = get_jwt_identity()
+        
+        # Buscar al usuario en la base de datos usando el email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
+        # Obtener el contacto a actualizar
+        contact = Contact.query.get(contact_id)
+        if not contact:
+            return jsonify({"message": "Contacto no encontrado"}), 404
+        
+        # Verificar que el contacto pertenece al usuario autenticado
+        if contact.user_id != user.id:
+            return jsonify({"message": "No tienes permiso para actualizar este contacto"}), 403
+        
+        # Obtener los datos a actualizar
+        data = request.get_json()
+
+        # Actualizar los campos del contacto
+        contact.nombre = data.get('nombre', contact.nombre)
+        contact.primer_apellido = data.get('primer_apellido', contact.primer_apellido)
+        contact.segundo_apellido = data.get('segundo_apellido', contact.segundo_apellido)
+        contact.sexo = data.get('sexo', contact.sexo)
+        contact.nacionalidad = data.get('nacionalidad', contact.nacionalidad)
+        contact.fecha_nacimiento = datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d').date() if 'fecha_nacimiento' in data else contact.fecha_nacimiento
+        contact.direccion = data.get('direccion', contact.direccion)
+        contact.localidad = data.get('localidad', contact.localidad)
+        contact.pais = data.get('pais', contact.pais)
+        contact.email = data.get('email', contact.email)
+        contact.telefono_movil = data.get('telefono_movil', contact.telefono_movil)
+        contact.telefono_fijo = data.get('telefono_fijo', contact.telefono_fijo)
+        
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Contacto actualizado exitosamente",
+            "contact": contact.serialize()
+        }), 200
+        
+    except KeyError as e:
+        return jsonify({
+            "message": "Datos incompletos",
+            "error": f"Falta el campo {str(e)}"
+        }), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error al actualizar el contacto",
+            "error": str(e)
+        }), 500
+
+#FUNCION PARA ELIMINAR UN CONTACTO
+@api.route('/contact/<int:contact_id>', methods=['DELETE'])
+@jwt_required()
+def delete_contact(contact_id):
+    try:
+        # Obtener el email del usuario autenticado
+        email = get_jwt_identity()
+        
+        # Buscar al usuario en la base de datos usando el email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
+        # Obtener el contacto a eliminar
+        contact = Contact.query.get(contact_id)
+        if not contact:
+            return jsonify({"message": "Contacto no encontrado"}), 404
+        
+        # Verificar que el contacto pertenece al usuario autenticado
+        if contact.user_id != user.id:
+            return jsonify({"message": "No tienes permiso para eliminar este contacto"}), 403
+        
+        # Eliminar el contacto
+        db.session.delete(contact)
+        db.session.commit()
+        
+        return jsonify({
+            "message": f"Contacto con ID {contact_id} eliminado exitosamente"
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error al eliminar el contacto",
             "error": str(e)
         }), 500
 
@@ -287,7 +419,6 @@ def create_sensitive_data():
             "message": "Error al guardar los datos sensibles",
             "error": str(e)
         }), 500
-
 
 # FUNCION PARA GUARDAR LOS DATOS RESERVA
 @api.route('/reserva', methods=['POST'])

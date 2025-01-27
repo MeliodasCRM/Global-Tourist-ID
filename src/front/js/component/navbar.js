@@ -2,27 +2,26 @@ import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext"; // Importar el contexto de Flux
 import { Link } from "react-router-dom";
 import "../../styles/navbar.css";
-
 export const Navbar = () => {
   const { store } = useContext(Context);
   const [authToken, setAuthToken] = useState(null);
-
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     setAuthToken(token);
   }, []);
-
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     setAuthToken(null);
     window.location.reload();
   };
-
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary custom-navbar">
       <div className="container-fluid">
         <Link to="/userhome">
           <span className="navbar-brand" href="#"> userhome </span>
+        </Link>
+        <Link to="/">
+          <span className="navbar-brand" href="#"> Global Turist </span>
         </Link>
         <button
           className="navbar-toggler"
@@ -42,10 +41,8 @@ export const Navbar = () => {
                 <span className="nav-link active" aria-current="page">  </span>
               </Link>
             </li>
-         
             <li className="nav-item">
-
-            <Link to="/Publica">
+              <Link to="/Publica">
                 <span className="nav-link active" aria-current="page">  </span>
               </Link>
             </li>

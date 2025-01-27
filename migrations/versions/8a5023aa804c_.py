@@ -1,8 +1,14 @@
 """empty message
 
+<<<<<<<< HEAD:migrations/versions/8a5023aa804c_.py
 Revision ID: 8a5023aa804c
 Revises: 
 Create Date: 2025-01-22 18:05:29.091032
+========
+Revision ID: acb7b4b41766
+Revises: 
+Create Date: 2025-01-22 20:03:45.905030
+>>>>>>>> 103c07718405e2cb0a735c7fbb7366900b739597:migrations/versions/acb7b4b41766_.py
 
 """
 from alembic import op
@@ -10,7 +16,11 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
+<<<<<<<< HEAD:migrations/versions/8a5023aa804c_.py
 revision = '8a5023aa804c'
+========
+revision = 'acb7b4b41766'
+>>>>>>>> 103c07718405e2cb0a735c7fbb7366900b739597:migrations/versions/acb7b4b41766_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -61,7 +71,6 @@ def upgrade():
     sa.Column('web', sa.String(length=255), nullable=True),
     sa.Column('url_anuncio', sa.String(length=255), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('reserva_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
