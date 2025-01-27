@@ -23,6 +23,7 @@ export const Navbar = () => {
       <div className="container-fluid">
         <Link to="/userhome">
           <span className="navbar-brand" href="#"> userhome </span>
+        </Link>
         <Link to="/">
           <span className="navbar-brand" href="#"> Global Turist </span>
         </Link>
@@ -44,10 +45,10 @@ export const Navbar = () => {
                 <span className="nav-link active" aria-current="page">  </span>
               </Link>
             </li>
-         
+
             <li className="nav-item">
 
-            <Link to="/Publica">
+              <Link to="/Publica">
                 <span className="nav-link active" aria-current="page">  </span>
               </Link>
             </li>
