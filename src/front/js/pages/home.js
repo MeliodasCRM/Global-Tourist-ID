@@ -1,15 +1,18 @@
 import React from "react";
 import "../../styles/home.css";
-import { Link } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
 
 export const Home = () => {
   const { t, i18n } = useTranslation();
-
+  const Navigate = useNavigate();
   const changeLanguage = (language) => {
     i18n.changeLanguage(language);
   };
+  const handleLoginRedirect = () => {
+    Navigate("/login");
+  }
 
   return (
     <div className="home-container">
@@ -59,11 +62,10 @@ export const Home = () => {
         <p className="bottom-text">
           {t('Get and enjoy Features For Free and make your life easy with us.')}
         </p>
-        <Link to="/login">
-          <button className="start-button">
+        <button className="start-button" onClick={handleLoginRedirect}>
             <FaArrowRight className="arrow-icon" />
           </button>
-        </Link>
+       
       </div>
     </div>
   );

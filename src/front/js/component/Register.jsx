@@ -1,186 +1,129 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Context } from "../store/appContext"; // Importar el contexto de Flux
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
-import { AiOutlineMail, AiOutlineLock } from "react-icons/ai"; // React Icons
-import { BsArrowRight } from "react-icons/bs"; // React Icons
+import React, { useState, useContext } from "react";
+import { Context } from "../store/appContext";
+import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
+import { useNavigate } from "react-router-dom"; // ✅ Importar useNavigate
 import "../../styles/register.css";
 
 export const Register = () => {
-  const { actions } = useContext(Context); // Acceder a las acciones del Flux
+  const { actions } = useContext(Context);
+  const navigate = useNavigate(); // ✅ Inicializar navegación
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    language: "es",
-
+    language: "es"
   });
-  const [activeTab, setActiveTab] = useState("login"); // Controlar si es login o signup
-  const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // Inicializar useNavigate para redirección
-
-  // Para prevenir la actualización de estado en un componente desmontado
-  const [isMounted, setIsMounted] = useState(true);
-
-  // Usamos un ref para evitar actualizar el estado cuando el componente se desmonta
-  const isMountedRef = React.useRef(true);
-
-  useEffect(() => {
-    // Marca el componente como montado
-    isMountedRef.current = true;
-    return () => {
-      // Cuando el componente se desmonta, actualizamos el ref
-      isMountedRef.current = false;
-    };
-  }, []);
+  const [activeTab, setActiveTab] = useState("login");
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const { email, password, language } = formData;
-  
     if (activeTab === "login") {
-      const result = await actions.login(email, password);
-      if (isMountedRef.current) setMessage(result.message);
+      await actions.login(formData.email, formData.password);
     } else {
-      // Incluye 'language' al enviar la solicitud de registro
-      const result = await actions.signup(email, password, language); // Añadir 'language' aquí
-      if (isMountedRef.current) {
-        if (result.success) {
-          alert("Usuario registrado exitosamente.");
-          setFormData({ email: "", password: "", language: "es" }); // Limpiar el formulario y resetear 'language'
-          setActiveTab("login");
-          navigate("/userhome");
-        } else {
-          setMessage(result.message);
-        }
+      const result = await actions.signup(formData.email, formData.password, formData.language);
+      if (result.success) {
+        alert("✅ Registro exitoso. Ahora puedes iniciar sesión.");
+        setActiveTab("login"); // ✅ Cambia a la pestaña de login
+        setFormData({ email: "", password: "", language: "es" }); // ✅ Limpia los campos
+        navigate("/login"); // ✅ Redirige al login
+      } else {
+        alert("❌ Error en el registro. Inténtalo de nuevo.");
       }
     }
   };
 
   return (
-    <div>
-      <div className="section">
-        <div className="container">
-          <div className="row full-height justify-content-center">
-            <div className="col-12 text-center align-self-center py-5">
-              <div className="section pb-5 pt-5 pt-sm-2 text-center">
-                <h6 className="mb-0 pb-3">
-                  <span onClick={() => setActiveTab("login")}>Log In</span>
-                  <span onClick={() => setActiveTab("signup")}>Sign Up</span>
-                </h6>
-                <input
-                  className="checkbox"
-                  type="checkbox"
-                  id="reg-log"
-                  name="reg-log"
-                  checked={activeTab === "signup"}
-                  onChange={() =>
-                    setActiveTab(activeTab === "login" ? "signup" : "login")
-                  }
-                />
-                <label htmlFor="reg-log"></label>
-                <div className="card-3d-wrap mx-auto">
-                  <div className="card-3d-wrapper">
-                    {activeTab === "login" && (
-                      <div className="card-front">
-                        <div className="center-wrap">
-                          <form className="section text-center" onSubmit={handleSubmit}>
-                            <h4 className="mb-4 pb-3">Log In</h4>
-                            <div className="form-group">
-                              <input
-                                type="email"
-                                className="form-style"
-                                id="email-login"
-                                name="email"
-                                placeholder="Su Correo Electrónico"
-                                value={formData.email}
-                                onChange={handleChange}
-                              />
-                              <AiOutlineMail className="input-icon" />
-                            </div>
-                            <div className="form-group mt-2">
-                              <input
-                                type="password"
-                                className="form-style"
-                                id="password-login"
-                                name="password"
-                                placeholder="Su Contraseña"
-                                value={formData.password}
-                                onChange={handleChange}
-                              />
-                              <AiOutlineLock className="input-icon" />
-                            </div>
-                            <button type="submit" className="btn mt-4">
-                              <BsArrowRight className="arrow-icon" />
-                            </button>
-                            <p className="mb-0 mt-4 text-center">
-                              <a href="#0" className="link">
-                                Forgot your password?
-                              </a>
-                            </p>
-                          </form>
-                        </div>
-                      </div>
-                    )}
-                    {activeTab === "signup" && (
-                      <div className="card-back">
-                        <div className="center-wrap">
-                          <form className="section text-center" onSubmit={handleSubmit}>
-                            <h4 className="mb-4 pb-3">Sign Up</h4>
-                            <div className="form-group mt-2">
-                              <input
-                                type="email"
-                                className="form-style"
-                                id="email-signup"
-                                name="email"
-                                placeholder="Su Correo Electrónico"
-                                value={formData.email}
-                                onChange={handleChange}
-                              />
-                              <AiOutlineMail className="input-icon" />
-                            </div>
-                            <div className="form-group mt-2">
-                              <input
-                                type="password"
-                                className="form-style"
-                                id="password-signup"
-                                name="password"
-                                placeholder="Su Contraseña"
-                                value={formData.password}
-                                onChange={handleChange}
-                              />
-                              <AiOutlineLock className="input-icon" />
-                            </div>
-                            <div className="form-group mt-2">
-                              <select
-                                className="form-style"
-                                id='language'
-                                name= "language"
-                                value={formData.language}
-                                onChange={handleChange}
-                                >
-                                  <option value="es"> Español (es)</option>
-                                  <option value="en"> Inglés (en)</option>
-                              </select>
-                            </div>
-                            <button type="submit" className="btn mt-4">
-                              <BsArrowRight className="arrow-icon" />
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {message && <p className="mt-4">{message}</p>}
-              </div>
-            </div>
-          </div>
+    <div className="auth-container">
+      {/* 1️⃣ Caja superior (Welcome / Create Account) */}
+      <div className="auth-header">
+        <h2>{activeTab === "login" ? "Welcome back!" : "Create an account!"}</h2>
+        <p>
+          {activeTab === "login" ? "Login below or " : "Enter your account details below or "}
+          <span className="switch-tab" onClick={() => setActiveTab(activeTab === "login" ? "signup" : "login")}>
+            {activeTab === "login" ? "create an account" : "Log In"}
+          </span>
+        </p>
+      </div>
+
+      {/* 2️⃣ Caja intermedia (Formulario - SOLO INPUTS) */}
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="input-wrapper">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <AiOutlineMail className="input-icon" />
         </div>
+
+        <div className="input-wrapper">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <AiOutlineLock className="input-icon" />
+        </div>
+
+        {/* Selector de idioma solo en Sign Up */}
+        {activeTab === "signup" && (
+          <div className="input-wrapper">
+            <label htmlFor="language">Language</label>
+            <select
+              id="language"
+              name="language"
+              value={formData.language}
+              onChange={handleChange}
+            >
+              <option value="es">Español (es)</option>
+              <option value="en">Inglés (en)</option>
+            </select>
+          </div>
+        )}
+      </form>
+
+      {/* 3️⃣ Caja inferior (QR y Botón - FUERA DEL FORMULARIO) */}
+      <div className="auth-footer">
+        <div className="divider"></div> {/* Línea divisora */}
+
+        {/* QR Code en lugar del texto */}
+        <div className="qr-container">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="80"
+            height="80"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="qr-icon"
+          >
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <path d="M14 14h1v1h-1zm3 0h1v1h-1zm0 3h1v1h-1zm-3 3h1v1h-1zm3 0h1v1h-1zm3-3h1v1h-1z"></path>
+          </svg>
+        </div>
+
+        {/* Botón de login/signup */}
+        <button className="auth-button" onClick={handleSubmit}>
+          {activeTab === "login" ? "Login" : "Sign Up"}
+        </button>
       </div>
     </div>
   );

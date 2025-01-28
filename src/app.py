@@ -26,6 +26,8 @@ app.config['BABEL_DEFAULT_TIMEZONE'] = 'UTC' # Zona horaria por defecto
 
 babel = Babel(app)
 
+babel = Babel(app)
+
 
 # Setup the Flask-JWT-Extended extension
 app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!

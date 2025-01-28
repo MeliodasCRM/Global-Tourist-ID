@@ -1,9 +1,157 @@
-body{
-	font-family: 'Poppins', sans-serif;
-	font-weight: 300;
-	font-size: 15px;
-	line-height: 1.7;
-	color: #c4c3ca;
-	background-color: #1f2029;
-	overflow-x: hidden;
-}
+/* Contenedor principal */
+.auth-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between; /* Separa las cajas automáticamente */
+	height: 100vh;
+	width: 100%;
+	gap: 40px; /* <-- Controla la separación entre las cajas */
+  }
+  
+  
+  /* 1️⃣ Caja superior (Welcome) */
+  .auth-header {
+	text-align: center;
+	width: 90%;
+	max-width: 400px;
+	margin-top: 40px;
+  }
+  
+  /* 2️⃣ Caja intermedia (Formulario - Alineada con auth-header) */
+  .auth-form {
+	display: flex;
+	flex-direction: column;
+	width: 90%;
+	max-width: 400px; /* Alinea con la caja superior */
+	margin-left: 60px;
+	
+  }
+  
+  /* Inputs alineados con caja superior */
+  .input-wrapper {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	width: 100%;
+	margin-bottom: 20px; /* Espacio entre inputs */
+  }
+  
+  .input-wrapper label {
+	font-size: 14px;
+	font-weight: bold;
+	margin-bottom: 5px; /* Espacio entre label y el input */
+	color: #333; /* Color oscuro para mejor visibilidad */
+  }
+  
+  .input-wrapper input {
+	width: 100%;
+	padding: 10px 15px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	font-size: 16px;
+  }
+  
+  .input-icon {
+	position: absolute;
+	right: 15px;
+	top: 55%;
+	transform: translateY(-50%);
+	color: #888;
+  }
+  
+  
+  /* 3️⃣ Caja inferior (Debe ocupar TODO el ancho) */
+  /* Caja inferior */
+.auth-footer {
+	background-color: #4f46e5; /* Azul */
+	width: 100vw;
+	height: 35vh;
+	border-radius: 30px 30px 0 0;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	margin-top: 30px; /* <-- Baja la caja inferior */
+  }
+  
+  /* Línea divisora en la caja inferior */
+  .divider {
+	width: 50px;
+	height: 4px;
+	background-color: white;
+	border-radius: 10px;
+	margin-bottom: 10px;
+  }
+  
+  /* Texto dentro de la caja inferior */
+  .auth-footer h2 {
+	font-size: 1.8rem;
+	color: white;
+	font-weight: bold;
+	margin-bottom: 10px;
+  }
+  
+  .auth-footer p {
+	font-size: 1rem;
+	color: #d1d5db;
+	max-width: 80%;
+	margin-bottom: 20px;
+  }
+  
+  /* Botón grande y centrado */
+  .auth-button {
+	background-color: white;
+	width: 80%;
+	max-width: 300px;
+	padding: 15px;
+	border-radius: 50px;
+	border: none;
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #4f46e5;
+	cursor: pointer;
+	transition: transform 0.2s ease-in-out;
+  }
+  
+  .auth-button:hover {
+	transform: scale(1.05);
+  }
+  .input-wrapper select {
+	width: 50%;  /* Mismo ancho que los otros inputs */
+	padding: 10px 15px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	font-size: 16px;
+	background-color: white;
+	appearance: none; /* Elimina el estilo predeterminado del sistema */
+	margin-left: 50px;
+  }
+  .qr-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 15px; /* Espacio entre QR y botón */
+  }
+  
+  .qr-icon {
+	width: 80px; /* Tamaño más pequeño */
+	height: 80px;
+	color: white; /* Mantiene el color */
+  }
+ /* Línea divisora */
+ .divider {
+    width: 50px;
+    height: 4px;
+    background-color: white;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  } 
+  .qr-container {
+	margin-top: 10px; /* Baja el QR para que la línea sea visible */
+  }
+   
+  
+  
