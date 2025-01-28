@@ -8,7 +8,6 @@ import { Login } from "./pages/login";
 import injectContext from "./store/appContext";
 import BackOffice from "./pages/backoffice";
 import ContactTable from "./component/ContactTable.jsx";
-import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import PrivateRoute from "./component/PrivateRoute.jsx";
 import PublicView from "./pages/publicView";
@@ -31,7 +30,6 @@ const Layout = () => {
         <div>
             <BrowserRouter>
                 <ScrollToTop>
-                <Navbar /> {/* Navbar global */}
                     <Routes>
                         {/* Rutas para el BackOffice */}
                         <Route path="/backoffice" element={<BackOffice />}>

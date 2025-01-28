@@ -1,0 +1,119 @@
+[33m28776a2[m[33m ([m[1;36mHEAD -> [m[1;32mestilos_globales[m[33m)[m 2- sedeja la home y el login y register ok
+[33m25be287[m 1-pantalla home ok afalta de aprobacion
+[33meefe97a[m 4-correccion ruta reseva para poder pintarla
+[33ma0945a4[m ajustes M
+[33m8319e16[m 3-rama actualizada con develop
+[33mb22fecf[m[33m ([m[1;31morigin/develop[m[33m)[m Merge pull request #28 from 4GeeksAcademy/userHome
+[33m2e13757[m 07.- Ajustes menores
+[33m785c6cb[m 06. Endpoint User, Contact, Sensitive-Data (Load, create, edit y delete) creados y funcionando. UserInfo actualizada y cargando datos del STORE
+[33m103c077[m Merge pull request #27 from 4GeeksAcademy/userHome
+[33m9bbd69f[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into userHome
+[33m89551f7[m 05. Endpoints Contacts creados y funcionando
+[33m50d87a7[m[33m ([m[1;32mdevelop[m[33m)[m vista_previa_home
+[33m52da317[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into userHome
+[33m42596c5[m 07. Ajustes
+[33m358fb8a[m Merge pull request #24 from 4GeeksAcademy/front_reservas
+[33m04339c3[m[33m ([m[1;31morigin/front_reservas[m[33m)[m ajustes 2
+[33m8297331[m resolver conflictos
+[33m64911ea[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into front_reservas
+[33md3e2871[m Merge pull request #23 from 4GeeksAcademy/endpoints
+[33mb026a89[m Merge branch 'develop' into endpoints
+[33me0395fd[m Commit vacio
+[33mf6e3b28[m Merge pull request #25 from 4GeeksAcademy/userHome
+[33m40e0bc3[m 06. Ajustes en UserInfo y UserForm
+[33md973c6f[m 05. Ajustes
+[33mf5fc4d2[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into userHome
+[33mb07ab4b[m 04. Cambios
+[33m6e633b5[m reservas-02
+[33m8fb2e30[m Save changes before rebase
+[33m12690a5[m 2-arreglo delas rutas integracio reserva
+[33mbe1144b[m Bases de datos definitivas y funciones para recoger datos de contacto, datos sensibles y reserva
+[33m38f2961[m 1.reservas
+[33m1c51a4f[m Bases de datos definitivas y funciones para recoger datos de contacto, datos sensibles y reserva
+[33mbcca718[m Bases de datos definitivas y funciones para recoger datos de contacto, datos sensibles y reserva
+[33m4fadcaa[m 1.reservas
+[33m8cde33b[m Función para generar Qr
+[33ma6af84b[m Bases de datos definitivas y funciones para recoger datos de contacto, datos sensibles y reserva
+[33mbe07dbd[m Muevo la función de crear qr a Routes
+[33m8bdb876[m Merge pull request #22 from 4GeeksAcademy/endpoints
+[33mfe0ac31[m reserva y base de datos nuevas
+[33ma12bda8[m 2-arreglo delas rutas integracio reserva
+[33mc2427ae[m 1.reservas
+[33ma3093af[m Actualización bases de datos
+[33m1670aca[m Bases de datos definitivas y funciones para recoger datos de contacto, datos sensibles y reserva
+[33mf15b4bc[m Función para generar Qr
+[33m23f32c0[m Merge pull request #21 from 4GeeksAcademy/endpoints
+[33m82e46d0[m Actualización bases de datos
+[33m1c7f941[m Bases de datos definitivas y funciones para recoger datos de contacto, datos sensibles y reserva
+[33mf94226d[m 1.reservas
+[33mbb2c904[m 1-reservas
+[33m81a14c8[m vista_previa_home
+[33mf2c1fa7[m Merge pull request #20 from 4GeeksAcademy/userHome
+[33mb212eb3[m 04. UserForm y Register con idioma
+[33mb06f87b[m Merge pull request #19 from 4GeeksAcademy/userHome
+[33ma72ea2e[m 03. Models de Pablo updated
+[33m326fd66[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into userHome
+[33m959f8bf[m Merge pull request #18 from 4GeeksAcademy:endpoints
+[33m9dd8892[m 02. UserHome & UserInfo
+[33m40cbf97[m Últimas bases de datos y funciones para recoger los datos
+[33m83f4996[m Últimas bases de datos y funciones para guardar los datos del usuario
+[33mde195ea[m 02.- desactivado el i18n
+[33m07e2685[m 01.- Home user y navbar en proceso
+[33mabaa388[m Passw a 255
+[33m36122ce[m[33m ([m[1;31morigin/userView[m[33m, [m[1;31morigin/userHome[m[33m, [m[1;31morigin/backoffice[m[33m)[m 3.- Cambios Home y Backoffice
+[33m9ede253[m Merge pull request #17 from 4GeeksAcademy/front_home
+[33m8c61b1a[m Merge branch 'develop' into front_home
+[33maa5edaa[m 1.home publica
+[33mc1588ed[m Merge pull request #16 from 4GeeksAcademy:endpoints
+[33m2881806[m[33m ([m[1;31morigin/endpoints[m[33m)[m Modificacion bases de datos a modelo optimizado
+[33m41fa077[m Merge pull request #15 from 4GeeksAcademy/backoffice
+[33m28c5322[m 2.- Login
+[33me41fdf9[m 1
+[33m5382217[m 03.- Arreglo de Bugs en models/reservas y limpieza de plantilla
+[33m0c8976c[m Optimización de tablas necesarias para realizar el MVP
+[33m3f76262[m Optimización de bases de datos. Se dejan solo las necesarias para el usuario, sus datos y la transaccion
+[33mc19cbb2[m Optimización bases de datos, creación de bases de datos que contienen información necesaria
+[33mefd807d[m Creo endpoints (crear, obtener, actualizar y eliminar) Empresas, Alojamientos, Reservas
+[33m82e3ef5[m 1ro.- Estructura BackOffice conectada
+[33mb913775[m Merge pull request #14 from 4GeeksAcademy/endpoints
+[33m8a78f05[m Merge branch 'develop' into endpoints
+[33md27693e[m Optimización de tablas necesarias para realizar el MVP
+[33medd2db7[m Optimización de bases de datos. Se dejan solo las necesarias para el usuario, sus datos y la transaccion
+[33m0eecede[m Merge pull request #12 from 4GeeksAcademy/endpoints
+[33med3ba21[m Optimización bases de datos, creación de bases de datos que contienen información necesaria
+[33m2b1cfa8[m[33m ([m[1;31morigin/login[m[33m)[m 03.- Arreglo de Bugs en models/reservas y limpieza de plantilla
+[33m1c4fbd0[m vista_previa_home
+[33m768fdc2[m Merge pull request #9 from 4GeeksAcademy:endpoints
+[33mb4cf0b5[m Creo endpoints (crear, obtener, actualizar y eliminar) Empresas, Alojamientos, Reservas
+[33m7413deb[m[33m ([m[1;32mmain[m[33m)[m Merge pull request #8 from 4GeeksAcademy:endpoints
+[33mc407797[m Creados endpoints de Empresas
+[33mcb3895f[m Merge pull request #7 from 4GeeksAcademy/endpoints
+[33mdb64303[m Merge remote-tracking branch 'origin/develop' into endpoints
+[33m17b4344[m Funciones serialize, GET y POST de empresa (API)
+[33m5947898[m Merge pull request #6 from 4GeeksAcademy/login
+[33md19cb21[m 01.- Login, signup, logout iniciado
+[33ma5ebe02[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into login
+[33md4b40d3[m Merge pull request #5 from 4GeeksAcademy/endpoints
+[33m94968ee[m Creación de las admin views
+[33m5875d9b[m Merge pull request #4 from 4GeeksAcademy/endpoints
+[33m2628510[m 02.- Enpoint Sign up eliminado user
+[33m52c8661[m Merge pull request #3 from 4GeeksAcademy/endpoints
+[33m61e5f9e[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into endpoints
+[33mc68ac68[m 01.- Enpoints login, user y signup creados
+[33mea823c8[m Merge pull request #2 from 4GeeksAcademy/Database
+[33m4494023[m[33m ([m[1;31morigin/Database[m[33m)[m Merge branch 'develop' of https://github.com/4GeeksAcademy/MauSon_Proyecto_Final into Database
+[33m136bccc[m 02.- User model modified
+[33m7b531e5[m 1ro inicio login
+[33m3256ba4[m Merge pull request #1 from 4GeeksAcademy/Database
+[33m76580c3[m Creación bases de datos excepto login y user
+[33maeee858[m Update app.py
+[33m123b985[m Update app.py
+[33m847367c[m Merge pull request #532 from ehiber/patch-1
+[33m992577d[m Update Pipfile
+[33m0263d6b[m Merge pull request #286 from enaguero/change_flask_cors_to_routes
+[33mb95c85d[m Change flask_cors to be applied after blue print is initalized
+[33m9b4d0d3[m Merge pull request #258 from tommygonzaleza/patch-1
+[33mab2c385[m Webpack config bug on codespaces hot reload fixed
+[33m0edb8f2[m Update .gitignore
+[33mb755811[m Merge pull request #231 from leomuzicarvalho/overhaul-project-setup
+[33mbd55d28[m add migrations folder to .gitignore / add shortcut command to downgrade migrations / add new CLI to flask to help students persisting example data in their database / update documentation with
