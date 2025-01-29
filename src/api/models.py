@@ -136,7 +136,7 @@ class Reserva(db.Model):
     nro_viajeros = db.Column(db.Integer)
     titular_medio_pago = db.Column(db.String(255))
     medio_pago_tipo = db.Column(db.Enum(MedioPagoTipo, name="mediopagotipo"), nullable=False)
-    medio_pago_nro = db.Column(db.Integer)
+    medio_pago_nro = db.Column(db.String(19))
     medio_pago_expira = db.Column(db.Date)
     fecha_pago = db.Column(db.Date)
     traveler_id = db.Column(db.Integer, db.ForeignKey('contact.id'))

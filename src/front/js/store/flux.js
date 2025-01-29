@@ -79,9 +79,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log("Error al cargar usuario:", errorResponse);
 				  }
 				} catch (error) {
-				  console.error("Error al cargar el usuario:", error);
+					console.error("Error al cargar el usuario:", error);
 				}
-			  },
+			},
 
 			logout: () => {
 				localStorage.removeItem("authToken");  // Eliminamos el token del localStorage
