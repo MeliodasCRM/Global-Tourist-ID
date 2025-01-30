@@ -81,7 +81,7 @@ def handle_Login():
         return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
 
     # Crear un token de acceso utilizando el email del usuario
-    token = create_access_token(identity=str(user.email))
+    token = create_access_token(identity=str(user.id))
     return(token)
 
 @api.route('/user', methods=['GET'])
@@ -855,9 +855,10 @@ def generate_group_qr(group_id):
         # Obtener todos los contactos del grupo con sus relaciones (optimizado)
         contacts = (
             Contact.query
+            .join(contact_group, contact_group.c.contact_id == Contact.id)  # Join con la tabla de asociación
+            .filter(contact_group.c.group_id == group_id)  # Filtrar por group_id
             .options(db.joinedload(Contact.sensitive_data))
             .options(db.joinedload(Contact.reservas))
-            .filter(Contact.group_id == group_id)
             .all()
         )
 
@@ -891,6 +892,6 @@ def generate_group_qr(group_id):
             as_attachment=True,
             download_name=f'group_{group_id}_qr.png'
         )
-        
+        # return jsonify(group_data), 200
     except Exception as e:
         return jsonify({"message": "Error al generar el QR grupal", "error": str(e)}), 500
