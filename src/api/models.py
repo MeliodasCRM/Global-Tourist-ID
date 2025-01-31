@@ -32,14 +32,12 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
 
-
 # Association table for Contact-Group relationship
 contact_group = db.Table(
     'contact_group',
     db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'), primary_key=True),
     db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True)
 )
-
 
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -86,16 +84,17 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     group_name = db.Column(db.String(255))
-    contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     
+    # Relación con Contactos (relación muchos a muchos)
     contacts = db.relationship('Contact', secondary=contact_group, back_populates='grupos')
 
     def serialize(self):
+        # Serializa el grupo incluyendo los contactos asociados
         return {
             'id': self.id,
             'user_id': self.user_id,
             'group_name': self.group_name,
-            'contact_id': self.contact_id
+            'contact_ids': [contact.id for contact in self.contacts]  # Lista de IDs de contactos asociados
         }
 
 class TipoNif(Enum):
