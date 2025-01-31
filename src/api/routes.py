@@ -81,7 +81,7 @@ def handle_Login():
         return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
 
     # Crear un token de acceso utilizando el email del usuario
-    token = create_access_token(identity=str(user.id))
+    token = create_access_token(identity=str(user.email))
     return(token)
 
 @api.route('/user', methods=['GET'])
@@ -92,16 +92,24 @@ def get_user():
         user_email = get_jwt_identity()  # El email del usuario autenticado
         print(f"Usuario autenticado con email: {user_email}")  # Log para verificar el email
 
+        if not user_email:
+            # Si no se obtiene el email desde el JWT
+            return jsonify({"message": "No se encontró el usuario autenticado en el token"}), 401
+
         # Buscar el usuario por email
         user = User.query.filter_by(email=user_email).first()
 
         if not user:
+            # Si no se encuentra el usuario en la base de datos
+            print(f"Usuario con email {user_email} no encontrado en la base de datos.")
             return jsonify({"message": "Usuario no encontrado"}), 404
 
+        # Si el usuario es encontrado, devolver la información serializada
         return jsonify(user.serialize()), 200
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        # Captura cualquier otro error y lo reporta
+        print(f"Error al obtener el usuario: {str(e)}")
         return jsonify({"message": "Error al obtener el usuario", "error": str(e)}), 500
     
 # FUNCTION para actualizar los datos del usuario autenticado

@@ -3,14 +3,10 @@ import { Button, Tab, Nav, Accordion } from "react-bootstrap";
 import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext"; // Contexto para acceder al store y acciones
-import UserContactForm from "../component/UserContactForm.jsx"; // Asegúrate de que la ruta es correcta
 import '../../styles/userInfo.css'; // Estilos del componente
 
 const UserInfo = () => {
   const [key, setKey] = useState("user01");
-  const [isFormVisible, setIsFormVisible] = useState(false);  // Mostrar el formulario
-  const [isEditing, setIsEditing] = useState(false);  // Controlar si estamos en modo edición
-  const [contactToEdit, setContactToEdit] = useState(null);  // Contacto a editar
   const navigate = useNavigate();
   const { store, actions } = useContext(Context);
 
@@ -26,15 +22,13 @@ const UserInfo = () => {
   };
 
   const handleCreateNewContact = () => {
-    setIsFormVisible(true);  // Mostrar formulario de contacto
-    setIsEditing(false);  // Asegurarse de que no estamos en edición
-    setContactToEdit(null);  // Limpiar datos de contacto
+    // Redirigir a UserForm para crear un nuevo contacto
+    navigate("/userform"); 
   };
 
   const handleEditContact = (contact) => {
-    setContactToEdit(contact);  // Establecer el contacto a editar
-    setIsEditing(true);  // Activar el modo edición
-    setIsFormVisible(true);  // Mostrar el formulario
+    // Redirigir a UserForm con el contacto a editar
+    navigate("/userform", { state: { contactToEdit: contact } }); 
   };
 
   const handleDeleteContact = async (contactId) => {
@@ -62,13 +56,11 @@ const UserInfo = () => {
 
     const sortedContacts = store.contact.sort((a, b) => (b.is_admin ? 1 : 0) - (a.is_admin ? 1 : 0));
 
-
     return sortedContacts.map((contact, index) => {
       // Filtrar los datos sensibles por contacto
       const sensitiveDataForContact = store.sensitive_data
         ? store.sensitive_data.filter((data) => data.contact_id === contact.id)
         : [];
-
 
       return (
         <Tab.Pane eventKey={`user${index + 1}`} key={contact.id}>
@@ -100,7 +92,6 @@ const UserInfo = () => {
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
-
 
           <div className="buttons-container">
             <Button variant="primary" className="me-2" onClick={() => handleEditContact(contact)}>
@@ -147,19 +138,6 @@ const UserInfo = () => {
           {renderTabs()}
         </Tab.Content>
       </Tab.Container>
-
-      {isFormVisible && (
-        <UserContactForm
-          contactData={contactToEdit}
-          isEditing={isEditing}
-          onSave={actions.saveContact}
-          onSuccess={() => {
-            setIsFormVisible(false);  // Ocultar el formulario
-            actions.loadContacts();  // Recargar los contactos después de guardar
-            navigate("/userinfo");  // Redirigir a la vista de UserInfo
-          }}
-        />
-      )}
 
       <footer className="user-footer fixed-bottom">
         <img src="banner.jpg" alt="Banner Publicitario" className="banner-image" />
