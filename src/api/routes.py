@@ -6,7 +6,7 @@ from datetime import datetime
 import qrcode
 import json
 import os
-from api.models import MedioPagoTipo, db, User, Contact, SensitiveData, Reserva, TipoNif # Importar los modelos de la base de datos
+from api.models import MedioPagoTipo, db, User, Contact, Group, SensitiveData, Reserva, TipoNif # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -86,22 +86,23 @@ def handle_Login():
 
 @api.route('/user', methods=['GET'])
 @jwt_required()  # Asegura que el usuario esté autenticado
-def get_user(user_id=None):
+def get_user():
     try:
-        user_email = get_jwt_identity()  # Obtiene el email del usuario autenticado
+        # Obtener el email desde el JWT
+        user_email = get_jwt_identity()  # El email del usuario autenticado
         print(f"Usuario autenticado con email: {user_email}")  # Log para verificar el email
 
-        if user_id:
-            user = User.query.get(user_id)
-            if not user:
-                return jsonify({"message": "Usuario no encontrado"}), 404
-            return jsonify(user.serialize()), 200
-        else:
-            users = User.query.all()
-            return jsonify([user.serialize() for user in users]), 200
+        # Buscar el usuario por email
+        user = User.query.filter_by(email=user_email).first()
+
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+
+        return jsonify(user.serialize()), 200
+
     except Exception as e:
         print(f"Error: {str(e)}")
-        return jsonify({"message": "Error al obtener los usuarios", "error": str(e)}), 500
+        return jsonify({"message": "Error al obtener el usuario", "error": str(e)}), 500
     
 # FUNCTION para actualizar los datos del usuario autenticado
 @api.route('/user/<int:user_id>', methods=['PUT'])
@@ -197,7 +198,6 @@ def get_contacts():
 @jwt_required()
 def create_contact():
     try:
-        # Obtener usuario actual del token JWT
         email = get_jwt_identity()  # Obtener el email del usuario autenticado
         
         # Buscar el usuario en la base de datos usando el email
@@ -205,12 +205,9 @@ def create_contact():
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
-        # Obtener el ID del usuario autenticado
-        current_user_id = user.id
-        
         # Obtener los datos del nuevo contacto
         data = request.get_json()
-        
+
         # Crear el nuevo contacto
         new_contact = Contact(
             nombre=data['nombre'],
@@ -225,17 +222,32 @@ def create_contact():
             email=data['email'],
             telefono_movil=data['telefono_movil'],
             telefono_fijo=data['telefono_fijo'],
-            user_id=current_user_id  # Aquí asignamos el ID del usuario autenticado
+            user_id=user.id  # Aquí asignamos el ID del usuario autenticado
         )
         
         db.session.add(new_contact)
         db.session.commit()
-        
+
+        # Si el contacto no es admin, buscar un grupo existente o crear uno
+        if not new_contact.is_admin:
+            group = Group.query.filter_by(user_id=user.id).first()
+            if group:
+                # Si ya existe un grupo, asociamos el contacto al grupo
+                group.contacts.append(new_contact)
+                db.session.commit()
+            else:
+                # Si no existe un grupo, creamos uno nuevo
+                new_group = Group(user_id=user.id, group_name="Grupo de Contactos")
+                db.session.add(new_group)
+                db.session.commit()
+                new_group.contacts.append(new_contact)  # Asociamos el contacto al nuevo grupo
+                db.session.commit()
+
         return jsonify({
             "message": "Contacto creado exitosamente",
             "contact": new_contact.serialize()
         }), 201
-        
+
     except KeyError as e:
         return jsonify({
             "message": "Datos incompletos",
@@ -255,7 +267,7 @@ def update_contact(contact_id):
     try:
         # Obtener el email del usuario autenticado
         email = get_jwt_identity()
-        
+
         # Buscar al usuario en la base de datos usando el email
         user = User.query.filter_by(email=email).first()
         if not user:
@@ -286,9 +298,10 @@ def update_contact(contact_id):
         contact.email = data.get('email', contact.email)
         contact.telefono_movil = data.get('telefono_movil', contact.telefono_movil)
         contact.telefono_fijo = data.get('telefono_fijo', contact.telefono_fijo)
-        
+
+        # Guardar los cambios en la base de datos
         db.session.commit()
-        
+
         return jsonify({
             "message": "Contacto actualizado exitosamente",
             "contact": contact.serialize()
@@ -313,33 +326,194 @@ def delete_contact(contact_id):
     try:
         # Obtener el email del usuario autenticado
         email = get_jwt_identity()
-        
+
         # Buscar al usuario en la base de datos usando el email
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
-        
-        # Obtener el contacto a eliminar
+
+        # Buscar el contacto a eliminar
         contact = Contact.query.get(contact_id)
         if not contact:
             return jsonify({"message": "Contacto no encontrado"}), 404
-        
-        # Verificar que el contacto pertenece al usuario autenticado
+
+        # Verificar que el contacto pertenece al usuario
         if contact.user_id != user.id:
             return jsonify({"message": "No tienes permiso para eliminar este contacto"}), 403
-        
-        # Eliminar el contacto
+
+        # Desvincular el contacto de los grupos asociados
+        for group in contact.grupos:  # Asegúrate de que 'grupos' es la relación que conecta con 'group'
+            group.contacts.remove(contact)  # Elimina el contacto de la relación
+
+        db.session.commit()  # Guarda los cambios
+
+        # Ahora puedes eliminar el contacto sin problemas
         db.session.delete(contact)
         db.session.commit()
+
+        return jsonify({"message": "Contacto eliminado exitosamente"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Error al eliminar el contacto", "error": str(e)}), 500
+
+# FUNCION PARA CARGAR TODOS LOS GRUPOS
+@api.route('/group', methods=['GET'])
+@jwt_required()
+def get_groups():
+    try:
+        # Obtener el email del usuario autenticado
+        user_email = get_jwt_identity()
+        user = User.query.filter_by(email=user_email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+
+        # Obtener todos los grupos del usuario
+        groups = Group.query.filter_by(user_id=user.id).all()
+
+        if not groups:
+            return jsonify({"message": "No hay grupos disponibles"}), 404
+
+        # Agregar los contact_ids asociados a cada grupo
+        group_data = []
+        for group in groups:
+            group_info = group.serialize()  # Serializa el grupo
+            # Solo obtener los contact_ids
+            group_info['contact_ids'] = [contact.id for contact in group.contacts]
+            group_data.append(group_info)
+
+        return jsonify(group_data), 200
+    except Exception as e:
+        return jsonify({"message": "Error al obtener los grupos", "error": str(e)}), 500
+
+
+# FUNCION PARA CREAR UN GRUPO
+@api.route('/group', methods=['POST'])
+@jwt_required()
+def create_group():
+    try:
+        email = get_jwt_identity()  # Obtener el email del usuario autenticado
         
+        # Buscar el usuario en la base de datos usando el email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+
+        # Obtener los datos del nuevo grupo (nombre por defecto: 'Grupo de Contactos')
+        data = request.get_json()
+        group_name = data.get('group_name', 'GRUPO DE CONTACTOS')
+
+        # Verificar si ya existe un grupo para este usuario
+        existing_group = Group.query.filter_by(user_id=user.id).first()
+        if existing_group:
+            return jsonify({"message": "El usuario ya tiene un grupo"}), 400
+
+        # Crear el nuevo grupo
+        new_group = Group(user_id=user.id, group_name=group_name)
+
+        db.session.add(new_group)
+        db.session.commit()
+
+        # Si se ha creado un contacto, lo asociamos al nuevo grupo
+        contact_id = data.get('contact_id')
+        if contact_id:
+            contact = Contact.query.get(contact_id)
+            if contact:
+                new_group.contacts.append(contact)  # Agrega el contacto al grupo
+                db.session.commit()
+
         return jsonify({
-            "message": f"Contacto con ID {contact_id} eliminado exitosamente"
-        }), 200
-        
+            "message": "Grupo creado exitosamente",
+            "group": new_group.serialize()
+        }), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({
-            "message": "Error al eliminar el contacto",
+            "message": "Error al crear el grupo",
+            "error": str(e)
+        }), 500
+
+# FUNCION PARA ACTUALIZAR UN GRUPO
+@api.route('/group/<int:group_id>', methods=['PUT'])
+@jwt_required()
+def update_group(group_id):
+    try:
+        user_email = get_jwt_identity()  # Obtener el email del usuario autenticado
+        user = User.query.filter_by(email=user_email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+
+        # Buscar el grupo por ID
+        group = Group.query.get(group_id)
+        if not group:
+            return jsonify({"message": "Grupo no encontrado"}), 404
+
+        # Verificar que el grupo pertenece al usuario autenticado
+        if group.user_id != user.id:
+            return jsonify({"message": "No tienes permiso para actualizar este grupo"}), 403
+
+        # Obtener los datos enviados para actualizar
+        data = request.get_json()
+
+        # Actualizar el nombre del grupo
+        group.group_name = data.get('group_name', group.group_name)
+
+        # Eliminar contactos actuales del grupo
+        group.contacts.clear()
+
+        # Agregar los nuevos contactos al grupo
+        contact_ids = data.get('contact_ids', [])
+        for contact_id in contact_ids:
+            contact = Contact.query.get(contact_id)
+            if contact and contact.user_id == user.id:  # Verificar que el contacto pertenece al mismo usuario
+                group.contacts.append(contact)
+
+        db.session.commit()
+
+        return jsonify({
+            "message": "Grupo actualizado exitosamente",
+            "group": group.serialize()  # Devolver el grupo actualizado
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Error al actualizar el grupo", "error": str(e)}), 500
+
+
+# FUNCION PARA ELIMINAR UN GRUPO
+@api.route('/group/<int:group_id>', methods=['DELETE'])
+@jwt_required()
+def delete_group(group_id):
+    try:
+        email = get_jwt_identity()  # Obtener el email del usuario autenticado
+        
+        # Buscar el usuario en la base de datos usando el email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
+        # Buscar el grupo por su ID
+        group = Group.query.get(group_id)
+        if not group:
+            return jsonify({"message": "Grupo no encontrado"}), 404
+        
+        # Verificar que el grupo pertenece al usuario
+        if group.user_id != user.id:
+            return jsonify({"message": "No tienes permiso para eliminar este grupo"}), 403
+        
+        # Eliminar el grupo
+        db.session.delete(group)
+        db.session.commit()
+
+        return jsonify({
+            "message": f"Grupo con ID {group_id} eliminado exitosamente"
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error al eliminar el grupo",
             "error": str(e)
         }), 500
 
@@ -653,3 +827,36 @@ def generate_contact_qr(contact_id):
             "error": str(e)
         }), 500
 
+# FUNCION PARA OBTENER TODOS LOS USUARIOS
+@api.route('/users', methods=['GET']) 
+@jwt_required()  # Asegura que el usuario esté autenticado
+def get_all_users():
+    try:
+        # Obtener todos los usuarios de la base de datos
+        users = User.query.all()
+
+        if not users:
+            return jsonify({"message": "No users found"}), 404
+
+        # Devuelve la lista de usuarios
+        return jsonify([user.serialize() for user in users]), 200
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"message": "Error al obtener los usuarios", "error": str(e)}), 500
+
+# FUNCION PARA OBTENER TODOS LOS CONTACTOS
+@api.route('/contacts', methods=['GET'])
+@jwt_required()  # Asegura que el usuario esté autenticado
+def get_all_contacts():
+    try:
+        # Obtener todos los contactos de la base de datos
+        contacts = Contact.query.all()
+
+        if not contacts:
+            return jsonify({"message": "No contacts found"}), 404
+
+        # Devuelve la lista de contactos
+        return jsonify([contact.serialize() for contact in contacts]), 200
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"message": "Error al obtener los contactos", "error": str(e)}), 500

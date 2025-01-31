@@ -6,7 +6,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			message: null,
 			authToken: localStorage.getItem("authToken") || null, // Inicializamos con el token del localStorage
 			role: null, //inicilizo el rol del usuario
-			user: null, // inicializo el usuario
+			user: [], // inicializo el usuario
 			contact: [], // inicialdatos de contactos
 			sensitive_data: [], //inicializo los datos sensibles
 			group: [], // Incializo el array de grupos
@@ -16,52 +16,63 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// Use getActions to call a function within a fuction
 			login: async (email, password) => {
 				try {
-				  const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ email, password }),
-				  });
-			  
-				  if (resp.ok) {
-					const token = await resp.text();
-					localStorage.setItem("authToken", token);
-					setStore({ authToken: token });
-			  
-					// Llamamos a la nueva acción para cargar los datos del usuario después de hacer login
-					await getActions().loadUser();
-			  
-					return { success: true, message: "Login exitoso" };
-				  } else {
-					const error = await resp.json();
-					return { success: false, message: error.message || "Error en el login" };
-				  }
+					const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ email, password }),
+					});
+
+					if (resp.ok) {
+						const token = await resp.text();
+						localStorage.setItem("authToken", token);
+						setStore({ authToken: token });
+
+						// Llamamos a la nueva acción para cargar los datos del usuario después de hacer login
+						await getActions().loadUser();
+
+						return { success: true, message: "Login exitoso" };
+					} else {
+						const error = await resp.json();
+						return { success: false, message: error.message || "Error en el login" };
+					}
 				} catch (err) {
-				  console.error("Error en login:", err);
-				  return { success: false, message: "Error de conexión" };
+					console.error("Error en login:", err);
+					return { success: false, message: "Error de conexión" };
 				}
-			  },
-			  
-			  // Acción para cargar el usuario en el store
-			  loadUser: async () => {
+			},
+
+			// Acción para cargar el usuario en el store
+			loadUser: async () => {
 				const store = getStore();
-				console.log("Token JWT:", store.authToken);  // Verifica que el token esté disponible
+			  
+				// Verifica si el token está disponible
+				if (!store.authToken) {
+				  console.error("Token JWT no disponible");
+				  return; // Si no tienes token, no puedes hacer la llamada para cargar el usuario
+				}
+			  
 				try {
+				  // Realizamos la llamada al backend para obtener los datos del usuario
 				  const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
 					method: "GET",
 					headers: {
 					  "Content-Type": "application/json",
-					  "Authorization": `Bearer ${store.authToken}`,  // Verifica si el token está siendo enviado correctamente
+					  "Authorization": `Bearer ${store.authToken}`, // Usamos el token JWT para la autorización
 					},
 				  });
 			  
 				  if (response.ok) {
+					// Al recibir la respuesta, parseamos los datos
 					const user = await response.json();
-					console.log("Usuario cargado:", user);
+			  
+					// Mostrar en consola los datos cargados del usuario
+					console.log("Datos del usuario cargados:", user);
 					setStore({ user: user });  // Guardamos los datos del usuario en el store
+			  
 				  } else {
 					console.error("Error al cargar el usuario");
 					const errorResponse = await response.json();
-					console.log("Error al cargar usuario:", errorResponse);  // Verifica el error
+					console.log("Error al cargar usuario:", errorResponse);
 				  }
 				} catch (error) {
 				  console.error("Error al cargar el usuario:", error);
@@ -76,18 +87,27 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			signup: async (email, password, language) => {
 				try {
+					// Llamamos a la API para crear el usuario
 					const resp = await fetch(process.env.BACKEND_URL + "/api/signup", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ email, password, language }),  // Verifica que 'language' está siendo enviado correctamente
+						body: JSON.stringify({ email, password, language }),
 					});
 
 					if (resp.ok) {
+						// Si el registro es exitoso, obtenemos el token
 						const data = await resp.json();
+						console.log("Usuario registrado exitosamente");
+
+						// Ahora obtenemos el token JWT
+						const token = await resp.text();
+						localStorage.setItem("authToken", token);
+						setStore({ authToken: token });
+
 						return { success: true, message: "Registro exitoso" };
 					} else {
 						const error = await resp.json();
-						console.error("Error en el registro:", error);  // Agrega un log para ver el error detallado
+						console.error("Error en el registro:", error);
 						return { success: false, message: error.message || "Error en el registro" };
 					}
 				} catch (err) {
@@ -96,27 +116,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Acción para cargar los contactos
+			// Acción para cargar los contactos del usuario logueado
 			loadContacts: async () => {
 				const store = getStore();
-				console.log("Token JWT:", store.authToken);  // Verifica que el token esté disponible
+
+				if (!store.authToken) {
+					console.error("Token JWT no disponible");
+					return;
+				}
+
 				try {
+					// Hacemos la llamada para obtener los contactos
 					const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${store.authToken}`,  // Verifica si el token está siendo enviado correctamente
+							"Authorization": `Bearer ${store.authToken}`,  // Enviamos el token JWT para autenticar al usuario
 						},
 					});
 
 					if (response.ok) {
 						const contacts = await response.json();
-						console.log("Contactos cargados:", contacts);  // Verifica si los contactos están llegando
-						setStore({ contact: contacts });  // Actualiza el store con los contactos
+
+						// Filtramos los contactos para obtener solo los que corresponden al usuario logueado
+						const userContacts = contacts.filter(contact => contact.user_id === store.user.id);
+
+						console.log("Contactos cargados para el usuario:", userContacts);
+						setStore({ contact: userContacts });  // Actualizamos el store con los contactos filtrados
 					} else {
 						console.error("Error al cargar los contactos");
 						const errorResponse = await response.json();
-						console.log("Error al cargar contactos:", errorResponse);  // Verifica el error
+						console.log("Error al cargar contactos:", errorResponse);
 					}
 				} catch (error) {
 					console.error("Error al cargar los contactos:", error);
@@ -147,7 +177,84 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Acción para actualizar un contacto
+			// Acción para crear un contacto y gestionar si es admin y el grupo
+			createContact: async (formData) => {
+				const store = getStore();
+				try {
+					// Verificar que el usuario esté cargado
+					if (!store.user || !store.user.id) {
+						console.error("El usuario no está cargado correctamente.");
+						return;
+					}
+			
+					// Verificar si el usuario ya tiene contactos
+					const userContacts = store.contact.filter(contact => contact.user_id === store.user.id);
+					let contact;
+					let group;
+			
+					// Verificar si el usuario tiene un grupo
+					const userGroup = store.group.find(group => group.user_id === store.user.id);
+			
+					if (userContacts.length === 0) {
+						// Crear el primer contacto como admin
+						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								"Authorization": `Bearer ${store.authToken}`,
+							},
+							body: JSON.stringify({
+								...formData,
+								is_admin: true,
+								user_id: store.user.id,
+							}),
+						});
+			
+						if (response.ok) {
+							contact = await response.json();
+							setStore({ contact: [contact] });
+			
+							// Si el usuario no tiene grupo, crearlo
+							if (!userGroup) {
+								await getActions().createGroup(contact.id);  // Crear un grupo si no existe
+							}
+						}
+					} else {
+						// Crear un contacto normal y asociarlo al grupo
+						contact = userContacts[0];  // Usamos el primer contacto encontrado
+			
+						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								"Authorization": `Bearer ${store.authToken}`,
+							},
+							body: JSON.stringify({
+								...formData,
+								is_admin: false,  // No es admin
+								user_id: store.user.id,
+							}),
+						});
+			
+						if (response.ok) {
+							const newContact = await response.json();
+							setStore({ contact: [...store.contact, newContact] });
+			
+							// Asociar el nuevo contacto al grupo
+							if (userGroup) {
+								await getActions().addToGroup(newContact.id, userGroup.id);
+							} else {
+								// Crear grupo si no existe
+								await getActions().createGroup(newContact.id);
+							}
+						}
+					}
+				} catch (err) {
+					console.error("Error al crear contacto o grupo:", err);
+				}
+			},
+
+			// Acción para modificar los datos de un contacto
 			updateContact: async (contactId, formData) => {
 				const store = getStore();
 				try {
@@ -167,12 +274,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 							contact.id === contactId ? updatedContact : contact
 						);
 						setStore({ contact: updatedContacts });
-						console.log("Contacto actualizado correctamente:", updatedContact);
+						console.log("Datos del contacto actualizados correctamente:", updatedContact);
 					} else {
-						console.error("Error al actualizar contacto");
+						console.error("Error al actualizar los datos del contacto");
 					}
 				} catch (err) {
-					console.error("Error al actualizar contacto:", err);
+					console.error("Error al actualizar los datos del contacto:", err);
 				}
 			},
 
@@ -202,62 +309,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Acción para crear un contacto normal (no admin) y gestionar el grupo
-			createNewContact: async (formData) => {
-				const store = getStore();
-				try {
-					// Verificar si el usuario ya tiene contactos
-					const userContacts = store.contact.filter(contact => contact.user_id === store.user.id);
-					let contact;
-
-					if (userContacts.length === 0) {
-						// Si no existen contactos, crear el primero como admin
-						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								"Authorization": `Bearer ${store.authToken}`,
-							},
-							body: JSON.stringify({
-								...formData,
-								is_admin: true,  // Crear el primer contacto como admin
-								user_id: store.user.id,
-							}),
-						});
-						if (response.ok) {
-							contact = await response.json();
-							setStore({ contact: [contact] });
-							// Crear el grupo asociado al contacto admin
-							await getActions().createGroup(contact.id);
-						}
-					} else {
-						// Si ya existe un contacto, crear uno normal y asociarlo al grupo
-						contact = userContacts[0]; // Usamos el primer contacto encontrado
-
-						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								"Authorization": `Bearer ${store.authToken}`,
-							},
-							body: JSON.stringify({
-								...formData,
-								is_admin: false,  // No es admin
-								user_id: store.user.id,
-							}),
-						});
-						if (response.ok) {
-							const newContact = await response.json();
-							setStore({ contact: [...store.contact, newContact] });
-							// Asociar el nuevo contacto al grupo principal
-							await getActions().addToGroup(newContact.id, contact.id);  // Agregamos al grupo
-						}
-					}
-				} catch (err) {
-					console.error("Error al crear contacto o grupo:", err);
-				}
-			},
-
 			// Acción para crear un nuevo grupo
 			createGroup: async (contactId) => {
 				const store = getStore();
@@ -270,12 +321,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 						},
 						body: JSON.stringify({
 							contact_id: contactId,
-							name: "Grupo de Contacto",  // Este es un nombre por defecto, puedes personalizarlo
+							name: "GRUPO",  // Este es un nombre por defecto, puedes personalizarlo
 						}),
 					});
 					if (response.ok) {
 						const group = await response.json();
-						setStore({ groups: [...store.groups, group] });
+						setStore({ group: [...store.group, group] });  // Actualizamos el store con el nuevo grupo
 					}
 				} catch (err) {
 					console.error("Error al crear grupo:", err);
@@ -293,10 +344,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Authorization": `Bearer ${store.authToken}`,
 						},
 					});
+
 					if (response.ok) {
 						const group = store.groups.find((g) => g.id === groupId);
-						group.contacts.push(contactId); // Agrega el nuevo contacto al grupo
-						setStore({ groups: [...store.groups] });
+						if (group) {
+							group.contacts.push(contactId);  // Agrega el nuevo contacto al grupo
+							setStore({ groups: [...store.groups] });
+						}
 					}
 				} catch (err) {
 					console.error("Error al agregar contacto al grupo:", err);
@@ -307,25 +361,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 			loadSensitiveData: async () => {
 				const store = getStore();
 				try {
-				  const response = await fetch(`${process.env.BACKEND_URL}/api/sensitive-data`, {
-					method: "GET",
-					headers: {
-					  "Content-Type": "application/json",
-					  "Authorization": `Bearer ${store.authToken}`,
-					},
-				  });
-			  
-				  if (response.ok) {
-					const sensitiveData = await response.json();
-					console.log("Datos sensibles cargados:", sensitiveData);  // Verifica si los datos sensibles están llegando
-					setStore({ sensitive_data: sensitiveData });  // Actualiza el store con los datos sensibles
-				  } else {
-					console.error("Error al cargar los datos sensibles");
-				  }
+					const response = await fetch(`${process.env.BACKEND_URL}/api/sensitive-data`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,
+						},
+					});
+
+					if (response.ok) {
+						const sensitiveData = await response.json();
+						console.log("Datos sensibles cargados:", sensitiveData);  // Verifica si los datos sensibles están llegando
+						setStore({ sensitive_data: sensitiveData });  // Actualiza el store con los datos sensibles
+					} else {
+						console.error("Error al cargar los datos sensibles");
+					}
 				} catch (error) {
-				  console.error("Error al cargar los datos sensibles:", error);
+					console.error("Error al cargar los datos sensibles:", error);
 				}
-			  },
+			},
 
 
 		},

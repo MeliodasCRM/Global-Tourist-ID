@@ -1,0 +1,19 @@
+/* userContactForm.css */
+.user-contact-form-container {
+    max-width: 375px;
+    width: 100%;
+    margin: 0 auto; /* Centra el formulario en la página */
+    padding: 15px;
+    overflow-y: auto; /* Permite el desplazamiento cuando se superan los límites de altura */
+  }
+  
+  @media (max-width: 768px) {
+    /* En pantallas más pequeñas, el formulario debe ser completamente responsivo */
+    .user-contact-form-container {
+      padding: 10px;
+    }
+  }
+  
+  button {
+    width: 100%;
+  }
