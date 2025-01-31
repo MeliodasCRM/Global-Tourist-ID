@@ -1,0 +1,257 @@
+.qr-share-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #F3F4F6;
+  position: relative;
+}
+
+/* Top Navbar */
+.top-navbar {
+  background-color: #D1D5DB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.top-navbar h1 {
+  color: #4F46E5;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-button {
+  background-color: #4F46E5;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.nav-button:hover {
+  transform: scale(1.05);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+/* Email Card */
+.email-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+  height: fit-content;
+  margin: 0 auto;
+}
+
+.email-card.success {
+  background-color: #F0FDF4;
+  border: 2px solid #10B981;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.input-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  cursor: text;
+  display: block;
+  width: 100%;
+}
+
+.check-icon {
+  color: #10B981;
+  font-size: 1.25rem;
+}
+
+.success-icon {
+  color: #10B981;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.email-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  outline: none;
+}
+
+.email-input:focus {
+  border-color: #4F46E5;
+}
+
+.error-message {
+  color: #EF4444;
+  font-size: 0.875rem;
+  margin: -0.5rem 0 1rem 0;
+}
+
+/* Checkbox */
+.checkbox-container {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.checkbox-text {
+  user-select: none;
+  flex-grow: 1;
+}
+
+.checkbox-wrapper {
+  position: relative;
+  height: 20px;
+  min-width: 20px;
+}
+
+.terms-checkbox {
+  position: absolute;
+  opacity: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.checkmark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 20px;
+  width: 20px;
+  background-color: white;
+  border: 2px solid #E5E7EB;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.terms-checkbox:checked ~ .checkmark {
+  background-color: #4F46E5;
+  border-color: #4F46E5;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.terms-checkbox:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Botones */
+.button-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.button:disabled {
+  background-color: #9CA3AF;
+  cursor: not-allowed;
+}
+
+.primary-button {
+  background-color: #4F46E5;
+  color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+  background-color: #4338CA;
+}
+
+.secondary-button {
+  background-color: #E5E7EB;
+  color: #374151;
+}
+
+.secondary-button:hover {
+  background-color: #D1D5DB;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  background-color: #4F46E5;
+  display: flex;
+  justify-content: space-around;
+  padding: 0.75rem 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0px -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 0.5rem;
+}
+
+.nav-item:hover {
+  transform: scale(1.1);
+}
+
+.nav-item.active {
+  color: yellow;
+}
