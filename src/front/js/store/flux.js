@@ -16,57 +16,57 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// Use getActions to call a function within a fuction
 			login: async (email, password) => {
 				try {
-				  const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ email, password }),
-				  });
-			  
-				  if (resp.ok) {
-					const token = await resp.text();
-					localStorage.setItem("authToken", token);
-					setStore({ authToken: token });
-			  
-					// Llamamos a la nueva acción para cargar los datos del usuario después de hacer login
-					await getActions().loadUser();
-			  
-					return { success: true, message: "Login exitoso" };
-				  } else {
-					const error = await resp.json();
-					return { success: false, message: error.message || "Error en el login" };
-				  }
+					const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ email, password }),
+					});
+
+					if (resp.ok) {
+						const token = await resp.text();
+						localStorage.setItem("authToken", token);
+						setStore({ authToken: token });
+
+						// Llamamos a la nueva acción para cargar los datos del usuario después de hacer login
+						await getActions().loadUser();
+
+						return { success: true, message: "Login exitoso" };
+					} else {
+						const error = await resp.json();
+						return { success: false, message: error.message || "Error en el login" };
+					}
 				} catch (err) {
-				  console.error("Error en login:", err);
-				  return { success: false, message: "Error de conexión" };
+					console.error("Error en login:", err);
+					return { success: false, message: "Error de conexión" };
 				}
-			  },
-			  
-			  // Acción para cargar el usuario en el store
-			  loadUser: async () => {
+			},
+
+			// Acción para cargar el usuario en el store
+			loadUser: async () => {
 				const store = getStore();
 				console.log("Token JWT:", store.authToken);  // Verifica que el token esté disponible
 				try {
-				  const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-					method: "GET",
-					headers: {
-					  "Content-Type": "application/json",
-					  "Authorization": `Bearer ${store.authToken}`,  // Verifica si el token está siendo enviado correctamente
-					},
-				  });
-			  
-				  if (response.ok) {
-					const user = await response.json();
-					console.log("Usuario cargado:", user);
-					setStore({ user: user });  // Guardamos los datos del usuario en el store
-				  } else {
-					console.error("Error al cargar el usuario");
-					const errorResponse = await response.json();
-					console.log("Error al cargar usuario:", errorResponse);  // Verifica el error
-				  }
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,  // Verifica si el token está siendo enviado correctamente
+						},
+					});
+
+					if (response.ok) {
+						const user = await response.json();
+						console.log("Usuario cargado:", user);
+						setStore({ user: user });  // Guardamos los datos del usuario en el store
+					} else {
+						console.error("Error al cargar el usuario");
+						const errorResponse = await response.json();
+						console.log("Error al cargar usuario:", errorResponse);  // Verifica el error
+					}
 				} catch (error) {
-				  console.error("Error al cargar el usuario:", error);
+					console.error("Error al cargar el usuario:", error);
 				}
-			  },
+			},
 
 			logout: () => {
 				localStorage.removeItem("authToken");  // Eliminamos el token del localStorage
@@ -307,25 +307,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 			loadSensitiveData: async () => {
 				const store = getStore();
 				try {
-				  const response = await fetch(`${process.env.BACKEND_URL}/api/sensitive-data`, {
-					method: "GET",
-					headers: {
-					  "Content-Type": "application/json",
-					  "Authorization": `Bearer ${store.authToken}`,
-					},
-				  });
-			  
-				  if (response.ok) {
-					const sensitiveData = await response.json();
-					console.log("Datos sensibles cargados:", sensitiveData);  // Verifica si los datos sensibles están llegando
-					setStore({ sensitive_data: sensitiveData });  // Actualiza el store con los datos sensibles
-				  } else {
-					console.error("Error al cargar los datos sensibles");
-				  }
+					const response = await fetch(`${process.env.BACKEND_URL}/api/sensitive-data`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,
+						},
+					});
+
+					if (response.ok) {
+						const sensitiveData = await response.json();
+						console.log("Datos sensibles cargados:", sensitiveData);  // Verifica si los datos sensibles están llegando
+						setStore({ sensitive_data: sensitiveData });  // Actualiza el store con los datos sensibles
+					} else {
+						console.error("Error al cargar los datos sensibles");
+					}
 				} catch (error) {
-				  console.error("Error al cargar los datos sensibles:", error);
+					console.error("Error al cargar los datos sensibles:", error);
 				}
-			  },
+			},
 
 
 		},

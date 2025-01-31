@@ -6,7 +6,7 @@ from datetime import datetime
 import qrcode
 import json
 import os
-from api.models import MedioPagoTipo, db, User, Contact, SensitiveData, Reserva, TipoNif # Importar los modelos de la base de datos
+from api.models import MedioPagoTipo, db, User, Contact, SensitiveData, Reserva, TipoNif, Group, contact_group # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -81,7 +81,7 @@ def handle_Login():
         return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
 
     # Crear un token de acceso utilizando el email del usuario
-    token = create_access_token(identity=user.email)
+    token = create_access_token(identity=str(user.id))
     return(token)
 
 @api.route('/user', methods=['GET'])
@@ -596,31 +596,38 @@ def create_reserva():
             "error": str(e)
         }), 500
     
+# FUNCION GENERAR QR INDIVIDUAL
 @api.route('/contact/<int:contact_id>/qr', methods=['GET'])
 @jwt_required()
 def generate_contact_qr(contact_id):
     try:
-        # Verificar que el contacto existe y pertenece al usuario actual
+        current_user_id = get_jwt_identity()  # Obtener el ID del usuario autenticado
+        
+        # Validar que el user_id del token es un número
+        if not current_user_id.isdigit():
+            return jsonify({"message": "Identidad del usuario inválida"}), 401  # Token corrupto
+
+        current_user_id = int(current_user_id)  # Convertir a integer
+
+        # Buscar el contacto asociado al usuario
         contact = Contact.query.filter_by(
             id=contact_id,
-            user_id=get_jwt_identity()
+            user_id=current_user_id
         ).first()
         
         if not contact:
-            return jsonify({
-                "message": "Contacto no encontrado o no autorizado"
-            }), 404
+            return jsonify({"message": "Contacto no encontrado o no autorizado"}), 404
             
-        # Obtener datos sensibles
+        # Obtener datos sensibles y reservas
         sensitive_data = SensitiveData.query.filter_by(contact_id=contact_id).first()
+        reservas = Reserva.query.filter_by(traveler_id=contact_id).all()
         
-        # Crear diccionario con todos los datos
-        contact_data = contact.serialize()
-        if sensitive_data:
-            contact_data['sensitive_data'] = sensitive_data.serialize()
-        
-        # Convertir datos a JSON
-        qr_data = json.dumps(contact_data)
+        # Construir datos para el QR
+        qr_data = {
+            "contact": contact.serialize(),
+            "sensitive_data": sensitive_data.serialize() if sensitive_data else None,
+            "reservas": [reserva.serialize() for reserva in reservas] if reservas else []
+        }
         
         # Generar QR
         qr = qrcode.QRCode(
@@ -629,13 +636,10 @@ def generate_contact_qr(contact_id):
             box_size=10,
             border=4,
         )
-        qr.add_data(qr_data)
+        qr.add_data(json.dumps(qr_data))
         qr.make(fit=True)
 
-        # Crear imagen
         img = qr.make_image(fill_color="black", back_color="white")
-        
-        # Guardar imagen en buffer
         img_buffer = BytesIO()
         img.save(img_buffer, format='PNG')
         img_buffer.seek(0)
@@ -646,10 +650,74 @@ def generate_contact_qr(contact_id):
             as_attachment=True,
             download_name=f'contact_{contact_id}_qr.png'
         )
+        # Comprobar los datos del QR
+        # return jsonify(qr_data), 200
         
     except Exception as e:
-        return jsonify({
-            "message": "Error al generar el código QR",
-            "error": str(e)
-        }), 500
+        return jsonify({"message": "Error al generar el QR", "error": str(e)}), 500
+    
+# FUNCION QR TODOS LOS CONTACTOS
+@api.route('/group/<int:group_id>/qr', methods=['GET'])
+@jwt_required()
+def generate_group_qr(group_id):
+    try:
+        current_user_id = get_jwt_identity()
 
+        # Validar que el user_id del token es un número
+        try:
+            current_user_id = int(current_user_id)
+        except (ValueError, TypeError):
+            return jsonify({"message": "Identidad del usuario inválida"}), 401
+
+        # Verificar que el grupo pertenece al usuario
+        group = Group.query.filter_by(
+            id=group_id,
+            user_id=current_user_id
+        ).first()
+        
+        if not group:
+            return jsonify({"message": "Grupo no encontrado o no autorizado"}), 404
+
+        # Obtener todos los contactos del grupo con sus relaciones (optimizado)
+        contacts = (
+            Contact.query
+            .join(contact_group, contact_group.c.contact_id == Contact.id)  # Join con la tabla de asociación
+            .filter(contact_group.c.group_id == group_id)  # Filtrar por group_id
+            .options(db.joinedload(Contact.sensitive_data))
+            .options(db.joinedload(Contact.reservas))
+            .all()
+        )
+
+        # Construir datos para el QR
+        group_data = []
+        for contact in contacts:
+            group_data.append({
+                "contact": contact.serialize(),
+                "sensitive_data": contact.sensitive_data.serialize() if contact.sensitive_data else None,
+                "reservas": [reserva.serialize() for reserva in contact.reservas] if contact.reservas else []
+            })
+
+        # Generar QR con ajuste automático de tamaño
+        qr = qrcode.QRCode(
+            version=None,  # Versión automática según datos
+            error_correction=qrcode.constants.ERROR_CORRECT_H,  # Mayor corrección de errores
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(json.dumps(group_data))
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        img_buffer = BytesIO()
+        img.save(img_buffer, format='PNG')
+        img_buffer.seek(0)
+        
+        return send_file(
+            img_buffer,
+            mimetype='image/png',
+            as_attachment=True,
+            download_name=f'group_{group_id}_qr.png'
+        )
+        # return jsonify(group_data), 200
+    except Exception as e:
+        return jsonify({"message": "Error al generar el QR grupal", "error": str(e)}), 500

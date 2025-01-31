@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Form, Row, Col, Card, Tab, Nav } from "react-bootstrap"; 
-import { FaArrowLeft } from "react-icons/fa"; 
-import { useNavigate } from "react-router-dom"; 
+import { Button, Form, Row, Col, Card, Tab, Nav } from "react-bootstrap";
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext"; // Importa el contexto
-import '../../styles/userForm.css'; 
+import '../../styles/userForm.css';
 
 export const UserForm = ({ onSave, isEditing, isNew, user }) => {
   const [formData, setFormData] = useState({
@@ -15,13 +15,13 @@ export const UserForm = ({ onSave, isEditing, isNew, user }) => {
     email: "",
   });
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { store } = useContext(Context);  // Obtén el store para acceder al user_id y group_id
 
   // Al cargar el componente, precargamos los datos si estamos editando
   useEffect(() => {
     if (isEditing && user) {
-      setFormData(user); 
+      setFormData(user);
     } else if (isNew) {
       setFormData({
         nombre: "",
