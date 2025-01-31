@@ -19,6 +19,7 @@ import { DetallesReserva } from "./pages/DetallesReserva.js";
 import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
 import UserForm from "./pages/UserForm.js";
+import QrShare from "./pages/QrShare.js";
 //create your first component
 const Layout = () => {
     //the basename is used when your project is published in a subdirectory and not in the root of the domain
@@ -48,7 +49,7 @@ const Layout = () => {
                         {/* Rutas generales */}
                         <Route path="/" element={<Home />} />
                         <Route path="/publica" element={<PublicView />} />
-                      
+
                         <Route path="/login" element={<Login />} />
                         {/* Ruta protegida para UserHome */}
                         <Route path="/userhome" element={<PrivateRoute element={UserHome} />} />
@@ -58,19 +59,20 @@ const Layout = () => {
                         <Route path="/nueva-reserva" element={<PrivateRoute element={NuevaReservaForm} />} />
                         <Route path="/editar-reserva/:id" element={<PrivateRoute element={EditarReservaForm} />} />
                         <Route path="/reserva/:id" element={<PrivateRoute element={DetallesReserva} />} />
+                        <Route path="/share" element={<PrivateRoute element={QrShare} />} />
 
                         {/* Ruta para manejar 404 */}
                         <Route path="*" element={<h1>404 Not Found</h1>} />
 
                         {/* Rutas adicionales */}
-                     
-                       
+
+
                         {/* <Route path="/reservas" element={<UserReservas />} /> */}
                         {/* <Route path="/nueva-reserva" element={<NuevaReservaForm />} />
                         <Route path="/editar-reserva/:id" element={<EditarReservaForm />} />
                         <Route path="/reserva/:id" element={<DetallesReserva />} /> */}
-                       
-                       
+
+
                     </Routes>
 
                     {/* Navbar y Footer solo se muestran en las rutas generales */}
