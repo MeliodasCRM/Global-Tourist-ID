@@ -35,10 +35,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const error = await resp.json();
 						return { success: false, message: error.message || "Error en el login" };
 					}
+					const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ email, password }),
+					});
+
+					if (resp.ok) {
+						const token = await resp.text();
+						localStorage.setItem("authToken", token);
+						setStore({ authToken: token });
+
+						// Llamamos a la nueva acción para cargar los datos del usuario después de hacer login
+						await getActions().loadUser();
+
+						return { success: true, message: "Login exitoso" };
+					} else {
+						const error = await resp.json();
+						return { success: false, message: error.message || "Error en el login" };
+					}
 				} catch (err) {
 					console.error("Error en login:", err);
 					return { success: false, message: "Error de conexión" };
 				}
+			},
+
+			// Acción para cargar el usuario en el store
+			loadUser: async () => {
 			},
 
 			// Acción para cargar el usuario en el store
@@ -75,9 +98,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log("Error al cargar usuario:", errorResponse);
 				  }
 				} catch (error) {
-				  console.error("Error al cargar el usuario:", error);
+					console.error("Error al cargar el usuario:", error);
 				}
-			  },
+			},
 
 			logout: () => {
 				localStorage.removeItem("authToken");  // Eliminamos el token del localStorage

@@ -62,11 +62,13 @@ const UserInfo = () => {
 
     const sortedContacts = store.contact.sort((a, b) => (b.is_admin ? 1 : 0) - (a.is_admin ? 1 : 0));
 
+
     return sortedContacts.map((contact, index) => {
       // Filtrar los datos sensibles por contacto
       const sensitiveDataForContact = store.sensitive_data
         ? store.sensitive_data.filter((data) => data.contact_id === contact.id)
         : [];
+
 
       return (
         <Tab.Pane eventKey={`user${index + 1}`} key={contact.id}>
@@ -98,6 +100,7 @@ const UserInfo = () => {
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
+
 
           <div className="buttons-container">
             <Button variant="primary" className="me-2" onClick={() => handleEditContact(contact)}>

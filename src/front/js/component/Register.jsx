@@ -39,9 +39,9 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const { email, password, language } = formData;
-  
+
     if (activeTab === "login") {
       const result = await actions.login(email, password);
       if (isMountedRef.current) setMessage(result.message);
@@ -159,12 +159,12 @@ export const Register = () => {
                               <select
                                 className="form-style"
                                 id='language'
-                                name= "language"
+                                name="language"
                                 value={formData.language}
                                 onChange={handleChange}
-                                >
-                                  <option value="es"> Español (es)</option>
-                                  <option value="en"> Inglés (en)</option>
+                              >
+                                <option value="es"> Español (es)</option>
+                                <option value="en"> Inglés (en)</option>
                               </select>
                             </div>
                             <button type="submit" className="btn mt-4">
