@@ -13,6 +13,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 		},
 		actions: {
+			setAuthToken: (token) => {
+				localStorage.setItem("authToken", token ? token : "");  // Guardamos el token en localStorage
+				setStore({ authToken: token });  // Actualizamos el store con el token
+			},
 			// Use getActions to call a function within a fuction
 			login: async (email, password) => {
 				try {

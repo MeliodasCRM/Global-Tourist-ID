@@ -8,29 +8,28 @@ export const Login = () => {
   console.log("🔍 Login.js se está ejecutando");
 
   const { store } = useContext(Context);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isChecking, setIsChecking] = useState(true); // ⏳ Estado para verificar el token
   const [validToken, setValidToken] = useState(false);
 
   useEffect(() => {
     console.log("🔍 store.authToken:", store.authToken);
-    // Verificamos si el token es válido (no "null", "undefined" ni una cadena vacía)
-    if (
-      store.authToken &&
-      store.authToken !== "null" &&
-      store.authToken !== "undefined" &&
-      store.authToken !== ""
-    ) {
+
+    if (store.authToken && store.authToken !== "null" && store.authToken !== "undefined" && store.authToken.trim() !== "") {
       setValidToken(true);
+    } else {
+      setValidToken(false);
     }
-    setIsLoading(false); // Ya terminamos la verificación
+
+    setIsChecking(false); // ✅ Estado listo para renderizar
   }, [store.authToken]);
-  if (isLoading) {
-    return <h1>Cargando...</h1>; // Evita parpadeos en la pantalla
+
+  if (isChecking) {
+    return <h1>Cargando...</h1>; // Evita parpadeos
   }
 
   if (validToken) {
-    console.log("🔄 Redirigiendo a /userhome");
-    return <Navigate to="/userhome" />;
+    console.log("✅ Token válido, redirigiendo a /userhome");
+    return <Navigate to="/userhome" replace />;
   }
 
   return (
