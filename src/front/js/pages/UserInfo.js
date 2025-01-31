@@ -1,44 +1,43 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Tab, Nav, Accordion, Card } from "react-bootstrap";
+import { Button, Tab, Nav, Accordion } from "react-bootstrap";
 import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext"; // Contexto para acceder al store y acciones
-import UserForm from './UserForm'; // Importamos el componente UserForm
 import '../../styles/userInfo.css'; // Estilos del componente
 
 const UserInfo = () => {
   const [key, setKey] = useState("user01");
-  const [isFormVisible, setIsFormVisible] = useState(false); // Estado para controlar la visibilidad de UserForm
-  const [isEditing, setIsEditing] = useState(false);
-  const [contactToEdit, setContactToEdit] = useState(null); // Contacto a editar, si aplica
   const navigate = useNavigate();
-  const { store, actions } = useContext(Context);  // Usamos el contexto para acceder al store y las acciones
+  const { store, actions } = useContext(Context);
 
   useEffect(() => {
     if (store.user) {
-      console.log("Llamando a loadContacts y loadSensitiveData");  // Verificación
-      console.log("Usuario en store:", store.user);
-      actions.loadContacts();  // Cargar los contactos
-      actions.loadSensitiveData();  // Cargar los datos sensibles
+      actions.loadContacts();
+      actions.loadSensitiveData();
     }
-  }, [store.user]); // Esto asegura que solo se ejecute cuando 'store.user' cambie, no en cada render
-
-  console.log("Contactos en el store:", store.contact);
-  console.log("Datos Sensibles en el store:", store.sensitive_data);
+  }, [store.user]);
 
   const handleBack = () => {
-    navigate("/userhome"); // Redirigir al home del usuario
+    navigate("/userhome");
   };
 
   const handleCreateNewContact = () => {
-    setIsEditing(false);  // Cambiar el estado a no editar
-    setIsFormVisible(true);  // Mostrar el formulario
+    // Redirigir a UserForm para crear un nuevo contacto
+    navigate("/userform"); 
   };
 
   const handleEditContact = (contact) => {
-    setContactToEdit(contact);
-    setIsEditing(true);
-    setIsFormVisible(true);
+    // Redirigir a UserForm con el contacto a editar
+    navigate("/userform", { state: { contactToEdit: contact } }); 
+  };
+
+  const handleDeleteContact = async (contactId) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este contacto?");
+    if (confirmDelete) {
+      await actions.deleteContact(contactId);
+      actions.loadContacts();  // Recargar los contactos después de eliminar
+      navigate("/userinfo");  // Redirigir a la vista de contactos
+    }
   };
 
   const renderTabs = () => {
@@ -55,7 +54,6 @@ const UserInfo = () => {
       );
     }
 
-    // Ordenamos los contactos para que el principal (is_admin = true) sea el primero
     const sortedContacts = store.contact.sort((a, b) => (b.is_admin ? 1 : 0) - (a.is_admin ? 1 : 0));
 
     return sortedContacts.map((contact, index) => {
@@ -75,14 +73,11 @@ const UserInfo = () => {
                 Email: {contact.email}
               </Accordion.Body>
             </Accordion.Item>
-
-            {/* Segunda parte del acordeón: Datos Sensibles */}
             <Accordion.Item eventKey="1">
               <Accordion.Header>Datos Sensibles</Accordion.Header>
               <Accordion.Body>
                 {sensitiveDataForContact.length > 0 ? (
                   <div>
-                    {/* Aquí renderizas los datos sensibles si existen */}
                     {sensitiveDataForContact.map((data) => (
                       <p key={data.id}>
                         Tipo de NIF: {data.nif_tipo}<br />
@@ -102,9 +97,9 @@ const UserInfo = () => {
             <Button variant="primary" className="me-2" onClick={() => handleEditContact(contact)}>
               Editar Contacto
             </Button>
-            {contact.is_admin && (
-              <Button variant="danger">Eliminar Contacto</Button>
-            )}
+            <Button variant="danger" onClick={() => handleDeleteContact(contact.id)}>
+              Eliminar Contacto
+            </Button>
           </div>
         </Tab.Pane>
       );
@@ -143,15 +138,6 @@ const UserInfo = () => {
           {renderTabs()}
         </Tab.Content>
       </Tab.Container>
-
-      {isFormVisible && (
-        <UserForm
-          onSave={actions.saveContact}  // Acción para guardar
-          isEditing={isEditing}
-          isNew={!isEditing}
-          user={contactToEdit}
-        />
-      )}
 
       <footer className="user-footer fixed-bottom">
         <img src="banner.jpg" alt="Banner Publicitario" className="banner-image" />

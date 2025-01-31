@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
-// import i18n from '../../i18n';
 import { Home } from "./pages/home";
 import { Login } from "./pages/login";
 import injectContext from "./store/appContext";
