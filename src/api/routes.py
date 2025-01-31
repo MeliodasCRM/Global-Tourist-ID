@@ -12,6 +12,9 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash #(Libreria que sirve para guardar una constraseña segura)
 from io import BytesIO
+import gzip
+import base64
+
 
 api = Blueprint('api', __name__)
 
@@ -844,33 +847,25 @@ def generate_contact_qr(contact_id):
 def generate_group_qr(group_id):
     try:
         current_user_id = get_jwt_identity()
-
-        # Validar que el user_id del token es un número
         try:
             current_user_id = int(current_user_id)
         except (ValueError, TypeError):
             return jsonify({"message": "Identidad del usuario inválida"}), 401
 
-        # Verificar que el grupo pertenece al usuario
-        group = Group.query.filter_by(
-            id=group_id,
-            user_id=current_user_id
-        ).first()
-        
+        group = Group.query.filter_by(id=group_id, user_id=current_user_id).first()
         if not group:
             return jsonify({"message": "Grupo no encontrado o no autorizado"}), 404
 
-        # Obtener todos los contactos del grupo con sus relaciones (optimizado)
         contacts = (
             Contact.query
-            .join(contact_group, contact_group.c.contact_id == Contact.id)  # Join con la tabla de asociación
-            .filter(contact_group.c.group_id == group_id)  # Filtrar por group_id
+            .join(contact_group, contact_group.c.contact_id == Contact.id)
+            .filter(contact_group.c.group_id == group_id)
             .options(db.joinedload(Contact.sensitive_data))
             .options(db.joinedload(Contact.reservas))
             .all()
         )
 
-        # Construir datos para el QR
+        # Construir los datos sin modificar nombres
         group_data = []
         for contact in contacts:
             group_data.append({
@@ -879,27 +874,43 @@ def generate_group_qr(group_id):
                 "reservas": [reserva.serialize() for reserva in contact.reservas] if contact.reservas else []
             })
 
-        # Generar QR con ajuste automático de tamaño
+        # Convertir a JSON
+        json_data = json.dumps(group_data)
+        print(f"Tamaño del JSON antes de compresión: {len(json_data)} caracteres")
+
+        # Comprimir con gzip
+        compressed_data = gzip.compress(json_data.encode('utf-8'))
+        
+        # Convertir a base64
+        encoded_data = base64.b64encode(compressed_data).decode('utf-8')
+
+        print(f"Tamaño después de compresión y base64: {len(encoded_data)} caracteres")
+
+        # Si el tamaño sigue siendo demasiado grande, devolver error
+        if len(encoded_data) > 2953:
+            return jsonify({"message": "El contenido del QR sigue siendo demasiado grande"}), 400
+
+        # Generar QR con la data comprimida y codificada
         qr = qrcode.QRCode(
-            version=None,  # Versión automática según datos
-            error_correction=qrcode.constants.ERROR_CORRECT_H,  # Mayor corrección de errores
+            version=40,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,  # Máxima corrección de errores
             box_size=10,
             border=4,
         )
-        qr.add_data(json.dumps(group_data))
+        qr.add_data(encoded_data)
         qr.make(fit=True)
 
         img = qr.make_image(fill_color="black", back_color="white")
         img_buffer = BytesIO()
         img.save(img_buffer, format='PNG')
         img_buffer.seek(0)
-        
+
         return send_file(
             img_buffer,
             mimetype='image/png',
             as_attachment=True,
             download_name=f'group_{group_id}_qr.png'
         )
-        # return jsonify(group_data), 200
+
     except Exception as e:
         return jsonify({"message": "Error al generar el QR grupal", "error": str(e)}), 500
