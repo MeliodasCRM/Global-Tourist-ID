@@ -206,6 +206,7 @@ def create_contact():
     try:
         user_id = get_jwt_identity()
         user = User.query.filter_by(id=user_id).first()
+
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
@@ -254,10 +255,9 @@ def create_contact():
 @jwt_required()
 def update_contact(contact_id):
     try:
-        id = get_jwt_identity()
-
-        # Buscar al usuario en la base de datos usando el email
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
@@ -312,8 +312,9 @@ def update_contact(contact_id):
 @jwt_required()
 def delete_contact(contact_id):
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -347,8 +348,9 @@ def delete_contact(contact_id):
 @jwt_required()
 def get_groups():
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -376,8 +378,9 @@ def get_groups():
 @jwt_required()
 def create_group():
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -421,8 +424,9 @@ def create_group():
 @jwt_required()
 def update_group(group_id):
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -468,8 +472,9 @@ def update_group(group_id):
 @jwt_required()
 def delete_group(group_id):
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
@@ -502,13 +507,14 @@ def delete_group(group_id):
 @jwt_required()
 def get_sensitive_data():
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
-        # Obtener todos los contactos del usuario
-        contacts = Contact.query.filter_by(user_id=user.id).all()
+        # Obtener todos los contactos del usuario autenticado
+        contacts = Contact.query.filter_by(user_id=user_id).all()
         if not contacts:
             return jsonify({"message": "No se encontraron contactos para este usuario"}), 404
         
@@ -527,15 +533,14 @@ def get_sensitive_data():
 @jwt_required()
 def create_sensitive_data():
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
         data = request.get_json()
-        
-        # Obtener el user_id del usuario autenticado
-        user_id = user.id
+
 
         # Verificar que el contacto existe y pertenece al usuario actual
         contact = Contact.query.filter_by(id=data['contact_id'], user_id=user_id).first()
@@ -587,14 +592,11 @@ def create_sensitive_data():
 @jwt_required()
 def update_sensitive_data(sensitive_data_id):
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
-        
-        
-        # Obtener el user_id del usuario autenticado
-        user_id = user.id
 
         # Buscar el dato sensible por su id
         sensitive_data = SensitiveData.query.filter_by(id=sensitive_data_id).first()
@@ -647,15 +649,12 @@ def update_sensitive_data(sensitive_data_id):
 @jwt_required()
 def delete_sensitive_data(sensitive_data_id):
     try:
-        id = get_jwt_identity()
-        user = User.query.filter_by(id=id).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
+        
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
-        
-        # Obtener el user_id del usuario autenticado
-        user_id = user.id
-
         # Buscar el dato sensible por su id
         sensitive_data = SensitiveData.query.filter_by(id=sensitive_data_id).first()
 
