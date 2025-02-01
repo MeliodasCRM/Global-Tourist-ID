@@ -24,7 +24,7 @@ werkzeug = "*"
 flask-babel = "*"
 qrcode = "*"
 pillow = "*"
-
+flask-babelplus = "*"
 
 [requires]
 python_version = "3.10"
