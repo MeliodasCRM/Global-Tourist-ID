@@ -84,27 +84,27 @@ def handle_Login():
         return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
 
     # Crear un token de acceso utilizando el email del usuario
-    token = create_access_token(identity=str(user.email))
+    token = create_access_token(identity=str(user.id))
     return(token)
 
 @api.route('/user', methods=['GET'])
 @jwt_required()  # Asegura que el usuario esté autenticado
 def get_user():
     try:
-        # Obtener el email desde el JWT
-        user_email = get_jwt_identity()  # El email del usuario autenticado
-        print(f"Usuario autenticado con email: {user_email}")  # Log para verificar el email
+        # Obtener el id desde el JWT
+        user_id = get_jwt_identity()
+        print(f"Usuario autenticado con id: {user_id}")  
 
-        if not user_email:
-            # Si no se obtiene el email desde el JWT
+        if not user_id:
+            # Si no se obtiene el id desde el JWT
             return jsonify({"message": "No se encontró el usuario autenticado en el token"}), 401
 
-        # Buscar el usuario por email
-        user = User.query.filter_by(email=user_email).first()
+        # Buscar el usuario por id
+        user = User.query.get(user_id)
 
         if not user:
             # Si no se encuentra el usuario en la base de datos
-            print(f"Usuario con email {user_email} no encontrado en la base de datos.")
+            print(f"Usuario con id {user_id} no encontrado en la base de datos.")
             return jsonify({"message": "Usuario no encontrado"}), 404
 
         # Si el usuario es encontrado, devolver la información serializada
@@ -181,22 +181,17 @@ def backoffice():
 @jwt_required()
 def get_contacts():
     try:
-        email = get_jwt_identity()  # Esto devolverá el email del usuario actual
-        print(f"Usuario autenticado: {email}")  # Verifica que el email esté correcto
-
-        user = User.query.filter_by(email=email).first()
-        if not user:
+        user_id = get_jwt_identity()
+        print(f"Usuario autenticado con ID: {user_id}") 
+        if not user_id:
             print("Usuario no encontrado")
             return jsonify({"message": "Usuario no encontrado"}), 404
-        
-        user_id = user.id
-        print(f"Usuario autenticado con ID: {user_id}")  # Verifica el ID del usuario
 
         contacts = Contact.query.filter_by(user_id=user_id).all()
 
         if not contacts:
-            print("No se encontraron contactos.")
-            return jsonify({"message": "No hay contactos disponibles"}), 404
+            print("No se encontraron contactos para el usuario: {user_id}.")
+            return jsonify({"message": "No hay contactos disponibles para el user"}), 404
 
         return jsonify([contact.serialize() for contact in contacts]), 200
     except Exception as e:
@@ -209,10 +204,8 @@ def get_contacts():
 @jwt_required()
 def create_contact():
     try:
-        email = get_jwt_identity()  # Obtener el email del usuario autenticado
-        
-        # Buscar el usuario en la base de datos usando el email
-        user = User.query.filter_by(email=email).first()
+        user_id = get_jwt_identity()
+        user = User.query.filter_by(id=user_id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
@@ -239,21 +232,6 @@ def create_contact():
         db.session.add(new_contact)
         db.session.commit()
 
-        # Si el contacto no es admin, buscar un grupo existente o crear uno
-        if not new_contact.is_admin:
-            group = Group.query.filter_by(user_id=user.id).first()
-            if group:
-                # Si ya existe un grupo, asociamos el contacto al grupo
-                group.contacts.append(new_contact)
-                db.session.commit()
-            else:
-                # Si no existe un grupo, creamos uno nuevo
-                new_group = Group(user_id=user.id, group_name="Grupo de Contactos")
-                db.session.add(new_group)
-                db.session.commit()
-                new_group.contacts.append(new_contact)  # Asociamos el contacto al nuevo grupo
-                db.session.commit()
-
         return jsonify({
             "message": "Contacto creado exitosamente",
             "contact": new_contact.serialize()
@@ -276,11 +254,10 @@ def create_contact():
 @jwt_required()
 def update_contact(contact_id):
     try:
-        # Obtener el email del usuario autenticado
-        email = get_jwt_identity()
+        id = get_jwt_identity()
 
         # Buscar al usuario en la base de datos usando el email
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(id=id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
@@ -335,11 +312,8 @@ def update_contact(contact_id):
 @jwt_required()
 def delete_contact(contact_id):
     try:
-        # Obtener el email del usuario autenticado
-        email = get_jwt_identity()
-
-        # Buscar al usuario en la base de datos usando el email
-        user = User.query.filter_by(email=email).first()
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -373,9 +347,8 @@ def delete_contact(contact_id):
 @jwt_required()
 def get_groups():
     try:
-        # Obtener el email del usuario autenticado
-        user_email = get_jwt_identity()
-        user = User.query.filter_by(email=user_email).first()
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -403,10 +376,8 @@ def get_groups():
 @jwt_required()
 def create_group():
     try:
-        email = get_jwt_identity()  # Obtener el email del usuario autenticado
-        
-        # Buscar el usuario en la base de datos usando el email
-        user = User.query.filter_by(email=email).first()
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -450,8 +421,8 @@ def create_group():
 @jwt_required()
 def update_group(group_id):
     try:
-        user_email = get_jwt_identity()  # Obtener el email del usuario autenticado
-        user = User.query.filter_by(email=user_email).first()
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -497,10 +468,8 @@ def update_group(group_id):
 @jwt_required()
 def delete_group(group_id):
     try:
-        email = get_jwt_identity()  # Obtener el email del usuario autenticado
-        
-        # Buscar el usuario en la base de datos usando el email
-        user = User.query.filter_by(email=email).first()
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
         
@@ -533,11 +502,8 @@ def delete_group(group_id):
 @jwt_required()
 def get_sensitive_data():
     try:
-        # Obtener el email del usuario autenticado
-        email = get_jwt_identity()
-
-        # Obtener el user_id basado en el email
-        user = User.query.filter_by(email=email).first()
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
             return jsonify({"message": "Usuario no encontrado"}), 404
 
@@ -561,16 +527,12 @@ def get_sensitive_data():
 @jwt_required()
 def create_sensitive_data():
     try:
-        data = request.get_json()
-        
-        # Obtener el email del usuario autenticado
-        email = get_jwt_identity()
-
-        # Buscar el usuario por su email y obtener su user_id
-        user = User.query.filter_by(email=email).first()
-        
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
-            return jsonify({"message": "Usuario no encontrado o no autorizado"}), 404
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
+        data = request.get_json()
         
         # Obtener el user_id del usuario autenticado
         user_id = user.id
@@ -625,14 +587,11 @@ def create_sensitive_data():
 @jwt_required()
 def update_sensitive_data(sensitive_data_id):
     try:
-        # Obtener el email del usuario autenticado
-        email = get_jwt_identity()
-
-        # Buscar el usuario por su email y obtener su user_id
-        user = User.query.filter_by(email=email).first()
-        
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
-            return jsonify({"message": "Usuario no encontrado o no autorizado"}), 404
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
         
         # Obtener el user_id del usuario autenticado
         user_id = user.id
@@ -688,14 +647,11 @@ def update_sensitive_data(sensitive_data_id):
 @jwt_required()
 def delete_sensitive_data(sensitive_data_id):
     try:
-        # Obtener el email del usuario autenticado
-        email = get_jwt_identity()
-
-        # Buscar el usuario por su email y obtener su user_id
-        user = User.query.filter_by(email=email).first()
-        
+        id = get_jwt_identity()
+        user = User.query.filter_by(id=id).first()
         if not user:
-            return jsonify({"message": "Usuario no encontrado o no autorizado"}), 404
+            return jsonify({"message": "Usuario no encontrado"}), 404
+        
         
         # Obtener el user_id del usuario autenticado
         user_id = user.id
@@ -723,61 +679,6 @@ def delete_sensitive_data(sensitive_data_id):
         db.session.rollback()
         return jsonify({
             "message": "Error al eliminar los datos sensibles",
-            "error": str(e)
-        }), 500
-
-# FUNCION PARA GUARDAR LOS DATOS RESERVA
-@api.route('/reserva', methods=['POST'])
-@jwt_required()
-def create_reserva():
-    try:
-        data = request.get_json()
-        # Verificar que el viajero existe y pertenece al usuario actual
-        traveler = Contact.query.filter_by(
-            id=data['traveler_id'],
-            user_id=get_jwt_identity()
-        ).first()
-
-        if not traveler:
-            return jsonify({"message": "Viajero no encontrado o no autorizado"}), 404
-
-        # Validar tipo de medio de pago
-        try:
-            medio_pago = MedioPagoTipo[data['medio_pago_tipo']]
-        except KeyError:
-            return jsonify({
-                "message": "Tipo de medio de pago inválido",
-                "valid_types": [tipo.name for tipo in MedioPagoTipo]
-            }), 400
-        nueva_reserva = Reserva(
-            fecha_entrada=datetime.strptime(data['fecha_entrada'], '%Y-%m-%d').date(),
-            fecha_salida=datetime.strptime(data['fecha_salida'], '%Y-%m-%d').date(),
-            alojamiento=data['alojamiento'],
-            nro_rooms=data['nro_rooms'],
-            nro_viajeros=data['nro_viajeros'],
-            titular_medio_pago=data['titular_medio_pago'],
-            medio_pago_tipo=medio_pago,
-            medio_pago_nro=data.get('medio_pago_nro'),
-            medio_pago_expira=datetime.strptime(data['medio_pago_expira'], '%Y-%m-%d').date() if data.get('medio_pago_expira') else None,
-            fecha_pago=datetime.strptime(data['fecha_pago'], '%Y-%m-%d').date() if data.get('fecha_pago') else None,
-            traveler_id=data['traveler_id']
-        )
-
-        db.session.add(nueva_reserva)
-        db.session.commit()
-        return jsonify({
-            "message": "Reserva creada exitosamente",
-            "reserva": nueva_reserva.serialize()
-        }), 201
-    except KeyError as e:
-        return jsonify({
-            "message": "Datos incompletos",
-            "error": f"Falta el campo {str(e)}"
-        }), 400
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "message": "Error al crear la reserva",
             "error": str(e)
         }), 500
     
