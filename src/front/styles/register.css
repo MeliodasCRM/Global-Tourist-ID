@@ -23,10 +23,15 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  
+
 }
 
 .form-group {
   position: relative;
+  width: 90%;
+  max-width: 400px;
+
 }
 
 .form-input {
@@ -36,6 +41,7 @@
   border-radius: 5px;
   font-size: 1rem;
   padding-left: 40px;
+  box-sizing: border-box; 
 }
 
 .input-icon {
@@ -146,3 +152,10 @@
 .auth-button:hover {
   transform: scale(1.05);
 }
+
+.input-wrapper input[type="email"],
+.input-wrapper input[type="password"] {
+    padding-left: 50px; /* 🔹 Empuja el texto más a la derecha */
+}
+
+

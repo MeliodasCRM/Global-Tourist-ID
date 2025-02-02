@@ -46,6 +46,9 @@ const UserHome = () => {
     actions.setAuthToken(null);
     navigate("/"); // Ahora usa "navigate" en minúscula
   }
+   const handleFaUser = () => {
+    navigate("/userinfo");
+   }
 
   return (
     <div className="user-home">
@@ -89,7 +92,7 @@ const UserHome = () => {
         <button className="nav-item">
           <FaHome />
         </button>
-        <button className="nav-item">
+        <button className="nav-item" onClick={handleFaUser}>
           <FaUser />
         </button>
         <button className="nav-item active">

@@ -1,184 +1,160 @@
-/* Reset básico para eliminar márgenes y paddings por defecto */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Estilos para el contenedor principal */
-.user-info {
+/* ✅ Contenedor Principal */
+#user-info-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   height: 100vh;
+  font-family: "Poppins", sans-serif;
+  background-color: #ffffff;
 }
 
-/* Estilo del header */
-.user-navbar {
-  background-color: #333;
-  color: white;
-  padding: 10px 15px;
-  font-size: 18px;
-  z-index: 10;
+/* 📌 NAVBAR SUPERIOR */
+#user-info-container .user-navbar {
+  background-color: #d1d5db;
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  padding: 15px;
+  width: 100%;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#user-info-container .nav-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4f46e5;
+}
+
+#user-info-container .nav-button {
+  background-color: #4f46e5;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+/* 📌 TABS DE CONTACTOS */
+#user-info-container .contact-tabs {
+  display: flex;
+  justify-content: center;
   align-items: center;
   width: 100%;
+  margin-top: 10px;
+  border-bottom: 2px solid #ddd; /* 🔹 Línea inferior como separador */
 }
 
-/* Botón de regreso y de nuevo centrados verticalmente en el header */
-.back-button,
-.profile-button {
+/* 📌 Cada botón de contacto */
+#user-info-container .tab-button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #666; /* 🔹 Color gris oscuro como en la imagen */
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out, border-bottom 0.2s ease-in-out;
+}
+
+/* 📌 Botón activo (Resalta Contacto seleccionado) */
+#user-info-container .tab-button.active {
+  color: #4f46e5; /* 🔹 Azul principal */
+  border-bottom: 3px solid #4f46e5; /* 🔹 Línea azul debajo del tab activo */
+}
+
+
+/* 📌 INFORMACIÓN DEL CONTACTO */
+#user-info-container .contact-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  width: 90%;
+  max-width: 450px;
+  margin-top: 10px;
+}
+
+#user-info-container .contact-header {
+  background-color: #4f46e5;
+  color: white;
+  padding: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 10px 10px 0 0;
+}
+
+#user-info-container .contact-details {
+  padding: 10px;
+}
+
+/* 📌 INFORMACIÓN SENSIBLE */
+#user-info-container .sensitive-info {
+  background-color: #4f46e5;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  width: 90%;
+  max-width: 450px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+/* 📌 BOTONES DE ACCIÓN */
+#user-info-container .action-buttons {
+  display: flex;
+  justify-content: space-around;
+  width: 90%;
+  max-width: 450px;
+  margin-top: 15px;
+}
+
+#user-info-container .edit-button,
+#user-info-container .delete-button,
+#user-info-container .add-button {
+  border: none;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#user-info-container .edit-button { background-color: #4f46e5; }
+#user-info-container .delete-button { background-color: red; }
+#user-info-container .add-button { background-color: green; border-radius: 50%; }
+
+/* 📌 NAVBAR INFERIOR */
+#user-info-container .bottom-nav {
+  background-color: #4f46e5; /* Color de la imagen */
+  width: 100%;
+  position: fixed; /* 🔹 La hace fija en la parte inferior */
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 15px 0;
+  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.1); /* 🔹 Agrega sombra superior */
+}
+
+/* 📌 ICONOS EN LA NAVBAR INFERIOR */
+#user-info-container .nav-item {
   background: none;
   border: none;
   color: white;
-  font-size: 18px;
+  font-size: 28px; /* 🔹 Iconos más grandes */
   cursor: pointer;
-  border-radius: 50%;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.profile-button {
-  background-color: #28a745;
-}
-
-/* Título del Header centrado */
-.user-title {
-  margin: 0;
-  flex-grow: 1;
-  text-align: center;
-}
-
-/* Estilo para las pestañas */
-.nav-underline .nav-link {
-  border-bottom: 2px solid #007bff; /* Cambia el color de la línea */
-  padding: 5px; /* Padding de 5px horizontal y vertical */
-}
-
-.nav-underline .nav-link.active {
-  border-bottom: 3px solid #0056b3; /* Resalta la línea para la pestaña activa */
-}
-
-/* Separación de las pestañas del navbar */
-.nav {
-  display: flex;
-  justify-content: center;
-  margin-top: 5px;
-}
-
-/* Estilos del Accordion */
-.accordion-button {
-  background-color: #f1f1f1;
-  color: #333;
-  padding: 5px 15px;  /* Padding vertical de 5px y horizontal de 5px */
-}
-
-/* Estilo cuando el acordeón está expandido */
-.accordion-button:not(.collapsed) {
-  background-color: #007bff;
-  color: white;
-}
-
-/* Acordeón con margen de 5px a la izquierda y derecha */
-.accordion {
-  margin: 5px;
-}
-
-/* Separación del acordeón de las tabs */
-.accordion-item {
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-/* Formulario: label e input */
-.form-label,
-input {
-  max-width: 250px;  /* Máximo de 250px de ancho */
-  width: 100%;  /* Para que ocupen todo el ancho disponible hasta ese máximo */
-  margin: 0 auto 15px; /* Separación de 15px verticalmente y centrado horizontalmente */
-}
-
-/* Estilo para los botones */
-button {
-  margin-right: 10px;
-  margin-left: 10px;
-  padding: 10px 20px; /* Ajuste del padding para los botones */
-}
-
-/* Centrado del label "QR Expiration Date" */
-.card-expiration-title {
-  display: flex;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: 20px;
-  padding: 5px; /* Padding de 5px horizontal y vertical */
-  width: 100%; /* Asegura que el título ocupe todo el ancho disponible */
-  text-align: center; /* Centra el texto */
-}
-
-
-/* Centrado del campo de fecha */
-.date-input {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.date-input input {
-  text-align: center;
-  margin: 0 5px;
-  width: 150px; /* Ajusta el tamaño del campo de fecha */
-  padding: 0 5px; /* Padding horizontal de 5px */
-}
-
-/* Centrado de los botones de generar QR */
-.buttons-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-/* Los botones "Generate QR" y "Generate All" en la misma línea con margen */
-.buttons-container button {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-/* Estilo del footer */
-.user-footer {
-  background-color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-.banner-image {
-  width: 100%;
-  height: 50px;
-  object-fit: cover;
-}
-
-/* Ajustes generales responsivos */
-@media (max-width: 768px) {
-  .nav-pills .nav-link {
-      font-size: 0.9rem; /* Ajuste del tamaño de las pestañas en pantallas pequeñas */
-  }
-
-  .buttons-container {
-      flex-direction: column; /* Los botones se apilan en pantallas pequeñas */
-      margin-top: 10px;
-  }
-
-  .buttons-container button {
-      margin-bottom: 10px;
-  }
+#user-info-container .nav-item.active {
+  color: yellow; /* 🔹 Resalta el icono activo */
 }
