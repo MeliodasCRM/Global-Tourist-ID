@@ -1,0 +1,112 @@
+/* Navbar Header */
+.navbar-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 70px;
+    background-color: #bac0ca;
+    display: flex;
+    align-items: center; /* Centra todos los elementos verticalmente */
+    justify-content: center; /* Mantiene el título centrado */
+    padding-top: 10px; /* Agrega espacio arriba */
+    padding-bottom: 10px; /* Agrega espacio abajo */
+    z-index: 100;
+}
+
+/* Contenedor del Header */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Centrado vertical */
+    width: 100%;
+    max-width: 360px; /* Evita que los botones queden pegados a los bordes */
+    margin: 0 auto;
+}
+
+/* Botón Back */
+.icon-back {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%; /* Hace el botón redondo */
+    background: #525aa6;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 15px; /* Agrega un pequeño margen para evitar que quede pegado */
+}
+
+/* Título centrado */
+.header-title {
+    flex-grow: 1; /* Hace que ocupe todo el espacio disponible */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Asegura el centrado vertical */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0; /* Elimina márgenes innecesarios */
+}
+
+/* Botón Menú */
+.menu-button {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%; /* Hace el botón redondo */
+    background: #525aa6;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 15px;
+}
+
+/* Oculta la flecha del desplegable de Bootstrap */
+.menu-button::after {
+    display: none !important;
+}
+
+/* Estilos del Dropdown */
+.dropdown-menu {
+    min-width: 150px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 3px 0; /* Menos altura */
+    background-color: white; /* Fondo estándar */
+}
+
+/* Estilo "stripped" para los ítems del menú */
+.dropdown-item:nth-child(odd) {
+    background-color: #f8f9fa; /* Color gris claro */
+}
+
+.dropdown-item:nth-child(even) {
+    background-color: white;
+}
+
+.dropdown-item {
+    padding: 6px 12px; /* Reduce el padding para que sea más compacto */
+    font-size: 14px;
+    text-align: left;
+    color: #333;
+    transition: background 0.3s ease-in-out;
+}
+
+.dropdown-item:hover {
+    background-color: #e0e0e0; /* Cambio de color en hover */
+}
+
+/* Ajuste responsivo */
+@media (min-width: 768px) {
+    .header-content {
+        max-width: 500px; /* Asegura que no se peguen en pantallas más grandes */
+    }
+}

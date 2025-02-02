@@ -1,52 +1,82 @@
-/* Estilos generales para el formulario */
+/* Contenedor principal */
+.user-form {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header fijo con el Navbar */
+.user-form-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 100; /* Asegura que el navbar siempre esté arriba */
+  background: white;
+}
+
+/* 📌 Pestañas más pequeñas y en la misma fila */
+.user-form-tabs {
+  position: sticky;
+  top: 56px; /* Justo debajo del Navbar */
+  width: 100%;
+  background: white;
+  z-index: 99;
+  border-bottom: 2px solid #ddd;
+}
+
+/* 📌 Pestañas alineadas en fila */
+.tabs-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+/* Ajuste de tamaño de pestañas */
+.tabs-row .nav-link {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+/* Contenedor del formulario */
+.user-form-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px 10px; /* Añade padding a los lados */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 📌 Contenedor del formulario con un ancho máximo */
 .user-form-container {
-    padding-top: 60px; /* Aseguramos que no esté debajo del navbar */
-    padding: 20px;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  /* Header con botón de regresar */
-  .user-navbar {
-    background-color: #333;
-    color: white;
-    padding: 10px 15px;
-    font-size: 18px;
-    z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-  
-  .back-button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .user-navbar h1 {
-    margin: 0;
-  }
-  
-  /* Centrado de los formularios y campos */
-  .form-group label {
-    text-align: left;
-  }
-  
-  .row {
-    margin-bottom: 15px;
-  }
-  
-  /* Botón de guardar y actualizar */
-  button {
-    margin-top: 20px;
-  }
-  
-  @media (max-width: 768px) {
-    .user-form-container {
-      max-width: 100%;
-    }
-  }
+  width: 100%;
+  padding: 15px;
+  background: white;
+}
+
+/* 📌 Botón "Actualizar" centrado */
+.button-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background: white;
+}
+
+/* 📌 Estilo del botón azul */
+.update-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  width: 200px;
+}
+
+.update-button:hover {
+  background-color: #0056b3;
+}
