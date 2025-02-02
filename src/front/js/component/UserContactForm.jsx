@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 
-const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
+const UserContactForm = ({ contactData, isEditing, onChange }) => {
   const [formData, setFormData] = useState({
     nombre: "",
     primer_apellido: "",
@@ -21,7 +21,7 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
   useEffect(() => {
     if (isEditing && contactData) {
       setFormData(contactData);
-    } else if (!isEditing) {
+    } else {
       setFormData({
         nombre: "",
         primer_apellido: "",
@@ -42,20 +42,15 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSave) {
-      onSave(formData);
-    }
+    const updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+    onChange(updatedFormData);
   };
 
   return (
-    <div style={{ maxWidth: "375px", margin: "0 auto" }}>
-      <Form onSubmit={handleSubmit}>
-        <Row>
+    <div className="user-contact-form-container">
+      <Form>
+        <Row className="mb-3">
           <Col sm={12}>
             <Form.Group controlId="nombre">
               <Form.Label>Nombre</Form.Label>
@@ -70,7 +65,8 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
           </Col>
         </Row>
 
-        <Row>
+        {/* Primer y Segundo Apellido */}
+        <Row className="mb-3">
           <Col sm={6}>
             <Form.Group controlId="primer_apellido">
               <Form.Label>Primer Apellido</Form.Label>
@@ -96,7 +92,46 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
           </Col>
         </Row>
 
-        <Row>
+        {/* Teléfonos */}
+        <Row className="mb-3">
+          <Col sm={6}>
+            <Form.Group controlId="telefono_movil">
+              <Form.Label>Teléfono Móvil</Form.Label>
+              <Form.Control
+                type="text"
+                name="telefono_movil"
+                value={formData.telefono_movil}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+          </Col>
+          <Col sm={6}>
+            <Form.Group controlId="telefono_fijo">
+              <Form.Label>Teléfono Fijo</Form.Label>
+              <Form.Control
+                type="text"
+                name="telefono_fijo"
+                value={formData.telefono_fijo}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col sm={6}>
+            <Form.Group controlId="email">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+          </Col>
           <Col sm={6}>
             <Form.Group controlId="sexo">
               <Form.Label>Sexo</Form.Label>
@@ -104,6 +139,21 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
                 type="text"
                 name="sexo"
                 value={formData.sexo}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col sm={6}>
+            <Form.Group controlId="fecha_nacimiento">
+              <Form.Label>Fecha de Nacimiento</Form.Label>
+              <Form.Control
+                type="date"
+                name="fecha_nacimiento"
+                value={formData.fecha_nacimiento}
                 onChange={handleChange}
                 required
               />
@@ -123,20 +173,9 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
           </Col>
         </Row>
 
-        <Row>
-          <Col sm={6}>
-            <Form.Group controlId="fecha_nacimiento">
-              <Form.Label>Fecha de Nacimiento</Form.Label>
-              <Form.Control
-                type="date"
-                name="fecha_nacimiento"
-                value={formData.fecha_nacimiento}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-          <Col sm={6}>
+        {/* Dirección */}
+        <Row className="mb-3">
+          <Col sm={12}>
             <Form.Group controlId="direccion">
               <Form.Label>Dirección</Form.Label>
               <Form.Control
@@ -150,7 +189,8 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
           </Col>
         </Row>
 
-        <Row>
+        {/* Localidad y País */}
+        <Row className="mb-3">
           <Col sm={6}>
             <Form.Group controlId="localidad">
               <Form.Label>Localidad</Form.Label>
@@ -176,52 +216,6 @@ const UserContactForm = ({ contactData, isEditing, onSave, user }) => {
             </Form.Group>
           </Col>
         </Row>
-
-        <Row>
-          <Col sm={6}>
-            <Form.Group controlId="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-          <Col sm={6}>
-            <Form.Group controlId="telefono_movil">
-              <Form.Label>Teléfono Móvil</Form.Label>
-              <Form.Control
-                type="text"
-                name="telefono_movil"
-                value={formData.telefono_movil}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col sm={6}>
-            <Form.Group controlId="telefono_fijo">
-              <Form.Label>Teléfono Fijo</Form.Label>
-              <Form.Control
-                type="text"
-                name="telefono_fijo"
-                value={formData.telefono_fijo}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-
-        </Row>
-
-        <Button variant="primary" type="submit" className="mt-3">
-          {isEditing ? "Actualizar Contacto" : "Guardar Contacto"}
-        </Button>
       </Form>
     </div>
   );

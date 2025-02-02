@@ -541,7 +541,6 @@ def create_sensitive_data():
         
         data = request.get_json()
 
-
         # Verificar que el contacto existe y pertenece al usuario actual
         contact = Contact.query.filter_by(id=data['contact_id'], user_id=user_id).first()
 
