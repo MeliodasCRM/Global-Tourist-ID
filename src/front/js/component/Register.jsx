@@ -1,12 +1,12 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
-import { useNavigate } from "react-router-dom"; // ✅ Importar useNavigate
+import { useNavigate } from "react-router-dom"; 
 import "../../styles/register.css";
 
 export const Register = () => {
   const { actions } = useContext(Context);
-  const navigate = useNavigate(); // ✅ Inicializar navegación
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,12 +25,12 @@ export const Register = () => {
     } else {
       const result = await actions.signup(formData.email, formData.password, formData.language);
       if (result.success) {
-        alert("✅ Registro exitoso. Ahora puedes iniciar sesión.");
-        setActiveTab("login"); // ✅ Cambia a la pestaña de login
-        setFormData({ email: "", password: "", language: "es" }); // ✅ Limpia los campos
-        navigate("/login"); // ✅ Redirige al login
+        alert("Registro exitoso. Ahora puedes iniciar sesión.");
+        setActiveTab("login"); // Cambia a la pestaña de login
+        setFormData({ email: "", password: "", language: "es" }); // Limpia los campos
+        navigate("/login"); // Redirige al login
       } else {
-        alert("❌ Error en el registro. Inténtalo de nuevo.");
+        alert("Error en el registro. Inténtalo de nuevo.");
       }
     }
   };
@@ -91,6 +91,7 @@ export const Register = () => {
               <option value="es">Español (es)</option>
               <option value="en">Inglés (en)</option>
             </select>
+
           </div>
         )}
       </form>
