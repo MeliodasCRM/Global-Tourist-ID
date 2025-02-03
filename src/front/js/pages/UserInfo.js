@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Button, Tab, Nav, Accordion, Card } from "react-bootstrap";
-import { FaArrowLeft, FaPlus } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext"; // Contexto para acceder al store y acciones
-import UserForm from './UserForm'; // Importamos el componente UserForm
-import '../../styles/userInfo.css'; // Estilos del componente
+import React, { useEffect, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
+import { Context } from "../store/appContext";
+import { FaPlus } from "react-icons/fa"; // Importamos el icono "+"
+import NavbarHeader from "../component/NavbarHeader.jsx";
+import ContactBody from "../component/ContactBody.jsx";
+import ContactBanner from "../component/ContactBanner.jsx";
+import NavbarFooter from "../component/NavbarFooter.jsx";
+import "../../styles/userView/userInfo.css";
 
 const UserInfo = () => {
   const [key, setKey] = useState("user01");
@@ -112,66 +115,11 @@ const UserInfo = () => {
   };
 
   return (
-    <div id="user-info-container">
-      {/* ✅ NavBar Superior */}
-      <header className="user-navbar">
-        <button className="nav-button" onClick={() => navigate("/userhome")}>
-          <FaArrowLeft />
-        </button>
-        <h1 className="nav-title">User Information</h1>
-        <button className="nav-button">
-          <FaBars />
-        </button>
-      </header>
-
-      {/* ✅ Tabs de Contactos */}
-      <div className="contact-tabs">
-        {contacts.map((contact) => (
-          <button
-            key={contact.id}
-            className={`tab-button ${selectedTab === contact.id ? "active" : ""}`}
-            onClick={() => setSelectedTab(contact.id)}
-          >
-            {contact.id.replace("contact", "Contact ")}
-          </button>
-        ))}
-      </div>
-
-      {/* ✅ Información del Contacto */}
-      <div className="contact-card">
-        <div className="contact-header">{contacts.find(c => c.id === selectedTab)?.name}</div>
-        <div className="contact-details">
-          <p><strong>Teléfono 1:</strong> {contacts.find(c => c.id === selectedTab)?.phone1}</p>
-          <p><strong>Teléfono 2:</strong> {contacts.find(c => c.id === selectedTab)?.phone2}</p>
-          <p><strong>Email:</strong> {contacts.find(c => c.id === selectedTab)?.email}</p>
-          <p><strong>Domicilio:</strong> {contacts.find(c => c.id === selectedTab)?.address}</p>
-        </div>
-      </div>
-
-      {/* ✅ Información Sensible */}
-      <div className="sensitive-info">
-        <h3>Información Sensible <FaEye /></h3>
-      </div>
-
-      {/* ✅ Botones de Acción */}
-      <div className="action-buttons">
-        <button className="edit-button"><FaEdit /> Editar</button>
-        <button className="add-button"><FaPlus /></button>
-        <button className="delete-button"><FaTrash /> Eliminar</button>
-      </div>
-
-      {isFormVisible && (
-        <UserForm
-          onSave={actions.saveContact}  // Acción para guardar
-          isEditing={isEditing}
-          isNew={!isEditing}
-          user={contactToEdit}
-        />
-      )}
-
-      <footer className="user-footer fixed-bottom">
-        <img src="banner.jpg" alt="Banner Publicitario" className="banner-image" />
-      </footer>
+    <div className="app-container">
+      <NavbarHeader prevLocation={location.state?.from} />
+      <ContactBody contacts={store.contact || []} />
+      <ContactBanner />
+      <NavbarFooter />
     </div>
   );
 };

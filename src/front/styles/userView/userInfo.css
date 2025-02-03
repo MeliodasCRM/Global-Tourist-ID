@@ -114,20 +114,6 @@ body {
     cursor: pointer;
 }
 
-/* Botón Add (Crear Contacto) */
-.btn-add {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 112px;
-    background: #525aa6;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
 /* Responsivo */
 @media (min-width: 768px) {
     .navbar-header,
@@ -143,4 +129,31 @@ body {
     .header-content {
         max-width: 600px;
     }
+}
+
+.create-contact-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #525aa6;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease-in-out;
+    margin-top: 20px;
+}
+
+/* Hover del botón */
+.create-contact-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Ícono "+" dentro del botón */
+.create-contact-btn .plus-icon {
+    font-size: 22px;
 }
