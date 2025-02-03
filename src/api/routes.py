@@ -681,7 +681,7 @@ def delete_sensitive_data(sensitive_data_id):
             "error": str(e)
         }), 500
     
-# FUNCION GENERAR QR INDIVIDUAL
+# FUNCION PARA ENVIAR QR INDIVIDUAL
 @api.route('/contact/<int:contact_id>/qr', methods=['GET'])
 @jwt_required()
 def generate_contact_qr(contact_id):
@@ -691,7 +691,7 @@ def generate_contact_qr(contact_id):
         # Validar que el user_id del token es un número
         if not current_user_id.isdigit():
             return jsonify({"message": "Identidad del usuario inválida"}), 401  # Token corrupto
-
+        
         current_user_id = int(current_user_id)  # Convertir a integer
 
         # Buscar el contacto asociado al usuario
@@ -702,18 +702,18 @@ def generate_contact_qr(contact_id):
         
         if not contact:
             return jsonify({"message": "Contacto no encontrado o no autorizado"}), 404
-            
+
         # Obtener datos sensibles y reservas
         sensitive_data = SensitiveData.query.filter_by(contact_id=contact_id).first()
         reservas = Reserva.query.filter_by(traveler_id=contact_id).all()
-        
+
         # Construir datos para el QR
         qr_data = {
             "contact": contact.serialize(),
             "sensitive_data": sensitive_data.serialize() if sensitive_data else None,
             "reservas": [reserva.serialize() for reserva in reservas] if reservas else []
         }
-        
+
         # Generar QR
         qr = qrcode.QRCode(
             version=1,
@@ -723,21 +723,21 @@ def generate_contact_qr(contact_id):
         )
         qr.add_data(json.dumps(qr_data))
         qr.make(fit=True)
-
+        
         img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convertir la imagen QR a base64
         img_buffer = BytesIO()
         img.save(img_buffer, format='PNG')
         img_buffer.seek(0)
-        
-        return send_file(
-            img_buffer,
-            mimetype='image/png',
-            as_attachment=True,
-            download_name=f'contact_{contact_id}_qr.png'
-        )
-        # Comprobar los datos del QR
-        # return jsonify(qr_data), 200
-        
+
+        qr_base64 = base64.b64encode(img_buffer.getvalue()).decode()
+
+        # Devolver el QR en base64
+        return jsonify({
+            "qr_base64": f"data:image/png;base64,{qr_base64}"
+        }), 200
+
     except Exception as e:
         return jsonify({"message": "Error al generar el QR", "error": str(e)}), 500
     
@@ -797,6 +797,7 @@ def generate_group_qr(group_id):
             box_size=10,
             border=4,
         )
+
         qr.add_data(encoded_data)
         qr.make(fit=True)
 

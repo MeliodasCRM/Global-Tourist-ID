@@ -6,12 +6,12 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db, User
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
-
+from flask_mail import Mail, Message
 
 # from models import Person
 
@@ -27,6 +27,15 @@ app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'locales'
 app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
 jwt = JWTManager(app)
 
+# CORREITO
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'meliodascrm@gmail.com'
+app.config['MAIL_PASSWORD'] = 'tipd thqq vily oddm'
+
+mail = Mail(app)
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
@@ -79,7 +88,29 @@ def serve_any_other_file(path):
 def index():
     return jsonify(message=_("welcome_message"))
 
+# CORREITO2
+@app.route('/send-email', methods=['POST'])
+def send_email():
+    email=request.json.get('email')
+    template_html = f""" 
+    <html>
+        <body>
+            <h1>ERES UN POU</h1>
+            <p>ENHORABUENA! HAS SIDO SELECCIONADA COMO POU DEL AÑO!</p>
+        </body>
+    </html>
+    """
+    msg=Message(
+        "Reset your password",
+        sender="meliodascrm@gmail.com",
+        recipients=[email],
+        html=template_html
+    )
+    mail.send(msg)
+    return jsonify({"msg":"Email sent"}), 200
+
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
+
