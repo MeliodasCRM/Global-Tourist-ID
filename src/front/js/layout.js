@@ -7,6 +7,7 @@ import { Login } from "./pages/login";
 import injectContext from "./store/appContext";
 import BackOffice from "./pages/backoffice";
 import ContactTable from "./component/ContactTable.jsx";
+import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import PrivateRoute from "./component/PrivateRoute.jsx";
 import PublicView from "./pages/publicView";
@@ -14,8 +15,6 @@ import { UserReservas } from "./pages/UserReservas.js";
 import { NuevaReservaForm } from "./pages/NuevaReserva.js";
 import { EditarReservaForm } from "./pages/EditarReservas.js";
 import { DetallesReserva } from "./pages/DetallesReserva.js";
-
-
 import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
 import UserForm from "./pages/UserForm.js";
@@ -49,7 +48,6 @@ const Layout = () => {
                         {/* Rutas generales */}
                         <Route path="/" element={<Home />} />
                         <Route path="/publica" element={<PublicView />} />
-
                         <Route path="/login" element={<Login />} />
                         {/* Ruta protegida para UserHome */}
                         <Route path="/userhome" element={<PrivateRoute element={UserHome} />} />
@@ -60,28 +58,19 @@ const Layout = () => {
                         <Route path="/editar-reserva/:id" element={<PrivateRoute element={EditarReservaForm} />} />
                         <Route path="/reserva/:id" element={<PrivateRoute element={DetallesReserva} />} />
                         <Route path="/share" element={<PrivateRoute element={QrShare} />} />
-
                         {/* Ruta para manejar 404 */}
                         <Route path="*" element={<h1>404 Not Found</h1>} />
-
                         {/* Rutas adicionales */}
-
-
                         {/* <Route path="/reservas" element={<UserReservas />} /> */}
                         {/* <Route path="/nueva-reserva" element={<NuevaReservaForm />} />
                         <Route path="/editar-reserva/:id" element={<EditarReservaForm />} />
                         <Route path="/reserva/:id" element={<DetallesReserva />} /> */}
-
-
                     </Routes>
-
                     {/* Navbar y Footer solo se muestran en las rutas generales */}
-
                     <Footer /> {/* Footer global */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>
     );
 };
-
 export default injectContext(Layout);
