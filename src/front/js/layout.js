@@ -15,8 +15,6 @@ import { UserReservas } from "./pages/UserReservas.js";
 import { NuevaReservaForm } from "./pages/NuevaReserva.js";
 import { EditarReservaForm } from "./pages/EditarReservas.js";
 import { DetallesReserva } from "./pages/DetallesReserva.js";
-
-
 import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
 import UserForm from "./pages/UserForm.js";
@@ -31,7 +29,6 @@ const Layout = () => {
         <div>
             <BrowserRouter>
                 <ScrollToTop>
-                    <Navbar /> {/* Navbar global */}
                     <Routes>
                         {/* Rutas para el BackOffice */}
                         <Route path="/backoffice" element={<BackOffice />}>
@@ -65,25 +62,18 @@ const Layout = () => {
 
                         {/* Ruta para manejar 404 */}
                         <Route path="*" element={<h1>404 Not Found</h1>} />
-
                         {/* Rutas adicionales */}
-
-
                         {/* <Route path="/reservas" element={<UserReservas />} /> */}
                         {/* <Route path="/nueva-reserva" element={<NuevaReservaForm />} />
                         <Route path="/editar-reserva/:id" element={<EditarReservaForm />} />
                         <Route path="/reserva/:id" element={<DetallesReserva />} /> */}
 
-
                     </Routes>
-
                     {/* Navbar y Footer solo se muestran en las rutas generales */}
-
                     <Footer /> {/* Footer global */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>
     );
 };
-
 export default injectContext(Layout);
