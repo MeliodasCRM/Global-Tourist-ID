@@ -10,6 +10,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			contact: [], // inicialdatos de contactos
 			sensitive_data: [], //inicializo los datos sensibles
 			group: [], // Incializo el array de grupos
+			activeContactId: null, // Inicializo el contacto activo
 
 		},
 		actions: {
@@ -105,7 +106,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						// Verifica los valores antes de hacer la comparación
 						console.log("store.user.id:", store.user.id);
 						console.log("user.id del backend:", user.id);
-			
+
 						// Verificamos que el user_id corresponda al del usuario logeado
 						if (user.id === store.user.id) {
 							console.log("Usuario cargado correctamente");
@@ -174,14 +175,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 						// o mostramos algún mensaje o redirigimos a login
 						return;
 					}
-			
+
 					// Verificar si el usuario ya tiene contactos
 					const userContacts = store.contact.filter(contact => contact.user_id === store.user.id);
 					// Verificar si el usuario tiene un grupo
 					const userGroup = store.group.find(group => group.user_id === store.user.id);
-			
+
 					let contact;  // Definir la variable `contact` antes de usarla
-			
+
 					if (userContacts.length === 0) {
 						// Crear el primer contacto como admin
 						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
@@ -196,11 +197,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 								user_id: store.user.id,
 							}),
 						});
-			
+
 						if (response.ok) {
 							contact = await response.json();  // Asignamos el contacto a la variable
 							setStore({ contact: [contact] });
-			
+
 							// Si el usuario no tiene grupo, crearlo
 							if (!userGroup) {
 								await getActions().createGroup(contact.id);  // Crear un grupo si no existe
@@ -209,7 +210,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					} else {
 						// Crear un contacto normal y asociarlo al grupo
 						contact = userContacts[0];  // Usamos el primer contacto encontrado
-			
+
 						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
 							method: "POST",
 							headers: {
@@ -222,11 +223,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 								user_id: store.user.id,
 							}),
 						});
-			
+
 						if (response.ok) {
 							const newContact = await response.json();
 							setStore({ contact: [...store.contact, newContact] });
-			
+
 							// Asociar el nuevo contacto al grupo
 							if (userGroup) {
 								await getActions().addToGroup(newContact.id, userGroup.id);
@@ -366,6 +367,69 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error al cargar los datos sensibles:", error);
 				}
+			},
+
+			// Acción para eliminar los datos sensibles de un contacto
+			deleteSensitiveData: (contactId) => {
+				return async (dispatch) => {
+					try {
+						// Hacer la petición para eliminar los datos sensibles del backend
+						const response = await fetch(`/api/sensitive-data/${contactId}`, {
+							method: 'DELETE',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						});
+
+						if (!response.ok) {
+							throw new Error('No se pudo eliminar los datos sensibles');
+						}
+
+						// Si la eliminación fue exitosa, actualizamos el store
+						dispatch({
+							type: 'DELETE_SENSITIVE_DATA',
+							payload: contactId,  // Enviamos el ID del contacto eliminado
+						});
+
+						// También recargamos los datos si es necesario
+						// dispatch(actions.loadSensitiveData()); // Si es necesario recargar los datos sensibles
+
+					} catch (error) {
+						console.error("Error al eliminar los datos sensibles:", error);
+					}
+				};
+			},
+
+			// Acción para actualizar los datos sensibles de un contacto
+			updateSensitiveData: (contactId, updatedData) => {
+				return async (dispatch) => {
+					try {
+						// Hacer la solicitud para actualizar los datos sensibles en el backend
+						const response = await fetch(`/api/sensitive-data/${contactId}`, {
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify(updatedData), // Enviamos los datos actualizados
+						});
+
+						if (!response.ok) {
+							throw new Error('No se pudo actualizar los datos sensibles');
+						}
+
+						// Si la actualización fue exitosa, actualizamos el store
+						dispatch({
+							type: 'UPDATE_SENSITIVE_DATA',
+							payload: { contactId, updatedData },  // Pasamos el ID y los nuevos datos
+						});
+
+						// También podrías querer recargar los datos sensibles si es necesario
+						// dispatch(actions.loadSensitiveData()); // Si es necesario recargar
+
+					} catch (error) {
+						console.error("Error al actualizar los datos sensibles:", error);
+					}
+				};
 			},
 
 

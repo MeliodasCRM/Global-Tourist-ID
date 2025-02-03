@@ -13,7 +13,7 @@ const UserForm = () => {
   const location = useLocation();
   const [key, setKey] = useState("contact");
   const [contactToEdit, setContactToEdit] = useState(location.state?.contactToEdit || null);
-  const [sensitiveData, setSensitiveData] = useState(null);
+  const [sensitiveData, setSensitiveData] = useState(location.state?.sensitiveDataToEdit || null);
 
   useEffect(() => {
     if (store.user && store.user.id) {
@@ -21,21 +21,13 @@ const UserForm = () => {
     }
   }, [store.user]);
 
-  useEffect(() => {
-    if (location.state?.contactToEdit && !contactToEdit) {
-      setContactToEdit(location.state.contactToEdit);
-      actions.loadSensitiveData(location.state.contactToEdit.id).then(data => {
-        setSensitiveData(data);
-      });
-    }
-  }, [location.state?.contactToEdit]);
-
   const handleSave = async () => {
     if (!store.user) {
-      console.error("❌ El usuario no está cargado correctamente.");
+      console.error("El usuario no está cargado correctamente.");
       return;
     }
 
+    // Guardar datos de contacto
     if (contactToEdit) {
       await actions.updateContact(contactToEdit.id, contactToEdit);
     } else {
@@ -45,6 +37,7 @@ const UserForm = () => {
       }
     }
 
+    // Guardar datos sensibles
     if (sensitiveData) {
       await actions.updateSensitiveData(contactToEdit?.id, sensitiveData);
     }

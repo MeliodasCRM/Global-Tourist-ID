@@ -1,68 +1,83 @@
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 
 const SensitiveDataForm = ({ sensitiveData, setSensitiveData }) => {
   const [formData, setFormData] = useState({
-    nif_tipo: "DNI",  // Valor por defecto
+    nif_tipo: "",
     nif_numero: "",
     nif_country: "",
   });
 
+  // Cargar los datos sensibles cuando cambian las props
   useEffect(() => {
     if (sensitiveData) {
-      setFormData(sensitiveData);
+      setFormData({
+        nif_tipo: sensitiveData.nif_tipo || "",
+        nif_numero: sensitiveData.nif_numero || "",
+        nif_country: sensitiveData.nif_country || "",
+      });
     }
   }, [sensitiveData]);
 
+  // Manejar el cambio en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
-    setFormData(updatedData);
-    setSensitiveData(updatedData);
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    // Actualizar el estado global con los nuevos valores
+    setSensitiveData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   return (
-    <div className="sensitive-data-form-container">
+    <div>
+      <h4>Datos Sensibles</h4>
       <Form>
-        <Row className="mb-3">
-          <Col sm={6}>
-            <Form.Group controlId="nif_tipo">
-              <Form.Label>Tipo de Documento</Form.Label>
-              <Form.Select name="nif_tipo" value={formData.nif_tipo} onChange={handleChange} required>
-                <option value="DNI">DNI</option>
-                <option value="TIE">TIE</option>
-                <option value="Pasaporte">Pasaporte</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col sm={6}>
-            <Form.Group controlId="nif_numero">
-              <Form.Label>Número de Documento</Form.Label>
-              <Form.Control
-                type="text"
-                name="nif_numero"
-                value={formData.nif_numero}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+        {/* NIF Tipo */}
+        <Form.Group controlId="nif_tipo">
+          <Form.Label>NIF Tipo</Form.Label>
+          <Form.Control
+            type="text"
+            name="nif_tipo"
+            value={formData.nif_tipo}
+            onChange={handleChange}
+            placeholder="Introduce el tipo de NIF"
+          />
+        </Form.Group>
 
-        <Row className="mb-3">
-          <Col sm={12}>
-            <Form.Group controlId="nif_country">
-              <Form.Label>País de Expedición</Form.Label>
-              <Form.Control
-                type="text"
-                name="nif_country"
-                value={formData.nif_country}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+        {/* NIF Número */}
+        <Form.Group controlId="nif_numero">
+          <Form.Label>NIF Número</Form.Label>
+          <Form.Control
+            type="text"
+            name="nif_numero"
+            value={formData.nif_numero}
+            onChange={handleChange}
+            placeholder="Introduce el número de NIF"
+          />
+        </Form.Group>
+
+        {/* NIF País */}
+        <Form.Group controlId="nif_country">
+          <Form.Label>NIF País</Form.Label>
+          <Form.Control
+            type="text"
+            name="nif_country"
+            value={formData.nif_country}
+            onChange={handleChange}
+            placeholder="Introduce el país del NIF"
+          />
+        </Form.Group>
+
+        {/* Botón de Guardar */}
+        <Button variant="primary" onClick={() => setSensitiveData(formData)}>
+          Guardar Datos
+        </Button>
       </Form>
     </div>
   );
