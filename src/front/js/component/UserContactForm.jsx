@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col } from "react-bootstrap";
+import "../../styles/userContactForm.css";
 
 const UserContactForm = ({ contactData, isEditing, onChange }) => {
   const [formData, setFormData] = useState({
@@ -50,6 +51,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
   return (
     <div className="user-contact-form-container">
       <Form>
+        {/* Nombre */}
         <Row className="mb-3">
           <Col sm={12}>
             <Form.Group controlId="nombre">
@@ -119,6 +121,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
           </Col>
         </Row>
 
+        {/* Email y Sexo */}
         <Row className="mb-3">
           <Col sm={6}>
             <Form.Group controlId="email">
@@ -146,6 +149,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
           </Col>
         </Row>
 
+        {/* Fecha de Nacimiento y Nacionalidad */}
         <Row className="mb-3">
           <Col sm={6}>
             <Form.Group controlId="fecha_nacimiento">

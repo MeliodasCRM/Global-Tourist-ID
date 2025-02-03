@@ -386,7 +386,7 @@ def create_group():
 
         # Obtener los datos del nuevo grupo (nombre por defecto: 'Grupo de Contactos')
         data = request.get_json()
-        group_name = data.get('group_name', 'GRUPO DE CONTACTOS')
+        group_name = data.get('group_name', 'GRUPO')
 
         # Verificar si ya existe un grupo para este usuario
         existing_group = Group.query.filter_by(user_id=user.id).first()

@@ -1,19 +1,25 @@
-/* userContactForm.css */
 .user-contact-form-container {
-    max-width: 375px;
+    max-width: 600px;
     width: 100%;
-    margin: 0 auto; /* Centra el formulario en la página */
-    padding: 15px;
-    overflow-y: auto; /* Permite el desplazamiento cuando se superan los límites de altura */
-  }
-  
-  @media (max-width: 768px) {
-    /* En pantallas más pequeñas, el formulario debe ser completamente responsivo */
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* Asegura márgenes uniformes en todos los dispositivos */
+@media (max-width: 768px) {
     .user-contact-form-container {
-      padding: 10px;
+        padding: 15px;
     }
-  }
-  
-  button {
-    width: 100%;
-  }
+}
+
+/* Asegura espacio uniforme entre los campos */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Mantiene las columnas alineadas */
+.row {
+    margin-bottom: 15px;
+}

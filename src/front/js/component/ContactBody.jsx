@@ -1,79 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Container, Tab, Nav } from "react-bootstrap";
-import { FaUserCircle } from "react-icons/fa";
-import UserContactCard from "./UserContactCard.jsx"; // Importa el componente de la card
-import '../../styles/userView/userInfo.css';
+import { FaUserCircle, FaPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
+import UserContactCard from "./UserContactCard.jsx";
+import "../../styles/userView/userInfo.css";
 
-const ContactBody = ({ contacts, handleEditContact, handleDeleteContact }) => {
+const ContactBody = () => {
+  const { store, actions } = useContext(Context);
   const [activeTab, setActiveTab] = useState("0");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (contacts && contacts.length > 0) {
-      setActiveTab("0"); // Establecer la pestaña activa en la primera
+    if (store.contact && store.contact.length > 0) {
+      setActiveTab("0");
     }
-  }, [contacts]);
+  }, [store.contact]);
 
-  // 🚀 Si no hay contactos, mostrar mensaje
-  if (!contacts || contacts.length === 0) {
+  /** 📌 Crear nuevo contacto */
+  const handleCreateContact = () => {
+    navigate("/userform");
+  };
+
+  /** 📌 Editar contacto */
+  const handleEditContact = (contactId) => {
+    const selectedContact = store.contact.find(contact => contact.id === contactId);
+    if (selectedContact) {
+      navigate("/userform", { state: { contactToEdit: selectedContact } });
+    } else {
+      console.error("❌ Contacto no encontrado para edición.");
+    }
+  };
+
+  /** 📌 Eliminar contacto */
+  const handleDeleteContact = async (contactId) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este contacto?");
+    if (confirmDelete) {
+      await actions.deleteContact(contactId);
+      actions.loadContacts();
+    }
+  };
+
+  // 🚀 Si no hay contactos, mostrar mensaje + botón de crear contacto
+  if (!store.contact || store.contact.length === 0) {
     return (
       <Container className="body-content">
         <div className="no-data-card">
           <h4>No hay contactos disponibles</h4>
           <p>Por favor, cree un contacto...</p>
         </div>
+
+        <div className="d-flex justify-content-center mt-3">
+          <button className="create-contact-btn" onClick={handleCreateContact}>
+            <FaPlus className="plus-icon" />
+          </button>
+        </div>
       </Container>
     );
   }
 
-  // 🚀 Si solo hay un contacto
-  if (contacts.length === 1) {
-    const contact = contacts[0];
-
-    return (
-      <div className="contact-body">
-        <Container className="body-content">
-          <Tab.Container activeKey="0">
-            <Nav variant="pills" className="contact-tabs">
-              <Nav.Item>
-                <Nav.Link eventKey="0" className="contact-tab">
-                  <FaUserCircle size={24} /> <span className="tab-text">{contact.nombre}</span>
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
-
-            <Tab.Content>
-              <Tab.Pane eventKey="0">
-                <UserContactCard
-                  id={contact.id}
-                  imageUrl={contact.imageUrl || "https://via.placeholder.com/50"}
-                  nombre={contact.nombre}
-                  primer_apellido={contact.primer_apellido}
-                  segundo_apellido={contact.segundo_apellido}
-                  sexo={contact.sexo}
-                  nacionalidad={contact.nacionalidad}
-                  fecha_nacimiento={contact.fecha_nacimiento}
-                  direccion={contact.direccion}
-                  localidad={contact.localidad}
-                  pais={contact.pais}
-                  email={contact.email}
-                  telefono_movil={contact.telefono_movil}
-                  telefono_fijo={contact.telefono_fijo}
-                  is_admin={contact.is_admin}
-                  user_id={contact.user_id}
-                  editarContacto={() => handleEditContact(contact)}
-                  borrarContacto={() => handleDeleteContact(contact.id)}
-                />
-              </Tab.Pane>
-            </Tab.Content>
-          </Tab.Container>
-        </Container>
-      </div>
-    );
-  }
-
-  // 🚀 Si hay más de un contacto, ordenar colocando el admin primero
-  const adminContact = contacts.find(contact => contact.is_admin);
-  const otherContacts = contacts.filter(contact => !contact.is_admin);
+  // 🚀 Ordenar contactos colocando el admin primero
+  const adminContact = store.contact.find(contact => contact.is_admin);
+  const otherContacts = store.contact.filter(contact => !contact.is_admin);
   const orderedContacts = adminContact ? [adminContact, ...otherContacts] : [...otherContacts];
 
   return (
@@ -117,6 +105,13 @@ const ContactBody = ({ contacts, handleEditContact, handleDeleteContact }) => {
             ))}
           </Tab.Content>
         </Tab.Container>
+
+        {/* 📌 Botón de Crear Contacto (colocado correctamente) */}
+        <div className="d-flex justify-content-center mt-3">
+          <button className="create-contact-btn" onClick={handleCreateContact}>
+            <FaPlus className="plus-icon" />
+          </button>
+        </div>
       </Container>
     </div>
   );
