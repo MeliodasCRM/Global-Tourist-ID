@@ -1,41 +1,21 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { Context } from "../store/appContext";
+import { Context } from "../store/appContext"; // Importar el contexto global
 import { Register } from "../component/Register.jsx";
 import "../../styles/login.css";
 
 export const Login = () => {
-  console.log("🔍 Login.js se está ejecutando");
-
   const { store } = useContext(Context);
-  const [isChecking, setIsChecking] = useState(true); // ⏳ Estado para verificar el token
-  const [validToken, setValidToken] = useState(false);
 
-  useEffect(() => {
-    console.log("🔍 store.authToken:", store.authToken);
-
-    if (store.authToken && store.authToken !== "null" && store.authToken !== "undefined" && store.authToken.trim() !== "") {
-      setValidToken(true);
-    } else {
-      setValidToken(false);
-    }
-
-    setIsChecking(false); // ✅ Estado listo para renderizar
-  }, [store.authToken]);
-
-  if (isChecking) {
-    return <h1>Cargando...</h1>; // Evita parpadeos
-  }
-
-  if (validToken) {
-    console.log("✅ Token válido, redirigiendo a /userhome");
-    return <Navigate to="/userhome" replace />;
+  // Redirige al usuario si ya está autenticado
+  if (store.authToken) {
+    return <Navigate to="/userhome" />;
   }
 
   return (
-    <div className="login-container">
+    <div className="login-page-container">
       <div className="login-box">
-        <Register />
+        <Register /> {/* Register se encarga de manejar login y signup */}
       </div>
     </div>
   );

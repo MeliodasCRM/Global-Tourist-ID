@@ -1,185 +1,64 @@
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Contenedor principal */
-  .home-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    justify-content: space-between;
-    align-items: center;
+/*
+    home.css: This website contains selectors only used in home.css
+
+    All pages share the styles on index.css but you should create 
+    one more css for each page that will contain the selected used 
+    on that page only (the ones not reused in other pages).
+*/
+
+/* Estilos Generales */
+.info-section {
     text-align: center;
-    font-family: "Poppins", sans-serif;
-    background-color: #525AA6; /* Color azul sólido */
-  }
-  
-  /* Sección superior - Mantiene la estructura */
-  .top-section {
-    width: 100%;
-    height: 55%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-  
-  /* Nuevo div para "Bienvenido..." */
-  .welcome-container {
-    position: absolute;
-    top: 80px; /* Ajusta la posición del texto */
-    width: 100%;
-    text-align: center;
-  }
-  
-  /* Texto de bienvenida */
-  .welcome-text {
+    padding: 40px 20px;
+    background-color: #f8f9fa; /* Color de fondo claro */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.info-section h1 {
+    font-size: 2.5rem; /* Tamaño grande para el encabezado */
+    font-weight: bold; /* Negrita */
+    color: #007bff; /* Azul primario */
+    margin-bottom: 20px;
+}
+
+.info-section p {
+    font-size: 1.2rem; /* Tamaño de fuente moderado */
+    color: #6c757d; /* Gris */
+    line-height: 1.6; /* Espaciado entre líneas */
+}
+
+.general-info {
+    margin-top: 40px;
+    padding: 30px 20px;
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.general-info h2 {
     font-size: 2rem;
     font-weight: bold;
-    color: white;
-  }
-  
-  /* Contenedor del código QR */
-  .qr-container {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 100px; /* Asegura que el QR no suba demasiado */
-  }
-  
-  .qr-icon {
-    width: 120px;
-    height: 120px;
-    stroke: black;
-  }
-  
-  /* Botones de cambio de idioma */
-  .language-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .language-button {
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border: 2px solid #facc15; /* Borde amarillo */
-    background-color: white; /* Fondo blanco */
-    color: #4f46e5; /* Texto azul */
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .language-button:hover {
-    background-color: #facc15; /* Amarillo en hover */
-    color: #4f46e5; /* Azul en hover */
-  }
-  
-  /* Sección inferior - Fondo oscuro */
-  .bottom-section {
-    background-color: #333333;
-    width: 100%;
-    height: 40%;
-    border-radius: 30px 30px 0 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  /* Línea divisora */
-  .divider {
-    width: 50px;
-    height: 4px;
-    background-color: white;
-    border-radius: 10px;
-    margin-bottom: 10px;
-  }
-  
-  /* Texto de la sección inferior */
-  .bottom-title {
-    font-size: 1.8rem;
-    color: white;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .bottom-text {
-    font-size: 1rem;
-    color: #d1d5db;
-    max-width: 80%;
+    color: #343a40; /* Negro/gris oscuro */
     margin-bottom: 20px;
-  }
-  
-  /* Botón de inicio */
-  .start-button {
-    background-color: white; /* Fondo blanco */
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: none;
+    text-align: center;
+}
+
+.general-info ul {
+    list-style: none; /* Quitar puntos de lista */
+    padding-left: 0;
+}
+
+.general-info li {
+    font-size: 1.1rem;
+    color: #495057; /* Gris oscuro */
+    padding: 10px 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0px 4px 6px rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .start-button:hover {
-    transform: scale(1.1);
-  }
-  
-  .arrow-icon {
-    color: #4f46e5;
-    font-size: 1.5rem;
-  }
-  
-  /* Adaptabilidad para móviles */
-  @media (max-width: 768px) {
-    .welcome-container {
-      top: 60px; /* Ajustamos la posición en móviles */
-    }
-  
-    .welcome-text {
-      font-size: 1.8rem;
-    }
-  
-    .qr-container {
-      margin-top: 80px; /* Ajustamos el QR */
-    }
-  
-    .qr-icon {
-      width: 100px;
-      height: 100px;
-    }
-  
-    .bottom-title {
-      font-size: 1.5rem;
-    }
-  
-    .bottom-text {
-      font-size: 0.9rem;
-    }
-  
-    .start-button {
-      width: 50px;
-      height: 50px;
-    }
-  
-    .arrow-icon {
-      font-size: 1.2rem;
-    }
-  }
-  
+    align-items: center; /* Alinea texto con íconos */
+}
+
+.general-info li i {
+    font-size: 1.5rem; /* Tamaño del ícono */
+    color: #007bff; /* Azul primario */
+    margin-right: 10px; /* Espaciado entre ícono y texto */
+}
