@@ -1,84 +1,97 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Tab, Nav } from "react-bootstrap";
-import { FaArrowLeft, FaPlus } from "react-icons/fa";
-import { useNavigate } from "react-router-dom"; // Importamos useNavigate para redirigir
-import { Context } from "../store/appContext"; // Contexto para acceder al store y acciones
-import UserContactForm from "../component/UserContactForm.jsx"; // Asegúrate de que la ruta es correcta
-import '../../styles/userForm.css'; // Estilos del componente
+import { Tab, Nav, Button, Container } from "react-bootstrap";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Context } from "../store/appContext";
+import NavbarHeader from "../component/NavbarHeader.jsx";
+import UserContactForm from "../component/UserContactForm.jsx";
+import SensitiveDataForm from "../component/SensitiveDataForm.jsx";
+import "../../styles/userForm.css";
 
 const UserForm = () => {
-  const [key, setKey] = useState("contact");
-  const [contactToEdit, setContactToEdit] = useState(null); // Contacto a editar
-  const [loading, setLoading] = useState(true); // Estado de carga para el usuario
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [key, setKey] = useState("contact");
+  const [contactToEdit, setContactToEdit] = useState(location.state?.contactToEdit || null);
+  const [sensitiveData, setSensitiveData] = useState(null);
 
   useEffect(() => {
-    if (store.user) {
-      actions.loadContacts(); // Cargar contactos después de que el usuario esté disponible
-      setLoading(false); // Cambiar a false cuando los datos estén listos
-    } else {
-      setLoading(false); // Si el usuario no está en el store, también desactiva el loading
+    if (store.user && store.user.id) {
+      actions.loadContacts();
     }
   }, [store.user]);
 
-  const handleBack = () => {
-    navigate("/userhome");
-  };
+  useEffect(() => {
+    if (location.state?.contactToEdit && !contactToEdit) {
+      setContactToEdit(location.state.contactToEdit);
+      actions.loadSensitiveData(location.state.contactToEdit.id).then(data => {
+        setSensitiveData(data);
+      });
+    }
+  }, [location.state?.contactToEdit]);
 
-  const handleSaveContact = (contactData) => {
+  const handleSave = async () => {
     if (!store.user) {
-      console.error("El usuario no está cargado correctamente");
+      console.error("❌ El usuario no está cargado correctamente.");
       return;
     }
 
     if (contactToEdit) {
-      actions.updateContact(contactToEdit.id, contactData); // Actualizar contacto
+      await actions.updateContact(contactToEdit.id, contactToEdit);
     } else {
-      actions.createContact(contactData, () => {
-        // Llamar a la función onSuccess después de guardar el contacto
-        setContactToEdit(null);  // Limpiar el formulario
-        navigate("/userinfo");  // Redirigir a la vista de usuario
-      });
+      const newContact = await actions.createContact(contactToEdit);
+      if (newContact) {
+        setContactToEdit(newContact);
+      }
     }
-  };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    if (sensitiveData) {
+      await actions.updateSensitiveData(contactToEdit?.id, sensitiveData);
+    }
+
+    navigate("/userinfo");
+  };
 
   return (
     <div className="user-form">
-      <header className="user-navbar fixed-top">
-        <Button variant="link" className="back-button" onClick={handleBack}>
-          <FaArrowLeft size={20} color="white" />
-        </Button>
-        <h1 className="user-title">Formulario de Usuario</h1>
-      </header>
+      <div className="user-form-header">
+        <NavbarHeader prevLocation={location.state?.from} />
+      </div>
 
-      <Tab.Container id="left-tabs-example" defaultActiveKey="contact" activeKey={key} onSelect={(k) => setKey(k)}>
-        <Nav variant="underline" className="mt-1 d-flex justify-content-center">
-          <Nav.Item>
-            <Nav.Link eventKey="contact">Datos de Contacto</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="sensitive">Datos Sensibles</Nav.Link>
-          </Nav.Item>
-        </Nav>
-        <Tab.Content>
-          <Tab.Pane eventKey="contact">
-            <UserContactForm
-              contactData={contactToEdit} // Pasamos los datos del contacto si estamos editando
-              isEditing={!!contactToEdit} // Verifica si estamos en modo edición
-              onSave={handleSaveContact} // Función para guardar
-              user={store.user} // Pasamos el usuario para asociar el contacto
-            />
-          </Tab.Pane>
-          <Tab.Pane eventKey="sensitive">
-            {/* Aquí se agregará otro componente */}
-          </Tab.Pane>
-        </Tab.Content>
-      </Tab.Container>
+      <div className="user-form-tabs">
+        <Tab.Container activeKey={key} onSelect={(k) => setKey(k)}>
+          <Nav variant="pills" className="tabs-row">
+            <Nav.Item>
+              <Nav.Link eventKey="contact">Datos de Contacto</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="sensitive">Datos Sensibles</Nav.Link>
+            </Nav.Item>
+          </Nav>
+
+          <Tab.Content>
+            <Tab.Pane eventKey="contact">
+              <UserContactForm
+                contactData={contactToEdit}
+                isEditing={!!contactToEdit}
+                onChange={(data) => setContactToEdit(data)}
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey="sensitive">
+              <SensitiveDataForm
+                sensitiveData={sensitiveData}
+                setSensitiveData={setSensitiveData}
+              />
+            </Tab.Pane>
+          </Tab.Content>
+        </Tab.Container>
+      </div>
+
+      <Container className="button-container">
+        <Button className="update-button" onClick={handleSave}>
+          Actualizar
+        </Button>
+      </Container>
     </div>
   );
 };
