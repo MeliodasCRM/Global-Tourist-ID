@@ -71,7 +71,6 @@ const UserHome = () => {
           <p>Del 14/02/2025 al 18/02/2025</p>
         </div>
 
-<<<<<<< HEAD
         {/* Código QR Dinámico */}
         <div className="qr-container">
           <img src={store.qrCodeUrl || "qr-placeholder.png"} alt="QR Code" className="qr-image" />
@@ -85,29 +84,6 @@ const UserHome = () => {
           <button className="action-button">
             <FaCopy />
           </button>
-=======
-        <div className="icon-container">
-          <div className="icon">
-          <Link to="/userInfo">
-            <FaUser size={40} color="#333" />
-            <p>Users</p>
-          </Link>
-          </div>
-          <div className="icon">
-          <Link to="/reservas">
-            <FaBriefcase size={40} color="#333" />
-            <p>Reservas</p>
-            </Link>
-          </div>
-          <div className="icon">
-            <FaQrcode size={40} color="#333" />
-            <p>QR Generator</p>
-          </div>
-          <div className="icon">
-            <FaBuilding size={40} color="#333" />
-            <p>Empresas</p>
-          </div>
->>>>>>> 0813e3e (4-correccion ruta reseva para poder pintarla)
         </div>
       </main>
 

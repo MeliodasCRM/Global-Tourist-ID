@@ -6,7 +6,7 @@ from datetime import datetime
 import qrcode
 import json
 import os
-from api.models import MedioPagoTipo, db, User, Contact, Group, SensitiveData, Reserva, TipoNif # Importar los modelos de la base de datos
+from api.models import MedioPagoTipo, db, User, Contact, Group, SensitiveData, Reserva, TipoNif, Group, contact_group # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required

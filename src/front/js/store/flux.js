@@ -13,10 +13,39 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 		},
 		actions: {
-			setAuthToken: (token) => {
-				localStorage.setItem("authToken", token ? token : "");  // Guardamos el token en localStorage
-				setStore({ authToken: token });  // Actualizamos el store con el token
+
+			// Acción para cargar el usuario en el store
+			signup: async (email, password, language) => {
+				try {
+					// Llamamos a la API para crear el usuario
+					const resp = await fetch(process.env.BACKEND_URL + "/api/signup", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ email, password, language }),
+					});
+
+					if (resp.ok) {
+						// Si el registro es exitoso, obtenemos el token
+						const data = await resp.json();
+						console.log("Usuario registrado exitosamente");
+
+						// Ahora obtenemos el token JWT
+						const token = await resp.text();
+						localStorage.setItem("authToken", token);
+						setStore({ authToken: token });
+
+						return { success: true, message: "Registro exitoso" };
+					} else {
+						const error = await resp.json();
+						console.error("Error en el registro:", error);
+						return { success: false, message: error.message || "Error en el registro" };
+					}
+				} catch (err) {
+					console.error("Error en signup:", err);
+					return { success: false, message: "Error de conexión" };
+				}
 			},
+
 			// Use getActions to call a function within a fuction
 			login: async (email, password) => {
 				try {
@@ -45,7 +74,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Acción para cargar el usuario en el store
+			// Función loadUser en el frontend
 			loadUser: async () => {
 				const store = getStore();
 
