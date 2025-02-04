@@ -131,6 +131,7 @@ body {
     }
 }
 
+/* Botón principal de crear */
 .create-contact-btn {
     width: 50px;
     height: 50px;
@@ -156,4 +157,69 @@ body {
 /* Ícono "+" dentro del botón */
 .create-contact-btn .plus-icon {
     font-size: 22px;
+}
+
+/* Estilos para los otros botones de editar y borrar */
+/* Botón principal de crear */
+.create-contact-btn, .edit-contact-btn, .delete-contact-btn {
+    width: 60px;  /* Tamaño del botón */
+    height: 60px;
+    border-radius: 50%; /* Redondeamos el botón */
+    background-color: #525aa6;  /* Color de fondo */
+    color: white;
+    display: flex;
+    justify-content: center;  /* Centrar los íconos */
+    align-items: center;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease-in-out;
+    margin: 10px;  /* Espaciado entre los botones */
+}
+
+/* Hover de los botones */
+.create-contact-btn:hover, .edit-contact-btn:hover, .delete-contact-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Colores específicos para cada tipo de botón */
+.edit-contact-btn {
+    background-color: #f0ad4e;  /* Color amarillo para Editar */
+}
+
+.delete-contact-btn {
+    background-color: #d9534f;  /* Color rojo para Borrar */
+}
+
+/* Hover de los botones */
+.edit-contact-btn:hover {
+    background-color: #ec971f;
+}
+
+.delete-contact-btn:hover {
+    background-color: #c9302c;
+}
+
+/* Íconos dentro de los botones */
+.create-contact-btn .plus-icon,
+.edit-contact-btn .edit-icon,
+.delete-contact-btn .delete-icon {
+    font-size: 28px; /* Tamaño del ícono */
+    font-weight: bold;  /* Asegura que el ícono esté centrado */
+}
+
+/* Asegurarnos de que los botones se vean bien en pantallas pequeñas */
+@media (max-width: 768px) {
+    .create-contact-btn, .edit-contact-btn, .delete-contact-btn {
+        width: 50px;  /* Reducir el tamaño en pantallas pequeñas */
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .create-contact-btn .plus-icon,
+    .edit-contact-btn .edit-icon,
+    .delete-contact-btn .delete-icon {
+        font-size: 22px; /* Reducir el tamaño de los íconos */
+    }
 }

@@ -1,51 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Form, Row, Col } from "react-bootstrap";
 import "../../styles/userContactForm.css";
 
-const UserContactForm = ({ contactData, isEditing, onChange }) => {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    primer_apellido: "",
-    segundo_apellido: "",
-    sexo: "",
-    nacionalidad: "",
-    fecha_nacimiento: "",
-    direccion: "",
-    localidad: "",
-    pais: "",
-    email: "",
-    telefono_movil: "",
-    telefono_fijo: "",
-    is_admin: false,
-  });
-
-  useEffect(() => {
-    if (isEditing && contactData) {
-      setFormData(contactData);
-    } else {
-      setFormData({
-        nombre: "",
-        primer_apellido: "",
-        segundo_apellido: "",
-        sexo: "",
-        nacionalidad: "",
-        fecha_nacimiento: "",
-        direccion: "",
-        localidad: "",
-        pais: "",
-        email: "",
-        telefono_movil: "",
-        telefono_fijo: "",
-        is_admin: false,
-      });
-    }
-  }, [isEditing, contactData]);
-
+const UserContactForm = ({ contactData, setContactForm, isEditing }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedFormData = { ...formData, [name]: value };
-    setFormData(updatedFormData);
-    onChange(updatedFormData);
+    setContactForm((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   return (
@@ -59,7 +22,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="nombre"
-                value={formData.nombre}
+                value={contactData.nombre || ""}
                 onChange={handleChange}
                 required
               />
@@ -75,7 +38,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="primer_apellido"
-                value={formData.primer_apellido}
+                value={contactData.primer_apellido || ""}
                 onChange={handleChange}
                 required
               />
@@ -87,7 +50,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="segundo_apellido"
-                value={formData.segundo_apellido}
+                value={contactData.segundo_apellido || ""}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -102,7 +65,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="telefono_movil"
-                value={formData.telefono_movil}
+                value={contactData.telefono_movil || ""}
                 onChange={handleChange}
                 required
               />
@@ -114,7 +77,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="telefono_fijo"
-                value={formData.telefono_fijo}
+                value={contactData.telefono_fijo || ""}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -129,7 +92,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="email"
                 name="email"
-                value={formData.email}
+                value={contactData.email || ""}
                 onChange={handleChange}
                 required
               />
@@ -141,7 +104,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="sexo"
-                value={formData.sexo}
+                value={contactData.sexo || ""}
                 onChange={handleChange}
                 required
               />
@@ -157,7 +120,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="date"
                 name="fecha_nacimiento"
-                value={formData.fecha_nacimiento}
+                value={contactData.fecha_nacimiento || ""}
                 onChange={handleChange}
                 required
               />
@@ -169,7 +132,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="nacionalidad"
-                value={formData.nacionalidad}
+                value={contactData.nacionalidad || ""}
                 onChange={handleChange}
                 required
               />
@@ -185,7 +148,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="direccion"
-                value={formData.direccion}
+                value={contactData.direccion || ""}
                 onChange={handleChange}
                 required
               />
@@ -201,7 +164,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="localidad"
-                value={formData.localidad}
+                value={contactData.localidad || ""}
                 onChange={handleChange}
                 required
               />
@@ -213,7 +176,7 @@ const UserContactForm = ({ contactData, isEditing, onChange }) => {
               <Form.Control
                 type="text"
                 name="pais"
-                value={formData.pais}
+                value={contactData.pais || ""}
                 onChange={handleChange}
                 required
               />

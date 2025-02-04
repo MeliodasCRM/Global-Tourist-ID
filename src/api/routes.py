@@ -200,6 +200,7 @@ def get_contacts():
     
 
 # FUNCION PARA CREAR UN CONTACTO
+# FUNCION PARA CREAR UN CONTACTO
 @api.route('/contact', methods=['POST'])
 @jwt_required()
 def create_contact():
@@ -233,9 +234,23 @@ def create_contact():
         db.session.add(new_contact)
         db.session.commit()
 
+        # Ahora que tenemos el ID del nuevo contacto, vamos a asociar los datos sensibles
+        sensitive_data = data.get("sensitive_data")  # Recibimos los datos sensibles en el cuerpo de la solicitud
+        if sensitive_data:
+            # Crear los datos sensibles y asociarlos con el contacto
+            new_sensitive_data = SensitiveData(
+                nif_tipo=sensitive_data['nif_tipo'],
+                nif_numero=sensitive_data['nif_numero'],
+                nif_country=sensitive_data['nif_country'],
+                contact_id=new_contact.id  # Asociamos el contacto creado con los datos sensibles
+            )
+            db.session.add(new_sensitive_data)
+            db.session.commit()
+
         return jsonify({
             "message": "Contacto creado exitosamente",
-            "contact": new_contact.serialize()
+            "contact": new_contact.serialize(),
+            "sensitive_data": new_sensitive_data.serialize() if sensitive_data else None
         }), 201
 
     except KeyError as e:

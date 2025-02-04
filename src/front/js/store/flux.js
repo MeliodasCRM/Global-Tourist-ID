@@ -11,6 +11,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			sensitive_data: [], //inicializo los datos sensibles
 			group: [], // Incializo el array de grupos
 			activeContactId: null, // Inicializo el contacto activo
+			contactToEdit: null, // Inicializo el contacto a editar
 
 		},
 		actions: {
@@ -165,80 +166,93 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			// Acción para crear un contacto y gestionar si es admin y el grupo
-			createContact: async (formData) => {
+			createContact: async (formData, sensitiveFormData) => {
 				const store = getStore();
 				try {
-					// Verificamos si el usuario está cargado correctamente
-					if (!store.user || !store.user.id) {
-						console.error("El usuario no está cargado correctamente.");
-						// Si el usuario no está cargado, esperamos un poco y lo intentamos de nuevo
-						// o mostramos algún mensaje o redirigimos a login
-						return;
+					const contactResponse = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,
+						},
+						body: JSON.stringify({
+							...formData,
+							is_admin: store.contact.length === 0,
+							user_id: store.user.id
+						}),
+					});
+			
+					if (!contactResponse.ok) {
+						throw new Error("Error al crear el contacto");
 					}
-
-					// Verificar si el usuario ya tiene contactos
-					const userContacts = store.contact.filter(contact => contact.user_id === store.user.id);
-					// Verificar si el usuario tiene un grupo
-					const userGroup = store.group.find(group => group.user_id === store.user.id);
-
-					let contact;  // Definir la variable `contact` antes de usarla
-
-					if (userContacts.length === 0) {
-						// Crear el primer contacto como admin
-						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								"Authorization": `Bearer ${store.authToken}`,
-							},
-							body: JSON.stringify({
-								...formData,
-								is_admin: true,
-								user_id: store.user.id,
-							}),
-						});
-
-						if (response.ok) {
-							contact = await response.json();  // Asignamos el contacto a la variable
-							setStore({ contact: [contact] });
-
-							// Si el usuario no tiene grupo, crearlo
-							if (!userGroup) {
-								await getActions().createGroup(contact.id);  // Crear un grupo si no existe
-							}
-						}
-					} else {
-						// Crear un contacto normal y asociarlo al grupo
-						contact = userContacts[0];  // Usamos el primer contacto encontrado
-
-						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								"Authorization": `Bearer ${store.authToken}`,
-							},
-							body: JSON.stringify({
-								...formData,
-								is_admin: false,  // No es admin
-								user_id: store.user.id,
-							}),
-						});
-
-						if (response.ok) {
-							const newContact = await response.json();
-							setStore({ contact: [...store.contact, newContact] });
-
-							// Asociar el nuevo contacto al grupo
-							if (userGroup) {
-								await getActions().addToGroup(newContact.id, userGroup.id);
-							} else {
-								// Crear grupo si no existe
-								await getActions().createGroup(newContact.id);
-							}
-						}
+			
+					const responseData = await contactResponse.json();
+					console.log("Response data:", responseData);
+			
+					// Extract contact from response
+					const newContact = responseData.contact;
+					console.log("Nuevo contacto:", newContact);
+			
+					if (!newContact || !newContact.id) {
+						throw new Error("ID de contacto no recibido en la respuesta");
 					}
-				} catch (err) {
-					console.error("Error al crear contacto o grupo:", err);
+			
+					setStore({ contact: [...store.contact, newContact] });
+			
+					// Create sensitive data if form has data
+					if (sensitiveFormData && newContact.id) {
+						console.log("Creating sensitive data for contact ID:", newContact.id);
+						await getActions().createSensitiveData(newContact.id, sensitiveFormData);
+					}
+			
+					return newContact;
+				} catch (error) {
+					console.error("Error en createContact:", error);
+					throw error;
+				}
+			},
+			
+			createSensitiveData: async (contactId, sensitiveFormData) => {
+				const store = getStore();
+				try {
+					console.log("Contact ID recibido:", contactId); // Debug log
+					console.log("Sensitive Form Data:", sensitiveFormData); // Debug log
+			
+					if (!contactId || typeof contactId !== 'number') {
+						throw new Error(`Contact ID invalid: ${contactId}`);
+					}
+			
+					const sensitiveData = {
+						nif_tipo: sensitiveFormData.nif_tipo || "TIE",
+						nif_numero: sensitiveFormData.nif_numero || "",
+						nif_country: sensitiveFormData.nif_country || "",
+						contact_id: contactId
+					};
+			
+					const response = await fetch(`${process.env.BACKEND_URL}/api/sensitive-data`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,
+						},
+						body: JSON.stringify(sensitiveData),
+					});
+			
+					const responseData = await response.json();
+					console.log("Sensitive data response:", responseData); // Debug log
+			
+					if (!response.ok) {
+						throw new Error(responseData.message || "Error al crear datos sensibles");
+					}
+			
+					setStore({
+						sensitive_data: [...store.sensitive_data, responseData]
+					});
+			
+					return responseData;
+				} catch (error) {
+					console.error("Error en createSensitiveData:", error);
+					throw error;
 				}
 			},
 
@@ -430,6 +444,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.error("Error al actualizar los datos sensibles:", error);
 					}
 				};
+			},
+
+			// Acción para establecer el contacto a editar
+			setContactToEdit: (contact) => {
+				setStore({ contactToEdit: contact });
+			},
+
+			// Acción para limpiar el contacto a editar
+			clearContactToEdit: () => {
+				setStore({ contactToEdit: null });
 			},
 
 

@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Tab, Nav } from "react-bootstrap";
-import { FaUserCircle, FaPlus } from "react-icons/fa";
+import { FaUserCircle, FaPlus, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import UserContactCard from "./UserContactCard.jsx";
-import UserSensitiveCard from "./UserSensitiveCard.jsx"; // Importamos el componente de datos sensibles
+import UserSensitiveCard from "./UserSensitiveCard.jsx";
 import "../../styles/userView/userInfo.css";
 
 const ContactBody = () => {
   const { store, actions } = useContext(Context);
   const [activeTab, setActiveTab] = useState("0");
-  const [contactToEdit, setContactToEdit] = useState(null);
-  const [sensitiveDataToEdit, setSensitiveDataToEdit] = useState(null);
   const navigate = useNavigate();
 
   const contact = store.contact || [];
@@ -23,73 +21,62 @@ const ContactBody = () => {
     }
   }, [contact]);
 
-  // Unificar las funciones de edición de contacto y datos sensibles
-  const handleEditForm = async (contactId) => {
-    // Buscar el contacto correspondiente
-    const selectedContact = contact.find(contact => contact.id === contactId);
+  // Lógica de edición
+  const handleEditForm = (contactId) => {
+    const selectedContact = contact.find((contact) => contact.id === contactId);
     if (selectedContact) {
-      setContactToEdit(selectedContact);
-      console.log("Contacto a editar:", selectedContact);
+      const selectedSensitiveData = sensitiveData.filter((data) => data.contact_id === contactId);
+      if (selectedSensitiveData.length > 0) {
+        navigate("/userform", {
+          state: {
+            contactToEdit: selectedContact,
+            sensitiveDataToEdit: selectedSensitiveData[0], // Pasar solo el primero
+          },
+        });
 
-      // Filtrar y obtener los datos sensibles correspondientes al contacto
-      const selectedSensitiveData = sensitiveData.filter(data => data.contact_id === contactId);
-
-      if (selectedSensitiveData && selectedSensitiveData.length > 0) {
-        setSensitiveDataToEdit(selectedSensitiveData[0]);  // Solo tomamos el primer dato sensible asociado
-        console.log("Datos sensibles a editar:", selectedSensitiveData[0]);
+        // Sincroniza activeTab con el id del contacto
+        setActiveTab(contactId);
       } else {
-        console.error("No se encontraron datos sensibles para este contacto.");
-        setSensitiveDataToEdit(null);  // No hay datos sensibles para este contacto
+        navigate("/userform", {
+          state: {
+            contactToEdit: selectedContact,
+            sensitiveDataToEdit: null,
+          },
+        });
+
+        // Sincroniza activeTab con el id del contacto
+        setActiveTab(contactId);
       }
-
-      // Navegar a la página de edición con los datos cargados
-      navigate("/userform", {
-        state: {
-          contactToEdit: selectedContact,
-          sensitiveDataToEdit: selectedSensitiveData[0] || null,  // Solo pasamos el primero, si existe
-        },
-      });
-    } else {
-      console.error("Contacto no encontrado para edición.");
     }
   };
 
-  const handleDeleteContact = async (contactId) => {
-    const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este contacto?");
-    if (confirmDelete) {
-      // Primero, eliminamos el contacto
-      await actions.deleteContact(contactId);
-
-      // Luego, eliminamos los datos sensibles asociados a este contacto
-      await actions.deleteSensitiveData(contactId);
-
-      // Recargamos los contactos y los datos sensibles
-      actions.loadContacts();
-      actions.loadSensitiveData();
+  // Lógica de eliminación
+  const handleDeleteContact = async () => {
+    const contactId = contact[activeTab]?.id;
+    if (contactId) {
+      const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este contacto?");
+      if (confirmDelete) {
+        await actions.deleteContact(contactId);
+        await actions.deleteSensitiveData(contactId);
+        actions.loadContacts();  // Recargamos los contactos
+        actions.loadSensitiveData();  // Recargamos los datos sensibles
+      }
     }
   };
 
-  // Si no hay contactos, mostrar mensaje + botón de crear contacto
-  if (!store.contact || store.contact.length === 0) {
-    return (
-      <Container className="body-content">
-        <div className="no-data-card">
-          <h4>No hay contactos disponibles</h4>
-          <p>Por favor, cree un contacto...</p>
-        </div>
-
-        <div className="d-flex justify-content-center mt-3">
-          <button className="create-contact-btn" onClick={() => navigate("/userform")}>
-            <FaPlus className="plus-icon" />
-          </button>
-        </div>
-      </Container>
-    );
-  }
+  // Lógica de creación
+  const handleCreateContact = () => {
+    navigate("/userform", {
+      state: {
+        contactToEdit: null,  // Campos vacíos para crear un nuevo contacto
+        sensitiveDataToEdit: null,  // Campos vacíos para crear datos sensibles
+      },
+    });
+  };
 
   // Ordenar contactos colocando el admin primero
-  const adminContact = contact.find(contact => contact.is_admin);
-  const otherContacts = contact.filter(contact => !contact.is_admin);
+  const adminContact = contact.find((contact) => contact.is_admin);
+  const otherContacts = contact.filter((contact) => !contact.is_admin);
   const orderedContacts = adminContact ? [adminContact, ...otherContacts] : [...otherContacts];
 
   return (
@@ -118,13 +105,11 @@ const ContactBody = () => {
                   segundo_apellido={contact.segundo_apellido}
                   telefono_movil={contact.telefono_movil}
                   email={contact.email}
-                  handleEditContact={() => handleEditForm(contact.id)} // Llamamos a la función unificada
-                  handleDeleteContact={() => handleDeleteContact(contact.id)}
                 />
 
                 {/* Si el contacto tiene datos sensibles, mostrar UserSensitiveCard */}
                 {sensitiveData
-                  .filter(data => data.contact_id === contact.id)
+                  .filter((data) => data.contact_id === contact.id)
                   .map((sensitiveData, sensitiveIndex) => (
                     <UserSensitiveCard
                       key={sensitiveIndex}
@@ -132,21 +117,33 @@ const ContactBody = () => {
                       nif_tipo={sensitiveData.nif_tipo}
                       nif_numero={sensitiveData.nif_numero}
                       nif_country={sensitiveData.nif_country}
-                      handleEditSensitiveData={() => handleEditForm(contact.id)} // Llamamos a la función unificada
-                      handleDeleteSensitiveData={() => handleDeleteSensitiveData(sensitiveData.contact_id)}
                     />
-                  ))
-                }
+                  ))}
               </Tab.Pane>
             ))}
           </Tab.Content>
         </Tab.Container>
 
-        {/*Botón de Crear Contacto (colocado correctamente) */}
+        {/* Botones de Crear, Editar y Borrar */}
         <div className="d-flex justify-content-center mt-3">
-          <button className="create-contact-btn" onClick={() => navigate("/userform")}>
+          {/* Botón Crear */}
+          <button className="create-contact-btn" onClick={handleCreateContact}>
             <FaPlus className="plus-icon" />
           </button>
+
+          {/* Botón Editar - Solo aparece cuando hay un contacto seleccionado */}
+          {contact[activeTab] && (
+            <button className="edit-contact-btn" onClick={() => handleEditForm(contact[activeTab].id)}>
+              <FaEdit className="edit-icon" />
+            </button>
+          )}
+
+          {/* Botón Borrar - Solo aparece cuando hay un contacto seleccionado */}
+          {contact[activeTab] && (
+            <button className="delete-contact-btn" onClick={handleDeleteContact}>
+              <FaTrashAlt className="delete-icon" />
+            </button>
+          )}
         </div>
       </Container>
     </div>
