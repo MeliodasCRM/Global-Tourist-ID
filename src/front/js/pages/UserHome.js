@@ -35,15 +35,14 @@ const UserHome = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    actions.setAuthToken(null);
-    navigate("/login"); // Ahora usa "navigate" en minúscula
+  const handleLogOut = () => {
+    console.log("Cerrando Sesión");
+    actions.logout();
+    navigate("/login");
   };
 
   const handleGoToHome = () => {
-    localStorage.removeItem("authToken");
-    actions.setAuthToken(null);
+    actions.logout();
     navigate("/"); // Ahora usa "navigate" en minúscula
   }
    const handleFaUser = () => {
@@ -54,7 +53,7 @@ const UserHome = () => {
     <div className="user-home">
       {/* NavBar Superior */}
       <header className="user-navbar">
-        <button className="nav-button" onClick={handleLogout}>
+        <button className="nav-button" onClick={handleLogOut}>
           <FaArrowLeft />
         </button>
         <h1 className="nav-title">Home User</h1>

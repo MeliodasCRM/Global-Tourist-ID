@@ -28,7 +28,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						// Si el registro es exitoso, obtenemos el token
 						const data = await resp.json();
 						console.log("Usuario registrado exitosamente");
-
 						// Ahora obtenemos el token JWT
 						const token = await resp.text();
 						localStorage.setItem("authToken", token);
