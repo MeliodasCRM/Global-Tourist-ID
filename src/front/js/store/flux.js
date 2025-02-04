@@ -169,6 +169,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 			createContact: async (formData, sensitiveFormData) => {
 				const store = getStore();
 				try {
+					// Check if user has contacts
+					const isFirstContact = store.contact.length === 0;
+
+					// Create contact
 					const contactResponse = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
 						method: "POST",
 						headers: {
@@ -177,58 +181,77 @@ const getState = ({ getStore, getActions, setStore }) => {
 						},
 						body: JSON.stringify({
 							...formData,
-							is_admin: store.contact.length === 0,
+							is_admin: isFirstContact,
 							user_id: store.user.id
 						}),
 					});
-			
+
 					if (!contactResponse.ok) {
 						throw new Error("Error al crear el contacto");
 					}
-			
+
 					const responseData = await contactResponse.json();
-					console.log("Response data:", responseData);
-			
-					// Extract contact from response
 					const newContact = responseData.contact;
-					console.log("Nuevo contacto:", newContact);
-			
+
 					if (!newContact || !newContact.id) {
 						throw new Error("ID de contacto no recibido en la respuesta");
 					}
-			
+
+					// Update store with new contact
 					setStore({ contact: [...store.contact, newContact] });
-			
-					// Create sensitive data if form has data
-					if (sensitiveFormData && newContact.id) {
-						console.log("Creating sensitive data for contact ID:", newContact.id);
+
+					// Get user's group
+					const userGroup = store.group?.find(g => g.user_id === store.user.id);
+
+					// Handle group logic
+					if (isFirstContact) {
+						// Create new group for first contact (admin)
+						await getActions().createGroup(newContact.id);
+					} else if (userGroup) {
+						// Add contact to existing group
+						await getActions().addToGroup(newContact.id, userGroup.id);
+
+						// Update local group state
+						const updatedGroup = {
+							...userGroup,
+							contact_ids: [...userGroup.contact_ids, newContact.id]
+						};
+						setStore({
+							group: store.group.map(g =>
+								g.id === userGroup.id ? updatedGroup : g
+							)
+						});
+					}
+
+					// Handle sensitive data if provided
+					if (sensitiveFormData && Object.keys(sensitiveFormData).length > 0) {
 						await getActions().createSensitiveData(newContact.id, sensitiveFormData);
 					}
-			
+
 					return newContact;
 				} catch (error) {
 					console.error("Error en createContact:", error);
 					throw error;
 				}
 			},
-			
+
 			createSensitiveData: async (contactId, sensitiveFormData) => {
 				const store = getStore();
 				try {
 					console.log("Contact ID recibido:", contactId); // Debug log
 					console.log("Sensitive Form Data:", sensitiveFormData); // Debug log
-			
+
 					if (!contactId || typeof contactId !== 'number') {
 						throw new Error(`Contact ID invalid: ${contactId}`);
 					}
-			
+
 					const sensitiveData = {
 						nif_tipo: sensitiveFormData.nif_tipo || "TIE",
 						nif_numero: sensitiveFormData.nif_numero || "",
 						nif_country: sensitiveFormData.nif_country || "",
 						contact_id: contactId
 					};
-			
+
 					const response = await fetch(`${process.env.BACKEND_URL}/api/sensitive-data`, {
 						method: "POST",
 						headers: {
@@ -237,18 +260,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 						},
 						body: JSON.stringify(sensitiveData),
 					});
-			
+
 					const responseData = await response.json();
 					console.log("Sensitive data response:", responseData); // Debug log
-			
+
 					if (!response.ok) {
 						throw new Error(responseData.message || "Error al crear datos sensibles");
 					}
-			
+
 					setStore({
 						sensitive_data: [...store.sensitive_data, responseData]
 					});
-			
+
 					return responseData;
 				} catch (error) {
 					console.error("Error en createSensitiveData:", error);
@@ -415,35 +438,52 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			// Acción para actualizar los datos sensibles de un contacto
-			updateSensitiveData: (contactId, updatedData) => {
-				return async (dispatch) => {
-					try {
-						// Hacer la solicitud para actualizar los datos sensibles en el backend
-						const response = await fetch(`/api/sensitive-data/${contactId}`, {
-							method: 'PUT',
-							headers: {
-								'Content-Type': 'application/json',
-							},
-							body: JSON.stringify(updatedData), // Enviamos los datos actualizados
-						});
-
-						if (!response.ok) {
-							throw new Error('No se pudo actualizar los datos sensibles');
-						}
-
-						// Si la actualización fue exitosa, actualizamos el store
-						dispatch({
-							type: 'UPDATE_SENSITIVE_DATA',
-							payload: { contactId, updatedData },  // Pasamos el ID y los nuevos datos
-						});
-
-						// También podrías querer recargar los datos sensibles si es necesario
-						// dispatch(actions.loadSensitiveData()); // Si es necesario recargar
-
-					} catch (error) {
-						console.error("Error al actualizar los datos sensibles:", error);
+			updateSensitiveData: async (contactId, sensitiveFormData) => {
+				const store = getStore();
+				try {
+					// Verificar si ya existen los datos sensibles para este contacto
+					const existingSensitiveData = store.sensitive_data.find(
+						item => item.contact_id === contactId
+					);
+			
+					const url = existingSensitiveData 
+						? `${process.env.BACKEND_URL}/api/sensitive-data/${existingSensitiveData.id}`
+						: `${process.env.BACKEND_URL}/api/sensitive-data`; // Usamos la URL adecuada
+			
+					const method = existingSensitiveData ? 'PUT' : 'POST'; // PUT si existe, POST si no existe
+			
+					const response = await fetch(url, {
+						method: method,
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${store.authToken}`,
+						},
+						body: JSON.stringify({
+							...sensitiveFormData,
+							contact_id: contactId
+						}),
+					});
+			
+					const responseData = await response.json();
+					
+					if (!response.ok) {
+						throw new Error(responseData.message || "Error al actualizar/crear datos sensibles");
 					}
-				};
+			
+					// Actualizamos el store según si los datos fueron actualizados o creados
+					setStore({
+						sensitive_data: existingSensitiveData
+							? store.sensitive_data.map(item => 
+								item.contact_id === contactId ? responseData : item
+							  )
+							: [...store.sensitive_data, responseData]
+					});
+			
+					return responseData;
+				} catch (error) {
+					console.error("Error actualizando los datos sensibles:", error);
+					throw error;
+				}
 			},
 
 			// Acción para establecer el contacto a editar
@@ -455,6 +495,30 @@ const getState = ({ getStore, getActions, setStore }) => {
 			clearContactToEdit: () => {
 				setStore({ contactToEdit: null });
 			},
+
+			loadRandomImgs: async () => {
+                console.log("Intentando cargar imagenes aleatorias...");
+
+                try {
+                    const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
+
+                    console.log("Estado de la respuesta:", response.status);
+                    if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
+                    const randomImgData = await response.json();
+
+                    if (Array.isArray(randomImgData.results)) {
+                        setStore({ UserImages: randomImgData.results })
+                        console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
+
+                    } else {
+                        console.error("Respuesta inesperada: `results` no es un array", randomImgData);
+                        setStore({ UserImages: [] });
+                    }
+                } catch (error) {
+                    console.error("Error al cargar usuarios aleatorios:", error);
+                }
+
+            },
 
 
 		},

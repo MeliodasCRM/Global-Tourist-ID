@@ -14,15 +14,20 @@ const SensitiveDataForm = ({ sensitiveData, setSensitiveData }) => {
     <div>
       <h4>Datos Sensibles</h4>
       <Form>
+        {/* NIF Tipo - Dropdown */}
         <Form.Group controlId="nif_tipo">
           <Form.Label>NIF Tipo</Form.Label>
           <Form.Control
-            type="text"
+            as="select"
             name="nif_tipo"
             value={sensitiveData?.nif_tipo || ""}
             onChange={handleChange}
-            placeholder="Introduce el tipo de NIF"
-          />
+          >
+            <option value="">Selecciona un tipo de NIF</option>
+            <option value="DNI">DNI</option>
+            <option value="TIE">TIE</option>
+            <option value="PASAPORTE">Pasaporte</option>
+          </Form.Control>
         </Form.Group>
 
         <Form.Group controlId="nif_numero">

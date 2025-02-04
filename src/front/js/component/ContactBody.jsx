@@ -26,16 +26,13 @@ const ContactBody = () => {
     const selectedContact = contact.find((contact) => contact.id === contactId);
     if (selectedContact) {
       const selectedSensitiveData = sensitiveData.filter((data) => data.contact_id === contactId);
-      if (selectedSensitiveData.length > 0) {
+      if (selectedSensitiveData && selectedSensitiveData.length > 0) {
         navigate("/userform", {
           state: {
             contactToEdit: selectedContact,
-            sensitiveDataToEdit: selectedSensitiveData[0], // Pasar solo el primero
+            sensitiveDataToEdit: selectedSensitiveData[0],
           },
         });
-
-        // Sincroniza activeTab con el id del contacto
-        setActiveTab(contactId);
       } else {
         navigate("/userform", {
           state: {
@@ -43,9 +40,6 @@ const ContactBody = () => {
             sensitiveDataToEdit: null,
           },
         });
-
-        // Sincroniza activeTab con el id del contacto
-        setActiveTab(contactId);
       }
     }
   };
@@ -58,8 +52,8 @@ const ContactBody = () => {
       if (confirmDelete) {
         await actions.deleteContact(contactId);
         await actions.deleteSensitiveData(contactId);
-        actions.loadContacts();  // Recargamos los contactos
-        actions.loadSensitiveData();  // Recargamos los datos sensibles
+        actions.loadContacts();
+        actions.loadSensitiveData();
       }
     }
   };
@@ -68,8 +62,8 @@ const ContactBody = () => {
   const handleCreateContact = () => {
     navigate("/userform", {
       state: {
-        contactToEdit: null,  // Campos vacíos para crear un nuevo contacto
-        sensitiveDataToEdit: null,  // Campos vacíos para crear datos sensibles
+        contactToEdit: null, 
+        sensitiveDataToEdit: null,
       },
     });
   };
@@ -107,7 +101,7 @@ const ContactBody = () => {
                   email={contact.email}
                 />
 
-                {/* Si el contacto tiene datos sensibles, mostrar UserSensitiveCard */}
+                {/* SensitiveCard */}
                 {sensitiveData
                   .filter((data) => data.contact_id === contact.id)
                   .map((sensitiveData, sensitiveIndex) => (
@@ -124,21 +118,18 @@ const ContactBody = () => {
           </Tab.Content>
         </Tab.Container>
 
-        {/* Botones de Crear, Editar y Borrar */}
         <div className="d-flex justify-content-center mt-3">
           {/* Botón Crear */}
           <button className="create-contact-btn" onClick={handleCreateContact}>
             <FaPlus className="plus-icon" />
           </button>
 
-          {/* Botón Editar - Solo aparece cuando hay un contacto seleccionado */}
           {contact[activeTab] && (
             <button className="edit-contact-btn" onClick={() => handleEditForm(contact[activeTab].id)}>
               <FaEdit className="edit-icon" />
             </button>
           )}
 
-          {/* Botón Borrar - Solo aparece cuando hay un contacto seleccionado */}
           {contact[activeTab] && (
             <button className="delete-contact-btn" onClick={handleDeleteContact}>
               <FaTrashAlt className="delete-icon" />
