@@ -31,7 +31,7 @@ const Layout = () => {
         <div>
             <BrowserRouter>
                 <ScrollToTop>
-                    <Navbar /> {/* Navbar global */}
+                    {/* <Navbar /> Navbar global */}
                     <Routes>
                         {/* Rutas para el BackOffice */}
                         <Route path="/backoffice" element={<BackOffice />}>
