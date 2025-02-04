@@ -740,50 +740,6 @@ def generate_contact_qr(contact_id):
 
     except Exception as e:
         return jsonify({"message": "Error al generar el QR", "error": str(e)}), 500
-    
-# FUNCIÓN PARA CREAR DATOS DE QR
-@api.route('/contact/<int:contact_id>/qrcode', methods=['POST'])
-@jwt_required()
-def create_qr_code(contact_id):
-    try:
-        current_user_id = get_jwt_identity()  # Obtener el ID del usuario
-
-        # Validar que el user_id del token es un número
-        if not current_user_id.isdigit():
-            return jsonify({"message": "Identidad del usuario inválida"}), 401
-
-        current_user_id = int(current_user_id)  # Convertir a integer
-
-        # Obtener los datos del formulario y URL del QR
-        nombre = request.json.get('nombre')
-        fecha_inicio = request.json.get('fecha_inicio')
-        fecha_fin = request.json.get('fecha_fin')
-        qr_data = request.json.get('data')
-
-        # Validar que no falten datos requeridos
-        if not nombre or not fecha_inicio or not fecha_fin or not qr_data:
-            return jsonify({"message": "Faltan datos requeridos"}), 400
-
-        # Asignar el contacto 1 (aunque en este caso es fijo)
-        contact_id = 1
-
-        # Crear el nuevo QR Code y guardarlo en la base de datos
-        qr_code = QrCode(
-            nombre=nombre,
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
-            data=qr_data,
-            user_id=current_user_id,
-            contact_id=contact_id
-        )
-
-        db.session.add(qr_code)
-        db.session.commit()
-
-        return jsonify({"message": "Registro QRCode creado con éxito", "qr_code": qr_code.serialize_extended()}), 201
-
-    except Exception as e:
-        return jsonify({"message": "Error al guardar el QR", "error": str(e)}), 500
 
 # FUNCION QR TODOS LOS CONTACTOS
 @api.route('/group/<int:group_id>/qr', methods=['GET'])
@@ -860,3 +816,124 @@ def generate_group_qr(group_id):
 
    except Exception as e:
        return jsonify({"message": "Error al generar el QR grupal", "error": str(e)}), 500
+
+# FUNCIÓN PARA CREAR DATOS DE QR
+@api.route('/contact/<int:contact_id>/qrcode', methods=['POST'])
+@jwt_required()
+def create_qr_code(contact_id):
+    try:
+        current_user_id = get_jwt_identity()  # Obtener el ID del usuario
+
+        # Validar que el user_id del token es un número
+        if not current_user_id.isdigit():
+            return jsonify({"message": "Identidad del usuario inválida"}), 401
+
+        current_user_id = int(current_user_id)  # Convertir a integer
+
+        # Obtener los datos del formulario y URL del QR
+        nombre = request.json.get('nombre')
+        fecha_inicio = request.json.get('fecha_inicio')
+        fecha_fin = request.json.get('fecha_fin')
+        qr_data = request.json.get('data')
+
+        # Validar que no falten datos requeridos
+        if not nombre or not fecha_inicio or not fecha_fin or not qr_data:
+            return jsonify({"message": "Faltan datos requeridos"}), 400
+
+        # Asignar el contacto 1 (aunque en este caso es fijo)
+        contact_id = 1
+
+        # Crear el nuevo QR Code y guardarlo en la base de datos
+        qr_code = QrCode(
+            nombre=nombre,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            data=qr_data,
+            user_id=current_user_id,
+            contact_id=contact_id
+        )
+
+        db.session.add(qr_code)
+        db.session.commit()
+
+        return jsonify({"message": "Registro QRCode creado con éxito", "qr_code": qr_code.serialize_extended()}), 201
+
+    except Exception as e:
+        return jsonify({"message": "Error al guardar el QR", "error": str(e)}), 500
+
+# FUNCIÓN PARA OBTENER TODOS LOS QR CREADOS POR EL USUARIO
+@api.route('/user/<int:user_id>/qrcodes', methods=['GET'])
+@jwt_required()
+def get_all_qr_codes(user_id):
+   try:
+       current_user_id = get_jwt_identity()  # Obtener el ID del usuario autenticado
+       
+       # Validar que el user_id del token es un número
+       if not current_user_id.isdigit():
+           return jsonify({"message": "Identidad del usuario inválida"}), 401  # Token corrupto
+       
+       current_user_id = int(current_user_id)  # Convertir a integer
+
+       # Obtener todos los QRs del usuario ordenados por ID descendente
+       qr_codes = QrCode.query.filter_by(user_id=user_id).order_by(QrCode.id.desc()).all()
+
+       # Serializar los datos
+       qr_list = [{
+           "id": qr.id,
+           "nombre": qr.nombre,
+           "fecha_inicio": qr.fecha_inicio,
+           "fecha_fin": qr.fecha_fin,
+           "data": qr.data
+       } for qr in qr_codes]
+
+       return jsonify({
+           "success": True,
+           "qr_codes": qr_list
+       }), 200
+
+   except Exception as e:
+       return jsonify({
+           "success": False,
+           "message": "Error al obtener los códigos QR",
+           "error": str(e)
+       }), 500
+   
+# FUNCIÓN PARA ELIMINAR EL QR
+@api.route('/user/<int:user_id>/qrcode/<int:qr_id>', methods=['DELETE'])
+@jwt_required()
+def delete_qr_code(user_id, qr_id):
+   try:
+       current_user_id = get_jwt_identity()
+
+       # Validar que el user_id del token es un número
+       if not current_user_id.isdigit():
+           return jsonify({"message": "Identidad del usuario inválida"}), 401
+
+       current_user_id = int(current_user_id)
+
+       # Verificar que el usuario solo puede eliminar sus propios QRs
+       if current_user_id != user_id:
+           return jsonify({"message": "No autorizado"}), 403
+
+       # Buscar el QR
+       qr_code = QrCode.query.filter_by(id=qr_id, user_id=user_id).first()
+
+       if not qr_code:
+           return jsonify({"message": "QR no encontrado"}), 404
+
+       # Eliminar el QR
+       db.session.delete(qr_code)
+       db.session.commit()
+
+       return jsonify({
+           "success": True,
+           "message": "QR eliminado correctamente"
+       }), 200
+
+   except Exception as e:
+       db.session.rollback()
+       return jsonify({
+           "success": False,
+           "message": "Error al eliminar el QR",
+           "error": str(e)
+       }), 500
