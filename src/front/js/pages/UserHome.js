@@ -47,20 +47,22 @@ const UserHome = () => {
 
         <div className="icon-container">
           <div className="icon">
-          <Link to="/userInfo">
-            <FaUser size={40} color="#333" />
-            <p>Users</p>
-          </Link>
-          </div>
-          <div className="icon">
-          <Link to="/userInfo">
-            <FaBriefcase size={40} color="#333" />
-            <p>Reservas</p>
+            <Link to="/userInfo">
+              <FaUser size={40} color="#333" />
+              <p>Users</p>
             </Link>
           </div>
           <div className="icon">
-            <FaQrcode size={40} color="#333" />
-            <p>QR Generator</p>
+            <Link to="/userInfo">
+              <FaBriefcase size={40} color="#333" />
+              <p>Reservas</p>
+            </Link>
+          </div>
+          <div className="icon">
+            <Link to="/generate">
+              <FaQrcode size={40} color="#333" />
+              <p>QR Generator</p>
+            </Link>
           </div>
           <div className="icon">
             <FaBuilding size={40} color="#333" />

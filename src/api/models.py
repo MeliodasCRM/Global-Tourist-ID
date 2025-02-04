@@ -207,7 +207,7 @@ class QrCode(db.Model):
     nombre = db.Column(db.String(255), nullable=False)
     fecha_inicio = db.Column(db.DateTime, nullable=False)
     fecha_fin = db.Column(db.DateTime, nullable=False)
-    data = db.Column(db.String(255))
+    data = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
@@ -217,11 +217,14 @@ class QrCode(db.Model):
     contact = db.relationship('Contact', backref='qr_codes', lazy=True)
     group = db.relationship('Group', backref='qr_codes', lazy=True)
 
-    def serialize(self):
+    def serialize_extended(self):
         return {
             'id': self.id,
             'nombre': self.nombre,
             'fecha_inicio': self.fecha_inicio.isoformat() if self.fecha_inicio else None,
             'fecha_fin': self.fecha_fin.isoformat() if self.fecha_fin else None,
-            'data': self.data
+            'data': self.data,
+            'user_id': self.user_id,
+            'contact_id': self.contact_id,
+            'group_id': self.group_id,
         }

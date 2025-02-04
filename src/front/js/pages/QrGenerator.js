@@ -5,16 +5,14 @@ import { FaArrowLeft, FaBars, FaHome, FaUser, FaQrcode, FaHistory, FaCheck, FaCa
 import "../../styles/QrGenerator.css";
 
 const isValidDate = (dateStr) => {
-   // Verifica el formato DD/MM/YY
    if (!/^\d{2}\/\d{2}\/\d{2}$/.test(dateStr)) {
       return false;
    }
 
    const [day, month, year] = dateStr.split('/').map(num => parseInt(num, 10));
-   const fullYear = 2000 + year; // Convertir año de dos dígitos a cuatro dígitos
+   const fullYear = 2000 + year;
    const date = new Date(fullYear, month - 1, day);
 
-   // Verifica si es una fecha válida
    return date &&
       date.getDate() === day &&
       date.getMonth() === month - 1 &&
@@ -35,7 +33,8 @@ const QrCard = ({
    setLocalError,
    handleSubmit,
    handleIndividualQR,
-   handleReset
+   handleReset,
+   isLoading
 }) => {
    const validateDate = (value, field) => {
       if (!value) {
@@ -51,7 +50,7 @@ const QrCard = ({
       if (field === 'endDate' && formData.startDate) {
          const startDate = getDateFromString(formData.startDate);
          const endDate = getDateFromString(value);
-         
+
          if (endDate < startDate) {
             setLocalError('La fecha de fin no puede ser anterior a la fecha de inicio');
             return false;
@@ -65,10 +64,8 @@ const QrCard = ({
    const handleDateChange = (e, field) => {
       const { value } = e.target;
       setFormData({ ...formData, [field]: value });
-      
-      // Solo validamos si el usuario ha ingresado una fecha completa
+
       if (value.length === 8) {
-         // Autoformateamos la fecha añadiendo los /
          const formattedDate = value.replace(/(\d{2})(\d{2})(\d{2})/, '$1/$2/$3');
          setFormData({ ...formData, [field]: formattedDate });
          validateDate(formattedDate, field);
@@ -175,15 +172,16 @@ const QrCard = ({
                      type="button"
                      className="button secondary-button"
                      onClick={handleIndividualQR}
+                     disabled={isLoading}
                   >
-                     Generar QR individual
+                     {isLoading ? "Generando..." : "Generar QR individual"}
                   </button>
                   <button
                      type="submit"
                      className="button primary-button"
-                     disabled={!formData.event || !formData.startDate || !formData.endDate || localError}
+                     disabled={!formData.event || !formData.startDate || !formData.endDate || localError || isLoading}
                   >
-                     Generar QR grupal
+                     {isLoading ? "Generando..." : "Generar QR grupal"}
                   </button>
                </div>
             </form>
@@ -204,6 +202,7 @@ const QrGenerator = () => {
    });
    const [isSubmitted, setIsSubmitted] = useState(false);
    const [localError, setLocalError] = useState(null);
+   const [isLoading, setIsLoading] = useState(false);
 
    useEffect(() => {
       const localToken = localStorage.getItem("authToken");
@@ -216,7 +215,6 @@ const QrGenerator = () => {
          return false;
       }
 
-      // Validar fechas
       if (!isValidDate(formData.startDate)) {
          setLocalError("Fecha de inicio inválida");
          return false;
@@ -229,7 +227,7 @@ const QrGenerator = () => {
 
       const startDate = getDateFromString(formData.startDate);
       const endDate = getDateFromString(formData.endDate);
-      
+
       if (endDate < startDate) {
          setLocalError("La fecha de fin no puede ser anterior a la fecha de inicio");
          return false;
@@ -244,18 +242,118 @@ const QrGenerator = () => {
       navigate("/login");
    };
 
-   const handleSubmit = (e) => {
-      e.preventDefault();
+   const handleIndividualQR = async () => {
       if (validateForm()) {
-         console.log('Generando QR grupal...');
-         setIsSubmitted(true);
+         try {
+            setIsLoading(true);
+            setLocalError(null);
+            console.log("Iniciando generación de QR individual...");
+
+            const token = localStorage.getItem("authToken");
+            const contactId = 1;
+            const BACKEND_URL = process.env.BACKEND_URL;
+
+            // Primera petición - Obtener QR
+            const qrResponse = await fetch(`${BACKEND_URL}api/contact/${contactId}/qr`, {
+               method: 'GET',
+               headers: {
+                  'Authorization': `Bearer ${token}`
+               }
+            });
+
+            if (!qrResponse.ok) {
+               throw new Error('Error en la generación del QR');
+            }
+
+            const qrData = await qrResponse.json();
+            console.log("QR generado correctamente");
+
+            // Segunda petición - Guardar datos
+            const saveResponse = await fetch(`${BACKEND_URL}api/contact/${contactId}/qrcode`, {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+               },
+               body: JSON.stringify({
+                  nombre: formData.name,
+                  fecha_inicio: formData.startDate,
+                  fecha_fin: formData.endDate,
+                  data: qrData.qr_base64
+               })
+            });
+
+            if (!saveResponse.ok) {
+               throw new Error('Error al guardar los datos del QR');
+            }
+
+            console.log("QR guardado exitosamente");
+            setIsSubmitted(true);
+
+         } catch (error) {
+            console.log("Se produjo un error en el proceso");
+            setLocalError("No se pudo completar la operación. Por favor, intente nuevamente.");
+         } finally {
+            setIsLoading(false);
+         }
       }
    };
 
-   const handleIndividualQR = () => {
+   const handleSubmit = async (e) => {
+      e.preventDefault();
       if (validateForm()) {
-         console.log('Generando QR individual...');
-         setIsSubmitted(true);
+         try {
+            setIsLoading(true);
+            setLocalError(null);
+            console.log("Iniciando generación de QR grupal...");
+
+            const token = localStorage.getItem("authToken");
+            const groupId = 1;
+            const BACKEND_URL = process.env.BACKEND_URL;
+
+            // Primera petición - Obtener QR grupal
+            const qrResponse = await fetch(`${BACKEND_URL}api/group/${groupId}/qr`, {
+               method: 'GET',
+               headers: {
+                  'Authorization': `Bearer ${token}`
+               }
+            });
+
+            if (!qrResponse.ok) {
+               throw new Error('Error en la generación del QR grupal');
+            }
+
+            const qrData = await qrResponse.json();
+            console.log("QR grupal generado correctamente");
+
+            // Segunda petición - Guardar datos del QR grupal
+            const saveResponse = await fetch(`${BACKEND_URL}api/contact/${groupId}/qrcode`, {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+               },
+               body: JSON.stringify({
+                  nombre: formData.name,
+                  fecha_inicio: formData.startDate,
+                  fecha_fin: formData.endDate,
+                  data: qrData.qr_base64
+               })
+            });
+
+            if (!saveResponse.ok) {
+               throw new Error('Error al guardar los datos del QR grupal');
+            }
+
+            console.log("QR grupal guardado exitosamente");
+            setIsSubmitted(true);
+
+         } catch (error) {
+            console.log("Se produjo un error en el proceso del QR grupal");
+            setLocalError("No se pudo completar la operación. Por favor, intente nuevamente.");
+         } finally {
+            setIsLoading(false);
+         }
       }
    };
 
@@ -296,6 +394,7 @@ const QrGenerator = () => {
                handleSubmit={handleSubmit}
                handleIndividualQR={handleIndividualQR}
                handleReset={handleReset}
+               isLoading={isLoading}
             />
          </main>
 
