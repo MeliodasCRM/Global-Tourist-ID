@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px;
+  padding: 10px;
   width: 100%;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -29,13 +29,13 @@
 .user-home .nav-button {
   background-color: #525AA6; /* Color azul */
   border: none;
-  border-radius: 60%; /* Hace que sean circulares */
-  width: 60px;
-  height: 60px;
+  border-radius: 50%; /* Hace que sean circulares */
+  width: 45px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 20px;
   color: white;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
@@ -113,7 +113,7 @@
   display: flex;
   justify-content: space-around; /* ✅ Espacia los iconos uniformemente */
   align-items: center;
-  padding: 10px 0;
+  padding: 5px 0;
   box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -122,7 +122,7 @@
   background: none;
   border: none;
   color: white;
-  font-size: 30px;
+  font-size: 24px;
   cursor: pointer;
 }
 
@@ -132,5 +132,5 @@
 
 .user-home .nav-item:hover {
   transform: scale(1.1); /* Efecto de escala al pasar el cursor */
-  transition: transform 0.2s ease-in-out;
+  transition: transform 1.05s ease-in-out;
 }

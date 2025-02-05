@@ -15,7 +15,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		actions: {
 
 			// Acción para cargar el usuario en el store
-			signup: async (email, password, language) => {
+			signup: async (email, password, language) => { 
 				try {
 					// Llamamos a la API para crear el usuario
 					const resp = await fetch(process.env.BACKEND_URL + "/api/signup", {
@@ -23,18 +23,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({ email, password, language }),
 					});
-
+			
 					if (resp.ok) {
-						// Si el registro es exitoso, obtenemos el token
-						const data = await resp.json();
+						// ✅ Leemos el JSON solo una vez
+						const data = await resp.json(); 
 						console.log("Usuario registrado exitosamente");
-						// Ahora obtenemos el token JWT
-						const token = await resp.text();
-						localStorage.setItem("authToken", token);
-						setStore({ authToken: token });
-
+			
+						// ✅ Extraemos el token del JSON (si la API lo envía en el JSON)
+						const token = data.token; 
+			
+						if (token) {
+							localStorage.setItem("authToken", token);
+							setStore({ authToken: token });
+						} else {
+							console.warn("Advertencia: No se recibió token en la respuesta.");
+						}
+			
 						return { success: true, message: "Registro exitoso" };
 					} else {
+						// ✅ Si la API responde con un error, leemos el JSON de error
 						const error = await resp.json();
 						console.error("Error en el registro:", error);
 						return { success: false, message: error.message || "Error en el registro" };
@@ -44,6 +51,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, message: "Error de conexión" };
 				}
 			},
+			
 
 			// Use getActions to call a function within a fuction
 			login: async (email, password) => {
