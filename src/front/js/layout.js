@@ -82,7 +82,7 @@ const Layout = () => {
 
                     {/* Navbar y Footer solo se muestran en las rutas generales */}
 
-                    <Footer /> {/* Footer global */}
+                    {/* <Footer /> Footer global */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>
