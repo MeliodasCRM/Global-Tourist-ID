@@ -6,7 +6,7 @@ from datetime import datetime
 import qrcode
 import json
 import os
-from api.models import MedioPagoTipo, db, User, Contact, Group, SensitiveData, Reserva, TipoNif, Group, contact_group # Importar los modelos de la base de datos
+from api.models import MedioPagoTipo, db, User, Contact, Group, SensitiveData, Reserva, TipoNif, Group, contact_group, QrCode # Importar los modelos de la base de datos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -695,7 +695,7 @@ def delete_sensitive_data(sensitive_data_id):
             "error": str(e)
         }), 500
     
-# FUNCION GENERAR QR INDIVIDUAL
+# FUNCION PARA OBTENER QR INDIVIDUAL
 @api.route('/contact/<int:contact_id>/qr', methods=['GET'])
 @jwt_required()
 def generate_contact_qr(contact_id):
@@ -705,7 +705,7 @@ def generate_contact_qr(contact_id):
         # Validar que el user_id del token es un número
         if not current_user_id.isdigit():
             return jsonify({"message": "Identidad del usuario inválida"}), 401  # Token corrupto
-
+        
         current_user_id = int(current_user_id)  # Convertir a integer
 
         # Buscar el contacto asociado al usuario
@@ -716,18 +716,18 @@ def generate_contact_qr(contact_id):
         
         if not contact:
             return jsonify({"message": "Contacto no encontrado o no autorizado"}), 404
-            
+
         # Obtener datos sensibles y reservas
         sensitive_data = SensitiveData.query.filter_by(contact_id=contact_id).first()
         reservas = Reserva.query.filter_by(traveler_id=contact_id).all()
-        
+
         # Construir datos para el QR
         qr_data = {
             "contact": contact.serialize(),
             "sensitive_data": sensitive_data.serialize() if sensitive_data else None,
             "reservas": [reserva.serialize() for reserva in reservas] if reservas else []
         }
-        
+
         # Generar QR
         qr = qrcode.QRCode(
             version=1,
@@ -737,94 +737,217 @@ def generate_contact_qr(contact_id):
         )
         qr.add_data(json.dumps(qr_data))
         qr.make(fit=True)
-
+        
         img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convertir la imagen QR a base64
         img_buffer = BytesIO()
         img.save(img_buffer, format='PNG')
         img_buffer.seek(0)
-        
-        return send_file(
-            img_buffer,
-            mimetype='image/png',
-            as_attachment=True,
-            download_name=f'contact_{contact_id}_qr.png'
-        )
-        # Comprobar los datos del QR
-        # return jsonify(qr_data), 200
-        
+
+        qr_base64 = base64.b64encode(img_buffer.getvalue()).decode()
+
+        # Devolver el QR en base64
+        return jsonify({
+            "qr_base64": f"data:image/png;base64,{qr_base64}"
+        }), 200
+
     except Exception as e:
         return jsonify({"message": "Error al generar el QR", "error": str(e)}), 500
-    
+
 # FUNCION QR TODOS LOS CONTACTOS
 @api.route('/group/<int:group_id>/qr', methods=['GET'])
 @jwt_required()
 def generate_group_qr(group_id):
+   try:
+       current_user_id = get_jwt_identity()
+       try:
+           current_user_id = int(current_user_id)
+       except (ValueError, TypeError):
+           return jsonify({"message": "Identidad del usuario inválida"}), 401
+
+       group = Group.query.filter_by(id=group_id, user_id=current_user_id).first()
+       if not group:
+           return jsonify({"message": "Grupo no encontrado o no autorizado"}), 404
+
+       contacts = (
+           Contact.query
+           .join(contact_group, contact_group.c.contact_id == Contact.id)
+           .filter(contact_group.c.group_id == group_id)
+           .options(db.joinedload(Contact.sensitive_data))
+           .options(db.joinedload(Contact.reservas))
+           .all()
+       )
+
+       # Construir los datos sin modificar nombres
+       group_data = []
+       for contact in contacts:
+           group_data.append({
+               "contact": contact.serialize(),
+               "sensitive_data": contact.sensitive_data.serialize() if contact.sensitive_data else None,
+               "reservas": [reserva.serialize() for reserva in contact.reservas] if contact.reservas else []
+           })
+
+       # Convertir a JSON
+       json_data = json.dumps(group_data)
+       print(f"Tamaño del JSON antes de compresión: {len(json_data)} caracteres")
+
+       # Comprimir con gzip
+       compressed_data = gzip.compress(json_data.encode('utf-8'))
+       
+       # Convertir a base64
+       encoded_data = base64.b64encode(compressed_data).decode('utf-8')
+
+       print(f"Tamaño después de compresión y base64: {len(encoded_data)} caracteres")
+
+       # Si el tamaño sigue siendo demasiado grande, devolver error
+       if len(encoded_data) > 2953:
+           return jsonify({"message": "El contenido del QR sigue siendo demasiado grande"}), 400
+
+       # Generar QR con la data comprimida y codificada
+       qr = qrcode.QRCode(
+           version=40,
+           error_correction=qrcode.constants.ERROR_CORRECT_H,  # Máxima corrección de errores
+           box_size=10,
+           border=4,
+       )
+
+       qr.add_data(encoded_data)
+       qr.make(fit=True)
+
+       img = qr.make_image(fill_color="black", back_color="white")
+       
+       # Convertir imagen a base64
+       img_buffer = BytesIO()
+       img.save(img_buffer, format='PNG')
+       img_buffer.seek(0)
+       qr_base64 = base64.b64encode(img_buffer.getvalue()).decode()
+
+       # Devolver el QR en base64 como en el endpoint individual
+       return jsonify({
+           "qr_base64": f"data:image/png;base64,{qr_base64}"
+       }), 200
+
+   except Exception as e:
+       return jsonify({"message": "Error al generar el QR grupal", "error": str(e)}), 500
+
+# FUNCIÓN PARA CREAR DATOS DE QR
+@api.route('/contact/<int:contact_id>/qrcode', methods=['POST'])
+@jwt_required()
+def create_qr_code(contact_id):
     try:
-        current_user_id = get_jwt_identity()
-        try:
-            current_user_id = int(current_user_id)
-        except (ValueError, TypeError):
+        current_user_id = get_jwt_identity()  # Obtener el ID del usuario
+
+        # Validar que el user_id del token es un número
+        if not current_user_id.isdigit():
             return jsonify({"message": "Identidad del usuario inválida"}), 401
 
-        group = Group.query.filter_by(id=group_id, user_id=current_user_id).first()
-        if not group:
-            return jsonify({"message": "Grupo no encontrado o no autorizado"}), 404
+        current_user_id = int(current_user_id)  # Convertir a integer
 
-        contacts = (
-            Contact.query
-            .join(contact_group, contact_group.c.contact_id == Contact.id)
-            .filter(contact_group.c.group_id == group_id)
-            .options(db.joinedload(Contact.sensitive_data))
-            .options(db.joinedload(Contact.reservas))
-            .all()
+        # Obtener los datos del formulario y URL del QR
+        nombre = request.json.get('nombre')
+        fecha_inicio = request.json.get('fecha_inicio')
+        fecha_fin = request.json.get('fecha_fin')
+        qr_data = request.json.get('data')
+
+        # Validar que no falten datos requeridos
+        if not nombre or not fecha_inicio or not fecha_fin or not qr_data:
+            return jsonify({"message": "Faltan datos requeridos"}), 400
+
+        # Asignar el contacto 1 (aunque en este caso es fijo)
+        contact_id = 1
+
+        # Crear el nuevo QR Code y guardarlo en la base de datos
+        qr_code = QrCode(
+            nombre=nombre,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            data=qr_data,
+            user_id=current_user_id,
+            contact_id=contact_id
         )
 
-        # Construir los datos sin modificar nombres
-        group_data = []
-        for contact in contacts:
-            group_data.append({
-                "contact": contact.serialize(),
-                "sensitive_data": contact.sensitive_data.serialize() if contact.sensitive_data else None,
-                "reservas": [reserva.serialize() for reserva in contact.reservas] if contact.reservas else []
-            })
+        db.session.add(qr_code)
+        db.session.commit()
 
-        # Convertir a JSON
-        json_data = json.dumps(group_data)
-        print(f"Tamaño del JSON antes de compresión: {len(json_data)} caracteres")
-
-        # Comprimir con gzip
-        compressed_data = gzip.compress(json_data.encode('utf-8'))
-        
-        # Convertir a base64
-        encoded_data = base64.b64encode(compressed_data).decode('utf-8')
-
-        print(f"Tamaño después de compresión y base64: {len(encoded_data)} caracteres")
-
-        # Si el tamaño sigue siendo demasiado grande, devolver error
-        if len(encoded_data) > 2953:
-            return jsonify({"message": "El contenido del QR sigue siendo demasiado grande"}), 400
-
-        # Generar QR con la data comprimida y codificada
-        qr = qrcode.QRCode(
-            version=40,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,  # Máxima corrección de errores
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(encoded_data)
-        qr.make(fit=True)
-
-        img = qr.make_image(fill_color="black", back_color="white")
-        img_buffer = BytesIO()
-        img.save(img_buffer, format='PNG')
-        img_buffer.seek(0)
-
-        return send_file(
-            img_buffer,
-            mimetype='image/png',
-            as_attachment=True,
-            download_name=f'group_{group_id}_qr.png'
-        )
+        return jsonify({"message": "Registro QRCode creado con éxito", "qr_code": qr_code.serialize_extended()}), 201
 
     except Exception as e:
-        return jsonify({"message": "Error al generar el QR grupal", "error": str(e)}), 500
+        return jsonify({"message": "Error al guardar el QR", "error": str(e)}), 500
+
+# FUNCIÓN PARA OBTENER TODOS LOS QR CREADOS POR EL USUARIO
+@api.route('/user/<int:user_id>/qrcodes', methods=['GET'])
+@jwt_required()
+def get_all_qr_codes(user_id):
+   try:
+       current_user_id = get_jwt_identity()  # Obtener el ID del usuario autenticado
+       
+       # Validar que el user_id del token es un número
+       if not current_user_id.isdigit():
+           return jsonify({"message": "Identidad del usuario inválida"}), 401  # Token corrupto
+       
+       current_user_id = int(current_user_id)  # Convertir a integer
+
+       # Obtener todos los QRs del usuario ordenados por ID descendente
+       qr_codes = QrCode.query.filter_by(user_id=user_id).order_by(QrCode.id.desc()).all()
+
+       # Serializar los datos
+       qr_list = [{
+           "id": qr.id,
+           "nombre": qr.nombre,
+           "fecha_inicio": qr.fecha_inicio,
+           "fecha_fin": qr.fecha_fin,
+           "data": qr.data
+       } for qr in qr_codes]
+
+       return jsonify({
+           "success": True,
+           "qr_codes": qr_list
+       }), 200
+
+   except Exception as e:
+       return jsonify({
+           "success": False,
+           "message": "Error al obtener los códigos QR",
+           "error": str(e)
+       }), 500
+   
+# FUNCIÓN PARA ELIMINAR EL QR
+@api.route('/user/<int:user_id>/qrcode/<int:qr_id>', methods=['DELETE'])
+@jwt_required()
+def delete_qr_code(user_id, qr_id):
+   try:
+       current_user_id = get_jwt_identity()
+
+       # Validar que el user_id del token es un número
+       if not current_user_id.isdigit():
+           return jsonify({"message": "Identidad del usuario inválida"}), 401
+
+       current_user_id = int(current_user_id)
+
+       # Verificar que el usuario solo puede eliminar sus propios QRs
+       if current_user_id != user_id:
+           return jsonify({"message": "No autorizado"}), 403
+
+       # Buscar el QR
+       qr_code = QrCode.query.filter_by(id=qr_id, user_id=user_id).first()
+
+       if not qr_code:
+           return jsonify({"message": "QR no encontrado"}), 404
+
+       # Eliminar el QR
+       db.session.delete(qr_code)
+       db.session.commit()
+
+       return jsonify({
+           "success": True,
+           "message": "QR eliminado correctamente"
+       }), 200
+
+   except Exception as e:
+       db.session.rollback()
+       return jsonify({
+           "success": False,
+           "message": "Error al eliminar el QR",
+           "error": str(e)
+       }), 500

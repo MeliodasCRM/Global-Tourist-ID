@@ -158,10 +158,10 @@ const QrShare = () => {
          </main>
 
          <nav className="bottom-nav">
-            <button className="nav-item" onClick={() => navigate("/")}>
+            <button className="nav-item" onClick={() => navigate("/userhome")}>
                <FaHome />
             </button>
-            <button className="nav-item" onClick={() => navigate("/profile")}>
+            <button className="nav-item" onClick={() => navigate("/userinfo")}>
                <FaUser />
             </button>
             <button className="nav-item active">

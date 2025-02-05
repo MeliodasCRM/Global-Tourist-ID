@@ -21,6 +21,7 @@ import UserForm from "./pages/UserForm.js";
 import QrShare from "./pages/QrShare.js";
 import QrHistory from "./pages/QrHistory.js";
 
+import QrGenerator from "./pages/QrGenerator.js";
 //create your first component
 const Layout = () => {
     //the basename is used when your project is published in a subdirectory and not in the root of the domain
@@ -63,6 +64,7 @@ const Layout = () => {
                         <Route path="/editar-reserva/:id" element={<PrivateRoute element={EditarReservaForm} />} />
                         <Route path="/reserva/:id" element={<PrivateRoute element={DetallesReserva} />} />
                         <Route path="/share" element={<PrivateRoute element={QrShare} />} />
+                        <Route path="/generate" element={<PrivateRoute element={QrGenerator} />} />
 
                         {/* Ruta para manejar 404 */}
                         <Route path="*" element={<h1>404 Not Found</h1>} />
