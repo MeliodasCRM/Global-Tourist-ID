@@ -126,8 +126,11 @@ const UserForm = () => {
       </div>
 
       <Container className="button-container">
-        <Button className="update-button" onClick={handleSave}>
-          {isEditing ? "Actualizar" : "Guardar"} Contacto
+        <Button
+          className={isEditing ? "update-button" : "create-button"}
+          onClick={handleSave}
+          >
+          {isEditing ? "Actualizar" : "Guardar"}
         </Button>
       </Container>
     </div>

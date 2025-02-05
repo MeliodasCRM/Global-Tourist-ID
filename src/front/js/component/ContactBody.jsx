@@ -62,7 +62,7 @@ const ContactBody = () => {
   const handleCreateContact = () => {
     navigate("/userform", {
       state: {
-        contactToEdit: null, 
+        contactToEdit: null,
         sensitiveDataToEdit: null,
       },
     });
@@ -72,6 +72,16 @@ const ContactBody = () => {
   const adminContact = contact.find((contact) => contact.is_admin);
   const otherContacts = contact.filter((contact) => !contact.is_admin);
   const orderedContacts = adminContact ? [adminContact, ...otherContacts] : [...otherContacts];
+
+  // Función para obtener una imagen aleatoria
+  const getRandomImage = () => {
+    const { UserImages } = store;
+    if (UserImages && UserImages.length > 0) {
+      const randomImage = UserImages[Math.floor(Math.random() * UserImages.length)];
+      return randomImage?.picture?.large || "https://via.placeholder.com/50";
+    }
+    return "https://via.placeholder.com/50";  // Imagen por defecto si no hay imágenes
+  };
 
   return (
     <div className="contact-body">
@@ -93,7 +103,7 @@ const ContactBody = () => {
                 {/* ContactCard */}
                 <UserContactCard
                   id={contact.id}
-                  imageUrl={contact.imageUrl || "https://via.placeholder.com/50"}
+                  imageUrl={getRandomImage()}
                   nombre={contact.nombre}
                   primer_apellido={contact.primer_apellido}
                   segundo_apellido={contact.segundo_apellido}

@@ -17,6 +17,7 @@ const UserInfo = () => {
     if (!store.user || !store.user.id) {
       actions.loadUser().then(() => {
         actions.loadContacts(); // Cargar los contactos
+        actions.loadRandomImgs();  // Cargar imágenes aleatorias
       });
     } else {
       actions.loadContacts();

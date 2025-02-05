@@ -1,0 +1,39 @@
+/* Contenedor principal */
+.qr-history-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Ocupa toda la altura de la ventana */
+  }
+  
+  /* Contenedor de contenido */
+  .qr-history-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centrado vertical */
+    align-items: center; /* Centrado horizontal */
+    flex-grow: 1; /* Toma todo el espacio disponible entre el header y el footer */
+    text-align: center; /* Centrar el texto */
+    padding: 20px; /* Espaciado alrededor del contenido */
+  }
+  
+  .qr-history-content h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+  
+  .qr-history-content p {
+    font-size: 1.2rem;
+    color: #6c757d;
+  }
+  
+  @media (min-width: 768px) {
+    .navbar-header,
+    .navbar-footer,
+    .contact-banner {
+      max-width: 100%;
+    }
+  
+    .qr-history-content {
+      margin-bottom: 160px;
+    }
+  }

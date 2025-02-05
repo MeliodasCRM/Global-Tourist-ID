@@ -12,6 +12,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			group: [], // Incializo el array de grupos
 			activeContactId: null, // Inicializo el contacto activo
 			contactToEdit: null, // Inicializo el contacto a editar
+            UserImages: [], //inicializo el array de imagenes aleatorias
 
 		},
 		actions: {
@@ -520,6 +521,29 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             },
 
+			loadRandomImgs: async () => {
+                console.log("Intentando cargar imagenes aleatorias...");
+
+                try {
+                    const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
+
+                    console.log("Estado de la respuesta:", response.status);
+                    if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
+                    const randomImgData = await response.json();
+
+                    if (Array.isArray(randomImgData.results)) {
+                        setStore({ UserImages: randomImgData.results })
+                        console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
+
+                    } else {
+                        console.error("Respuesta inesperada: `results` no es un array", randomImgData);
+                        setStore({ UserImages: [] });
+                    }
+                } catch (error) {
+                    console.error("Error al cargar usuarios aleatorios:", error);
+                }
+
+            },
 
 		},
 	};
