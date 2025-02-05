@@ -19,6 +19,7 @@ import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
 import UserForm from "./pages/UserForm.js";
 import QrShare from "./pages/QrShare.js";
+import QrGenerator from "./pages/QrGenerator.js";
 import QrHistory from "./pages/QrHistory.js";
 
 import QrGenerator from "./pages/QrGenerator.js";
@@ -82,7 +83,7 @@ const Layout = () => {
 
                     {/* Navbar y Footer solo se muestran en las rutas generales */}
 
-                    <Footer /> {/* Footer global */}
+                    {/* <Footer /> Footer global */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>
