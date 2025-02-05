@@ -13,7 +13,7 @@ const UserHome = () => {
 
   const { actions } = useContext(Context);
   console.log("🔍 UserHome.js se está ejecutando");
-  const navigate = useNavigate(); // Corregido: ahora usa "navigate" en minúscula
+  const navigate = useNavigate();
 
   const { store } = useContext(Context);
   const [validToken, setValidToken] = useState(null);
@@ -88,8 +88,9 @@ const UserHome = () => {
         <ContactBanner />
         <NavbarFooter />
       </div>
-      );
+    </div>
+  );
 
 };
 
-      export default UserHome;
+export default UserHome;
