@@ -28,7 +28,6 @@ flask-babelplus = "*"
 flask-mail = "*"
 mail = "*"
 
-
 [requires]
 python_version = "3.10"
 
