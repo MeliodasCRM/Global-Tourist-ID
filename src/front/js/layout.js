@@ -15,12 +15,12 @@ import { UserReservas } from "./pages/UserReservas.js";
 import { NuevaReservaForm } from "./pages/NuevaReserva.js";
 import { EditarReservaForm } from "./pages/EditarReservas.js";
 import { DetallesReserva } from "./pages/DetallesReserva.js";
-
-
 import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
 import UserForm from "./pages/UserForm.js";
 import QrShare from "./pages/QrShare.js";
+import QrHistory from "./pages/QrHistory.js";
+
 //create your first component
 const Layout = () => {
     //the basename is used when your project is published in a subdirectory and not in the root of the domain
@@ -57,6 +57,7 @@ const Layout = () => {
                         <Route path="/userhome" element={<PrivateRoute element={UserHome} />} />
                         <Route path="/userinfo" element={<PrivateRoute element={UserInfo} />} />
                         <Route path="/userform" element={<PrivateRoute element={UserForm} />} />
+                        <Route path="/qrhistory" element={<PrivateRoute element={QrHistory} />} />
                         <Route path="/reservas" element={<PrivateRoute element={UserReservas} />} />
                         <Route path="/nueva-reserva" element={<PrivateRoute element={NuevaReservaForm} />} />
                         <Route path="/editar-reserva/:id" element={<PrivateRoute element={EditarReservaForm} />} />

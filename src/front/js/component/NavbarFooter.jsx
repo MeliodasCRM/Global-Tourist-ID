@@ -1,14 +1,37 @@
 import React from "react";
 import { IoHome, IoPerson, IoQrCode, IoTime } from "react-icons/io5";
-import '../../styles/userView/userInfo.css';
+import { useNavigate } from "react-router-dom";
+import '../../styles/userView/navbarFooter.css';
 
 const NavbarFooter = () => {
+  const navigate = useNavigate(); // Usamos el hook useNavigate para cambiar de ruta
+
+  // Función para manejar la navegación
+  const handleNavigation = (path) => {
+    navigate(path); // Navega a la ruta especificada
+  };
+
   return (
     <div className="navbar-footer">
-      <IoHome className="footer-icon" />
-      <IoPerson className="footer-icon" />
-      <IoQrCode className="footer-icon" />
-      <IoTime className="footer-icon" />
+      {/* Botón de inicio */}
+      <button className="footer-icon" onClick={() => handleNavigation('/userhome')}>
+        <IoHome size={24} />
+      </button>
+
+      {/* Botón de perfil */}
+      <button className="footer-icon" onClick={() => handleNavigation('/userinfo')}>
+        <IoPerson size={24} />
+      </button>
+
+      {/* Botón de historial de QR */}
+      <button className="footer-icon" onClick={() => handleNavigation('/qrhistory')}>
+        <IoQrCode size={24} />
+      </button>
+
+      {/* Botón de creador de QR */}
+      <button className="footer-icon" onClick={() => handleNavigation('/qrcreator')}>
+        <IoTime size={24} />
+      </button>
     </div>
   );
 };

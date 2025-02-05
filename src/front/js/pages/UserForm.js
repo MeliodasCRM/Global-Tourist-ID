@@ -12,44 +12,82 @@ const UserForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [key, setKey] = useState("contact");
-  const [contactToEdit, setContactToEdit] = useState(location.state?.contactToEdit || null);
-  const [sensitiveData, setSensitiveData] = useState(null);
+
+  // Separate states for contact data and edit mode
+  const [formData, setFormData] = useState({
+    nombre: "",
+    primer_apellido: "",
+    segundo_apellido: "",
+    telefono_movil: "",
+    telefono_fijo: "",
+    email: "",
+    sexo: "",
+    fecha_nacimiento: "",
+    nacionalidad: "",
+    direccion: "",
+    localidad: "",
+    pais: ""
+  });
+
+  const [sensitiveFormData, setSensitiveFormData] = useState({
+    nif_tipo: "",
+    nif_numero: "",
+    nif_country: ""
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (store.user && store.user.id) {
-      actions.loadContacts();
-    }
-  }, [store.user]);
-
-  useEffect(() => {
-    if (location.state?.contactToEdit && !contactToEdit) {
-      setContactToEdit(location.state.contactToEdit);
-      actions.loadSensitiveData(location.state.contactToEdit.id).then(data => {
-        setSensitiveData(data);
+    if (location.state?.contactToEdit) {
+      setFormData(location.state.contactToEdit);
+      setSensitiveFormData(location.state.sensitiveDataToEdit || {});
+      setIsEditing(true);
+    } else {
+      setFormData({
+        nombre: "",
+        primer_apellido: "",
+        segundo_apellido: "",
+        telefono_movil: "",
+        telefono_fijo: "",
+        email: "",
+        sexo: "",
+        fecha_nacimiento: "",
+        nacionalidad: "",
+        direccion: "",
+        localidad: "",
+        pais: ""
       });
+      setSensitiveFormData({
+        nif_tipo: "",
+        nif_numero: "",
+        nif_country: ""
+      });
+      setIsEditing(false);
     }
-  }, [location.state?.contactToEdit]);
+  }, [location.state]);
 
   const handleSave = async () => {
     if (!store.user) {
-      console.error("❌ El usuario no está cargado correctamente.");
+      console.error("El usuario no está cargado correctamente.");
       return;
     }
 
-    if (contactToEdit) {
-      await actions.updateContact(contactToEdit.id, contactToEdit);
-    } else {
-      const newContact = await actions.createContact(contactToEdit);
-      if (newContact) {
-        setContactToEdit(newContact);
+    try {
+      if (isEditing) {
+        await actions.updateContact(formData.id, formData);
+        if (sensitiveFormData) {
+          await actions.updateSensitiveData(formData.id, sensitiveFormData);
+        }
+      } else {
+        const newContact = await actions.createContact(formData);
+        if (newContact && sensitiveFormData) {
+          await actions.createSensitiveData(newContact.id, sensitiveFormData);
+        }
       }
+      navigate("/userinfo");
+    } catch (error) {
+      console.error("Error al guardar:", error);
     }
-
-    if (sensitiveData) {
-      await actions.updateSensitiveData(contactToEdit?.id, sensitiveData);
-    }
-
-    navigate("/userinfo");
   };
 
   return (
@@ -72,15 +110,15 @@ const UserForm = () => {
           <Tab.Content>
             <Tab.Pane eventKey="contact">
               <UserContactForm
-                contactData={contactToEdit}
-                isEditing={!!contactToEdit}
-                onChange={(data) => setContactToEdit(data)}
+                contactData={formData}
+                setContactForm={setFormData}
+                isEditing={isEditing}
               />
             </Tab.Pane>
             <Tab.Pane eventKey="sensitive">
               <SensitiveDataForm
-                sensitiveData={sensitiveData}
-                setSensitiveData={setSensitiveData}
+                sensitiveData={sensitiveFormData}
+                setSensitiveData={setSensitiveFormData}
               />
             </Tab.Pane>
           </Tab.Content>
@@ -88,8 +126,11 @@ const UserForm = () => {
       </div>
 
       <Container className="button-container">
-        <Button className="update-button" onClick={handleSave}>
-          Actualizar
+        <Button
+          className={isEditing ? "update-button" : "create-button"}
+          onClick={handleSave}
+          >
+          {isEditing ? "Actualizar" : "Guardar"}
         </Button>
       </Container>
     </div>

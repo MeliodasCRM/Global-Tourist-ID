@@ -1,0 +1,92 @@
+.contact-card {
+    width: 320px;
+    padding: 10px;
+    margin-top: 10px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+/* Contenedor de las dos columnas */
+.contact-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Columna fija para la imagen */
+.contact-image-container {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #e0e0e0;
+}
+
+.contact-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Columna flexible para la información y botones */
+.contact-info {
+    flex-grow: 1;
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    width: calc(100% - 56px); /* Ajuste del ancho restante */
+}
+
+/* Nombre y apellidos en negrita */
+.contact-name {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Espaciado entre líneas */
+.contact-text {
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espacio entre icono y texto */
+    margin-top: 5px; /* Espaciado entre líneas */
+}
+
+/* Contenedor de los botones dentro de la columna de texto */
+.contact-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Estilos para los botones de acción */
+.contact-action-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #525aa6;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease-in-out;
+}
+
+.contact-action-btn:hover {
+    background: #0056b3;
+}

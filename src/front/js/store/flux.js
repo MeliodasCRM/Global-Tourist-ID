@@ -10,6 +10,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			contact: [], // inicialdatos de contactos
 			sensitive_data: [], //inicializo los datos sensibles
 			group: [], // Incializo el array de grupos
+			activeContactId: null, // Inicializo el contacto activo
+			contactToEdit: null, // Inicializo el contacto a editar
+            UserImages: [], //inicializo el array de imagenes aleatorias
 
 		},
 		actions: {
@@ -105,7 +108,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						// Verifica los valores antes de hacer la comparación
 						console.log("store.user.id:", store.user.id);
 						console.log("user.id del backend:", user.id);
-			
+
 						// Verificamos que el user_id corresponda al del usuario logeado
 						if (user.id === store.user.id) {
 							console.log("Usuario cargado correctamente");
@@ -164,80 +167,116 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			// Acción para crear un contacto y gestionar si es admin y el grupo
-			createContact: async (formData) => {
+			createContact: async (formData, sensitiveFormData) => {
 				const store = getStore();
 				try {
-					// Verificamos si el usuario está cargado correctamente
-					if (!store.user || !store.user.id) {
-						console.error("El usuario no está cargado correctamente.");
-						// Si el usuario no está cargado, esperamos un poco y lo intentamos de nuevo
-						// o mostramos algún mensaje o redirigimos a login
-						return;
+					// Check if user has contacts
+					const isFirstContact = store.contact.length === 0;
+
+					// Create contact
+					const contactResponse = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,
+						},
+						body: JSON.stringify({
+							...formData,
+							is_admin: isFirstContact,
+							user_id: store.user.id
+						}),
+					});
+
+					if (!contactResponse.ok) {
+						throw new Error("Error al crear el contacto");
 					}
-			
-					// Verificar si el usuario ya tiene contactos
-					const userContacts = store.contact.filter(contact => contact.user_id === store.user.id);
-					// Verificar si el usuario tiene un grupo
-					const userGroup = store.group.find(group => group.user_id === store.user.id);
-			
-					let contact;  // Definir la variable `contact` antes de usarla
-			
-					if (userContacts.length === 0) {
-						// Crear el primer contacto como admin
-						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								"Authorization": `Bearer ${store.authToken}`,
-							},
-							body: JSON.stringify({
-								...formData,
-								is_admin: true,
-								user_id: store.user.id,
-							}),
-						});
-			
-						if (response.ok) {
-							contact = await response.json();  // Asignamos el contacto a la variable
-							setStore({ contact: [contact] });
-			
-							// Si el usuario no tiene grupo, crearlo
-							if (!userGroup) {
-								await getActions().createGroup(contact.id);  // Crear un grupo si no existe
-							}
-						}
-					} else {
-						// Crear un contacto normal y asociarlo al grupo
-						contact = userContacts[0];  // Usamos el primer contacto encontrado
-			
-						const response = await fetch(`${process.env.BACKEND_URL}/api/contact`, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								"Authorization": `Bearer ${store.authToken}`,
-							},
-							body: JSON.stringify({
-								...formData,
-								is_admin: false,  // No es admin
-								user_id: store.user.id,
-							}),
-						});
-			
-						if (response.ok) {
-							const newContact = await response.json();
-							setStore({ contact: [...store.contact, newContact] });
-			
-							// Asociar el nuevo contacto al grupo
-							if (userGroup) {
-								await getActions().addToGroup(newContact.id, userGroup.id);
-							} else {
-								// Crear grupo si no existe
-								await getActions().createGroup(newContact.id);
-							}
-						}
+
+					const responseData = await contactResponse.json();
+					const newContact = responseData.contact;
+
+					if (!newContact || !newContact.id) {
+						throw new Error("ID de contacto no recibido en la respuesta");
 					}
-				} catch (err) {
-					console.error("Error al crear contacto o grupo:", err);
+
+					// Update store with new contact
+					setStore({ contact: [...store.contact, newContact] });
+
+					// Get user's group
+					const userGroup = store.group?.find(g => g.user_id === store.user.id);
+
+					// Handle group logic
+					if (isFirstContact) {
+						// Create new group for first contact (admin)
+						await getActions().createGroup(newContact.id);
+					} else if (userGroup) {
+						// Add contact to existing group
+						await getActions().addToGroup(newContact.id, userGroup.id);
+
+						// Update local group state
+						const updatedGroup = {
+							...userGroup,
+							contact_ids: [...userGroup.contact_ids, newContact.id]
+						};
+						setStore({
+							group: store.group.map(g =>
+								g.id === userGroup.id ? updatedGroup : g
+							)
+						});
+					}
+
+					// Handle sensitive data if provided
+					if (sensitiveFormData && Object.keys(sensitiveFormData).length > 0) {
+						await getActions().createSensitiveData(newContact.id, sensitiveFormData);
+					}
+
+					return newContact;
+				} catch (error) {
+					console.error("Error en createContact:", error);
+					throw error;
+				}
+			},
+
+			createSensitiveData: async (contactId, sensitiveFormData) => {
+				const store = getStore();
+				try {
+					console.log("Contact ID recibido:", contactId); // Debug log
+					console.log("Sensitive Form Data:", sensitiveFormData); // Debug log
+
+					if (!contactId || typeof contactId !== 'number') {
+						throw new Error(`Contact ID invalid: ${contactId}`);
+					}
+
+					const sensitiveData = {
+						nif_tipo: sensitiveFormData.nif_tipo || "TIE",
+						nif_numero: sensitiveFormData.nif_numero || "",
+						nif_country: sensitiveFormData.nif_country || "",
+						contact_id: contactId
+					};
+
+					const response = await fetch(`${process.env.BACKEND_URL}/api/sensitive-data`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,
+						},
+						body: JSON.stringify(sensitiveData),
+					});
+
+					const responseData = await response.json();
+					console.log("Sensitive data response:", responseData); // Debug log
+
+					if (!response.ok) {
+						throw new Error(responseData.message || "Error al crear datos sensibles");
+					}
+
+					setStore({
+						sensitive_data: [...store.sensitive_data, responseData]
+					});
+
+					return responseData;
+				} catch (error) {
+					console.error("Error en createSensitiveData:", error);
+					throw error;
 				}
 			},
 
@@ -368,6 +407,143 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			// Acción para eliminar los datos sensibles de un contacto
+			deleteSensitiveData: (contactId) => {
+				return async (dispatch) => {
+					try {
+						// Hacer la petición para eliminar los datos sensibles del backend
+						const response = await fetch(`/api/sensitive-data/${contactId}`, {
+							method: 'DELETE',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						});
+
+						if (!response.ok) {
+							throw new Error('No se pudo eliminar los datos sensibles');
+						}
+
+						// Si la eliminación fue exitosa, actualizamos el store
+						dispatch({
+							type: 'DELETE_SENSITIVE_DATA',
+							payload: contactId,  // Enviamos el ID del contacto eliminado
+						});
+
+						// También recargamos los datos si es necesario
+						// dispatch(actions.loadSensitiveData()); // Si es necesario recargar los datos sensibles
+
+					} catch (error) {
+						console.error("Error al eliminar los datos sensibles:", error);
+					}
+				};
+			},
+
+			// Acción para actualizar los datos sensibles de un contacto
+			updateSensitiveData: async (contactId, sensitiveFormData) => {
+				const store = getStore();
+				try {
+					// Verificar si ya existen los datos sensibles para este contacto
+					const existingSensitiveData = store.sensitive_data.find(
+						item => item.contact_id === contactId
+					);
+			
+					const url = existingSensitiveData 
+						? `${process.env.BACKEND_URL}/api/sensitive-data/${existingSensitiveData.id}`
+						: `${process.env.BACKEND_URL}/api/sensitive-data`; // Usamos la URL adecuada
+			
+					const method = existingSensitiveData ? 'PUT' : 'POST'; // PUT si existe, POST si no existe
+			
+					const response = await fetch(url, {
+						method: method,
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${store.authToken}`,
+						},
+						body: JSON.stringify({
+							...sensitiveFormData,
+							contact_id: contactId
+						}),
+					});
+			
+					const responseData = await response.json();
+					
+					if (!response.ok) {
+						throw new Error(responseData.message || "Error al actualizar/crear datos sensibles");
+					}
+			
+					// Actualizamos el store según si los datos fueron actualizados o creados
+					setStore({
+						sensitive_data: existingSensitiveData
+							? store.sensitive_data.map(item => 
+								item.contact_id === contactId ? responseData : item
+							  )
+							: [...store.sensitive_data, responseData]
+					});
+			
+					return responseData;
+				} catch (error) {
+					console.error("Error actualizando los datos sensibles:", error);
+					throw error;
+				}
+			},
+
+			// Acción para establecer el contacto a editar
+			setContactToEdit: (contact) => {
+				setStore({ contactToEdit: contact });
+			},
+
+			// Acción para limpiar el contacto a editar
+			clearContactToEdit: () => {
+				setStore({ contactToEdit: null });
+			},
+
+			loadRandomImgs: async () => {
+                console.log("Intentando cargar imagenes aleatorias...");
+
+                try {
+                    const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
+
+                    console.log("Estado de la respuesta:", response.status);
+                    if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
+                    const randomImgData = await response.json();
+
+                    if (Array.isArray(randomImgData.results)) {
+                        setStore({ UserImages: randomImgData.results })
+                        console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
+
+                    } else {
+                        console.error("Respuesta inesperada: `results` no es un array", randomImgData);
+                        setStore({ UserImages: [] });
+                    }
+                } catch (error) {
+                    console.error("Error al cargar usuarios aleatorios:", error);
+                }
+
+            },
+
+			loadRandomImgs: async () => {
+                console.log("Intentando cargar imagenes aleatorias...");
+
+                try {
+                    const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
+
+                    console.log("Estado de la respuesta:", response.status);
+                    if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
+                    const randomImgData = await response.json();
+
+                    if (Array.isArray(randomImgData.results)) {
+                        setStore({ UserImages: randomImgData.results })
+                        console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
+
+                    } else {
+                        console.error("Respuesta inesperada: `results` no es un array", randomImgData);
+                        setStore({ UserImages: [] });
+                    }
+                } catch (error) {
+                    console.error("Error al cargar usuarios aleatorios:", error);
+                }
+
+            },
 
 		},
 	};

@@ -14,7 +14,7 @@
   background: white;
 }
 
-/* 📌 Pestañas más pequeñas y en la misma fila */
+/* Pestañas más pequeñas y en la misma fila */
 .user-form-tabs {
   position: sticky;
   top: 56px; /* Justo debajo del Navbar */
@@ -24,7 +24,7 @@
   border-bottom: 2px solid #ddd;
 }
 
-/* 📌 Pestañas alineadas en fila */
+/* Pestañas alineadas en fila */
 .tabs-row {
   display: flex;
   justify-content: center;
@@ -49,34 +49,46 @@
   align-items: center;
 }
 
-/* 📌 Contenedor del formulario con un ancho máximo */
+/* Contenedor del formulario con un ancho máximo */
 .user-form-container {
   width: 100%;
   padding: 15px;
   background: white;
 }
 
-/* 📌 Botón "Actualizar" centrado */
+/* Botón "Actualizar" centrado */
 .button-container {
   display: flex;
   justify-content: center;
   padding: 10px;
   background: white;
 }
-
-/* 📌 Estilo del botón azul */
-.update-button {
-  background-color: #007bff;
-  color: white;
+/* Estilo para el botón de crear */
+.create-button {
+  background-color: green;  /* Fondo verde */
+  color: white;  /* Color de texto blanco */
+  border: none;
   padding: 10px 20px;
   font-size: 16px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
-  text-align: center;
-  width: 200px;
+  transition: background-color 0.3s ease;
 }
 
-.update-button:hover {
-  background-color: #0056b3;
+/* Estilo para el botón de actualizar */
+.update-button {
+  background-color: #525aa6;  /* Fondo azul */
+  color: white;  /* Color de texto blanco */
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 140px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover efecto para ambos botones */
+.create-button:hover, .update-button:hover {
+  opacity: 0.8;
 }
