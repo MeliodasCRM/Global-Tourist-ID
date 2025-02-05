@@ -372,6 +372,8 @@ const QrGenerator = () => {
    if (!validToken) return <Navigate to="/login" replace />;
 
    return (
+
+      
       <div className="qr-generator-container">
          <header className="top-navbar">
             <button className="nav-button" onClick={handleLogout}>

@@ -24,12 +24,12 @@ const NavbarFooter = () => {
       </button>
 
       {/* Botón de historial de QR */}
-      <button className="footer-icon" onClick={() => handleNavigation('/qrhistory')}>
+      <button className="footer-icon" onClick={() => handleNavigation('/generate')}>
         <IoQrCode size={24} />
       </button>
 
       {/* Botón de creador de QR */}
-      <button className="footer-icon" onClick={() => handleNavigation('/qrcreator')}>
+      <button className="footer-icon" onClick={() => handleNavigation('/qrhistory')}>
         <IoTime size={24} />
       </button>
     </div>
