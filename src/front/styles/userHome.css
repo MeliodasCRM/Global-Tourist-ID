@@ -1,39 +1,136 @@
-/* Contenedor principal */
-.user-home-container {
+/* 🚀 Estilos específicos para UserHome */
+.user-home .user-main {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Ocupa toda la altura de la ventana */
+  align-items: center;
+  justify-content: flex-start; /* 🔼 Asegura que los elementos inicien desde arriba */
+  flex-grow: 1;
+  width: 100%;
+  margin-top: -20px; /* 🔼 Mueve todo el contenido más arriba */
 }
 
-/* Contenedor de contenido */
-.user-home-content {
+/* 📌 NAVBAR SUPERIOR */
+.user-home .user-navbar {
+  background-color: #d1d5db; /* Color similar a la imagen */
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  width: 100%;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-home .nav-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #525AA6;
+}
+
+.user-home .nav-button {
+  background-color: #525AA6; /* Color azul */
+  border: none;
+  border-radius: 50%; /* Hace que sean circulares */
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* 📌 CAJA DEL VIAJE (Título) */
+.user-home .trip-info {
+  background-color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+  margin-top: 50px; /* 🔼 Mueve la caja más arriba */
+}
+
+/* 📌 CAJA DEL QR */
+.user-home .qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
-  justify-content: center; /* Centrado vertical */
-  align-items: center; /* Centrado horizontal */
-  flex-grow: 1; /* Toma todo el espacio disponible entre el header y el footer */
-  text-align: center; /* Centrar el texto */
-  padding: 20px; /* Espaciado alrededor del contenido */
+  background-color: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  width: 60%;
+  max-width: 250px;
+  min-height: 200px;
+  margin-top: 40px; /* 🔼 Mueve el QR más arriba */
 }
 
-.user-home-content h1 {
-  font-size: 2rem;
-  margin-bottom: 15px;
+
+/* 📌 CÓDIGO QR */
+.user-home .qr-image {
+  width: 150px;
+  height: 150px;
 }
 
-.user-home-content p {
-  font-size: 1.2rem;
-  color: #6c757d;
+/* 📌 ICONOS DEBAJO DEL QR */
+.user-home .action-buttons {
+  display: flex;
+  justify-content: center; /* ✅ Centra los iconos horizontalmente */
+  gap: 15px;
+  margin-top: 15px;
 }
 
-@media (min-width: 768px) {
-  .navbar-header,
-  .navbar-footer,
-  .contact-banner {
-    max-width: 100%;
-  }
+.user-home .action-button {
+  background-color: #525AA6;
+  border: none;
+  border-radius: 10px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
 
-  .user-home-content {
-    margin-bottom: 160px;
-  }
+.user-home .action-button:hover {
+  transform: scale(1.15);
+}
+
+/* 📌 BARRA DE NAVEGACIÓN INFERIOR */
+.user-home .bottom-nav {
+  background-color: #525AA6; /* ✅ Color exacto de la imagen */
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-around; /* ✅ Espacia los iconos uniformemente */
+  align-items: center;
+  padding: 5px 0;
+  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 📌 ICONOS EN LA NAVBAR INFERIOR */
+.user-home .nav-item {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.user-home .nav-item.active {
+  color: yellow; /* ✅ Resalta el icono activo */
+}
+
+.user-home .nav-item:hover {
+  transform: scale(1.1); /* Efecto de escala al pasar el cursor */
+  transition: transform 1.05s ease-in-out;
 }

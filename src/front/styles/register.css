@@ -256,25 +256,13 @@ h6 span{
   color: #ffeba7;
   box-shadow: 0 8px 24px 0 rgba(16,39,112,.2);
 }
-.btn:hover{  
-  background-color: #102770;
-  color: #ffeba7;
-  box-shadow: 0 8px 24px 0 rgba(16,39,112,.2);
+
+.auth-button:hover {
+  transform: scale(1.05);
 }
 
-
-
-
-/* .logo {
-	position: absolute;
-	top: 30px;
-	right: 30px;
-	display: block;
-	z-index: 100;
-	transition: all 250ms linear;
+.input-wrapper input[type="email"],
+.input-wrapper input[type="password"] {
+    padding-left: 50px; /* 🔹 Empuja el texto más a la derecha */
 }
-.logo img {
-	height: 26px;
-	width: auto;
-	display: block;
-} */
+

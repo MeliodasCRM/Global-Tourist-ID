@@ -18,7 +18,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		actions: {
 
 			// Acción para cargar el usuario en el store
-			signup: async (email, password, language) => {
+			signup: async (email, password, language) => { 
 				try {
 					const resp = await fetch(process.env.BACKEND_URL + "/api/signup", {
 						method: "POST",
@@ -44,6 +44,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, message: "Error de conexión" };
 				}
 			},
+			
 
 			// Use getActions to call a function within a fuction
 			login: async (email, password) => {

@@ -15,6 +15,8 @@ import { UserReservas } from "./pages/UserReservas.js";
 import { NuevaReservaForm } from "./pages/NuevaReserva.js";
 import { EditarReservaForm } from "./pages/EditarReservas.js";
 import { DetallesReserva } from "./pages/DetallesReserva.js";
+
+
 import UserHome from "./pages/UserHome.js";
 import UserInfo from "./pages/UserInfo.js";
 import UserForm from "./pages/UserForm.js";
@@ -32,7 +34,7 @@ const Layout = () => {
         <div>
             <BrowserRouter>
                 <ScrollToTop>
-                    <Navbar /> {/* Navbar global */}
+                    {/* <Navbar /> Navbar global */}
                     <Routes>
                         {/* Rutas para el BackOffice */}
                         <Route path="/backoffice" element={<BackOffice />}>
