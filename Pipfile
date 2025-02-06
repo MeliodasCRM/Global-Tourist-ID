@@ -27,6 +27,7 @@ pillow = "*"
 flask-babelplus = "*"
 flask-mail = "*"
 mail = "*"
+babel = "*"
 
 [requires]
 python_version = "3.10"
