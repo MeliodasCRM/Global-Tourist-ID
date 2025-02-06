@@ -1,6 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import NavbarHeader from "../component/NavbarHeader.jsx";
+import ContactBanner from "../component/ContactBanner.jsx";
+import NavbarFooter from "../component/NavbarFooter.jsx";
 import { FaArrowLeft, FaBars, FaHome, FaUser, FaQrcode, FaHistory, FaCheck } from "react-icons/fa";
 import "../../styles/QrShare.css";
 
@@ -132,16 +135,7 @@ const QrShare = () => {
 
    return (
       <div className="qr-share-container">
-         <header className="top-navbar">
-            <button className="nav-button" onClick={handleLogout}>
-               <FaArrowLeft />
-            </button>
-            <h1>Sharing QR</h1>
-            <button className="nav-button" onClick={() => navigate("/")}>
-               <FaBars />
-            </button>
-         </header>
-
+         <NavbarHeader />
          <main className="main-content">
             <EmailCard
                email={email}
@@ -156,21 +150,8 @@ const QrShare = () => {
                handleCancel={handleCancel}
             />
          </main>
-
-         <nav className="bottom-nav">
-            <button className="nav-item" onClick={() => navigate("/userhome")}>
-               <FaHome />
-            </button>
-            <button className="nav-item" onClick={() => navigate("/userinfo")}>
-               <FaUser />
-            </button>
-            <button className="nav-item active">
-               <FaQrcode />
-            </button>
-            <button className="nav-item" onClick={() => navigate("/history")}>
-               <FaHistory />
-            </button>
-         </nav>
+         <ContactBanner />
+         <NavbarFooter />
       </div>
    );
 };
