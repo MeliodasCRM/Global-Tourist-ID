@@ -1,8 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { FaArrowLeft, FaBars, FaHome, FaUser, FaQrcode, FaHistory, FaCheck, FaCalendarAlt } from "react-icons/fa";
+import { FaCheck, FaCalendarAlt } from "react-icons/fa";
 import "../../styles/QrGenerator.css";
+import NavbarHeader from "../component/NavbarHeader.jsx";
+import ContactBanner from "../component/ContactBanner.jsx";
+import NavbarFooter from "../component/NavbarFooter.jsx";
 
 const isValidDate = (dateStr) => {
    if (!/^\d{2}\/\d{2}\/\d{2}$/.test(dateStr)) {
@@ -375,46 +378,27 @@ const QrGenerator = () => {
 
       
       <div className="qr-generator-container">
-         <header className="top-navbar">
-            <button className="nav-button" onClick={handleLogout}>
-               <FaArrowLeft />
-            </button>
-            <h1>QR Generator</h1>
-            <button className="nav-button" onClick={() => navigate("/")}>
-               <FaBars />
-            </button>
-         </header>
-
-         <main className="main-content">
-            <QrCard
-               formData={formData}
-               setFormData={setFormData}
-               isSubmitted={isSubmitted}
-               setIsSubmitted={setIsSubmitted}
-               localError={localError}
-               setLocalError={setLocalError}
-               handleSubmit={handleSubmit}
-               handleIndividualQR={handleIndividualQR}
-               handleReset={handleReset}
-               isLoading={isLoading}
-            />
-         </main>
-
-         <nav className="bottom-nav">
-            <button className="nav-item" onClick={() => navigate("/userhome")}>
-               <FaHome />
-            </button>
-            <button className="nav-item" onClick={() => navigate("/userinfo")}>
-               <FaUser />
-            </button>
-            <button className="nav-item active">
-               <FaQrcode />
-            </button>
-            <button className="nav-item" onClick={() => navigate("/history")}>
-               <FaHistory />
-            </button>
-         </nav>
+         <NavbarHeader prevLocation={location.state?.from} />
+         <div className="qr-generator-content">
+            <main className="main-content">
+               <QrCard
+                  formData={formData}
+                  setFormData={setFormData}
+                  isSubmitted={isSubmitted}
+                  setIsSubmitted={setIsSubmitted}
+                  localError={localError}
+                  setLocalError={setLocalError}
+                  handleSubmit={handleSubmit}
+                  handleIndividualQR={handleIndividualQR}
+                  handleReset={handleReset}
+                  isLoading={isLoading}
+               />
+            </main>
+         </div>
+         <ContactBanner />
+         <NavbarFooter />
       </div>
+
    );
 };
 

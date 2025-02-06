@@ -1,10 +1,11 @@
 import React from "react";
 import '../../styles/userView/userInfo.css';
+import imagen from '../../img/WebBanner01_GTID.jpg';
 
 const ContactBanner = () => {
   return (
     <div className="contact-banner">
-      <img src="https://via.placeholder.com/375x100" alt="Banner Publicitario" />
+      <img src={imagen} alt="Banner Publicitario" />
     </div>
   );
 };

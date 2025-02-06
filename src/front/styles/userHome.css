@@ -2,38 +2,97 @@
 .user-home-container {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Ocupa toda la altura de la ventana */
+  height: 100vh;
 }
 
 /* Contenedor de contenido */
 .user-home-content {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centrado vertical */
+  justify-content: flex-start; /* Alineación hacia el top */
   align-items: center; /* Centrado horizontal */
-  flex-grow: 1; /* Toma todo el espacio disponible entre el header y el footer */
-  text-align: center; /* Centrar el texto */
-  padding: 20px; /* Espaciado alrededor del contenido */
+  flex-grow: 0; /* No crecer más allá de la altura que se le asigna */
+  height: 548px; /* Altura específica */
+  padding: 0 20px; /* Eliminamos el margen superior y agregamos solo padding horizontal */
+  background-color: white;
+  overflow-y: auto; /* Permite el desplazamiento si el contenido es más largo */
+  margin-top: 70px; /* Alinea el contenido pegado al navbarHeader */
 }
 
-.user-home-content h1 {
-  font-size: 2rem;
-  margin-bottom: 15px;
+/* Ajustar la caja del QR info card */
+.qr-info-card {
+  width: 300px;
+  height: 85px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 1px solid #A4A4A4;
+  background: #FFF;
+  box-shadow: 0px 4px 4px 0px #525AA6;
+  margin-top: 30px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.user-home-content p {
-  font-size: 1.2rem;
-  color: #6c757d;
+/* CAJA DE QR: El placeholder de la imagen del QR */
+.qr-info-placeholder {
+  width: 181px;
+  height: 181px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 4px solid #4D549C;
+  box-shadow: 0px 0px 25px 0px #333;
+  margin-top: 30px;
+  background-size: contain;
+  background-position: center;
+  display: flex;
+  justify-content: center; /* Alineación horizontal */
+  align-items: center; /* Alineación vertical */
 }
 
-@media (min-width: 768px) {
-  .navbar-header,
-  .navbar-footer,
-  .contact-banner {
-    max-width: 100%;
-  }
+.qr-info-placeholder img {
+  width: 100%; /* La imagen ocupará todo el tamaño del contenedor */
+  height: 100%;
+  object-fit: contain; /* Hace que la imagen se ajuste proporcionalmente */
+}
 
-  .user-home-content {
-    margin-bottom: 160px;
-  }
+/* BOTONES DE ACCIÓN (Compartir y Copiar) */
+.qr-info-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.share-button, .copy-button {
+  background-color: #525AA6;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.share-button:hover, .copy-button:hover {
+  transform: scale(1.1);
+}
+
+/* Estilos para el ContactBanner y NavbarFooter */
+.contact-banner {
+  margin-top: 30px; /* Separación después del contenido */
+}
+
+.navbar-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
 }
