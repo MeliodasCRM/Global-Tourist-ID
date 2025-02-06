@@ -375,6 +375,8 @@ const QrGenerator = () => {
    if (!validToken) return <Navigate to="/login" replace />;
 
    return (
+
+      
       <div className="qr-generator-container">
          <NavbarHeader prevLocation={location.state?.from} />
          <div className="qr-generator-content">

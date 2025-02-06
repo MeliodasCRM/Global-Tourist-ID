@@ -24,6 +24,7 @@ import QrShare from "./pages/QrShare.js";
 import QrGenerator from "./pages/QrGenerator.js";
 import QrHistory from "./pages/QrHistory.js";
 
+import QrGenerator from "./pages/QrGenerator.js";
 //create your first component
 const Layout = () => {
     //the basename is used when your project is published in a subdirectory and not in the root of the domain
