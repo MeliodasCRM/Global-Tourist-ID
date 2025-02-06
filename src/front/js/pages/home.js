@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import "../../styles/home.css";
 import {  useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
@@ -12,6 +12,12 @@ export const Home = () => {
   const handleLoginRedirect = () => {
     Navigate("/login");
   }
+
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
+
+
   return (
     <div className="home-container">
       {/* Sección superior con fondo azul */}

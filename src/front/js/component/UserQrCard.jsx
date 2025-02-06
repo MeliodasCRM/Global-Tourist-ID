@@ -1,31 +1,27 @@
 import React from "react";
-import { FaPhoneAlt, FaEye } from "react-icons/fa";
-import { AiTwotoneMail } from "react-icons/ai";
+import { FaEye } from "react-icons/fa";
 import "../../styles/userView/userContactCard.css";
 
 const UserQrCard = ({ 
-    id, imageUrl, nombre, primer_apellido, segundo_apellido, telefono_movil, email,
-    handleEditContact, handleDeleteContact, verContacto}) => {
+    id, nombre, fecha_inicio, fecha_fin, data, handleEditContact, handleDeleteContact, verContacto 
+}) => {
     return (
         <li className="contact-card list-group-item">
             {/* Contenedor de las dos columnas */}
             <div className="contact-content">
-                {/* Columna 1: Imagen */}
-                <div className="contact-image-container">
-                    <img src={imageUrl} alt={nombre} className="contact-image" />
-                </div>
-
-                {/* Columna 2: Información del contacto con botones */}
+                {/* Columna 1: Datos del QR */}
                 <div className="contact-info">
-                    <span className="contact-name">{nombre} {primer_apellido} {segundo_apellido}</span>
-                    <span className="contact-text"><FaPhoneAlt /> {telefono_movil}</span>
-                    <span className="contact-text"><AiTwotoneMail /> {email}</span>
+                    <span className="contact-name">{nombre}</span>
+                    <span className="contact-text">Inicio: {new Date(fecha_inicio).toLocaleDateString()}</span>
+                    <span className="contact-text">Fin: {new Date(fecha_fin).toLocaleDateString()}</span>
+                    <span className="contact-text">Data: {data}</span>
 
                     {/* Fila de botones de acción dentro de la columna de texto */}
                     <div className="contact-actions">
                         <div className="contact-action-btn" onClick={() => verContacto(id)}>
                             <FaEye />
                         </div>
+                        {/* Si quieres habilitar botones de editar y eliminar, puedes agregar lo siguiente */}
                         {/* <div className="contact-action-btn" onClick={() => handleEditContact(id)}>
                             <FaEdit />
                         </div>

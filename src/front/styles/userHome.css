@@ -1,44 +1,41 @@
-/* 🚀 Estilos específicos para UserHome */
-.user-home .user-main {
+/* Contenedor principal */
+.user-home-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* 🔼 Asegura que los elementos inicien desde arriba */
-  flex-grow: 1;
-  width: 100%;
-  margin-top: -20px; /* 🔼 Mueve todo el contenido más arriba */
+  height: 100vh; /* Ocupa toda la altura de la ventana */
 }
 
-/* 📌 NAVBAR SUPERIOR */
-.user-home .user-navbar {
-  background-color: #d1d5db; /* Color similar a la imagen */
+/* Contenedor de contenido */
+.user-home-content {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  width: 100%;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  justify-content: center; /* Centrado vertical */
+  align-items: center; /* Centrado horizontal */
+  flex-grow: 1; /* Toma todo el espacio disponible entre el header y el footer */
+  text-align: center; /* Centrar el texto */
+  padding: 20px; /* Espaciado alrededor del contenido */
 }
 
-.user-home .nav-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #525AA6;
+.user-home-content h1 {
+  font-size: 2rem;
+  margin-bottom: 15px;
 }
 
-.user-home .nav-button {
-  background-color: #525AA6; /* Color azul */
-  border: none;
-  border-radius: 50%; /* Hace que sean circulares */
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: white;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+.user-home-content p {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+@media (min-width: 768px) {
+  .navbar-header,
+  .navbar-footer,
+  .contact-banner {
+    max-width: 100%;
+  }
+
+  .user-home-content {
+    margin-bottom: 160px;
+  }
 }
 
 /* 📌 CAJA DEL VIAJE (Título) */

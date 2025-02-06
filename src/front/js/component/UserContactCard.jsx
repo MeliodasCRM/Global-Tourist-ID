@@ -6,6 +6,17 @@ import "../../styles/userView/userContactCard.css";
 const UserContactCard = ({ 
     id, imageUrl, nombre, primer_apellido, segundo_apellido, telefono_movil, email,
     handleEditContact, handleDeleteContact, verContacto}) => {
+
+
+          // Función para obtener una imagen aleatoria
+  const getRandomImage = () => {
+    const UserImages = store.UserImages;
+    if (UserImages && UserImages.length > 0) {
+      const randomImage = UserImages[Math.floor(Math.random() * UserImages.length)];
+      return randomImage?.picture?.large || "https://via.placeholder.com/50";
+    }
+    return "https://via.placeholder.com/50";  // Imagen por defecto si no hay imágenes
+  };
     return (
         <li className="contact-card list-group-item">
             {/* Contenedor de las dos columnas */}

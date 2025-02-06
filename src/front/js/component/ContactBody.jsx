@@ -73,16 +73,6 @@ const ContactBody = () => {
   const otherContacts = contact.filter((contact) => !contact.is_admin);
   const orderedContacts = adminContact ? [adminContact, ...otherContacts] : [...otherContacts];
 
-  // Función para obtener una imagen aleatoria
-  const getRandomImage = () => {
-    const { UserImages } = store;
-    if (UserImages && UserImages.length > 0) {
-      const randomImage = UserImages[Math.floor(Math.random() * UserImages.length)];
-      return randomImage?.picture?.large || "https://via.placeholder.com/50";
-    }
-    return "https://via.placeholder.com/50";  // Imagen por defecto si no hay imágenes
-  };
-
   return (
     <div className="contact-body">
       <Container className="body-content">

@@ -9,7 +9,7 @@ export const Login = () => {
 
   const { store } = useContext(Context);
   const [isChecking, setIsChecking] = useState(true); // ⏳ Estado para verificar el token
-  const [validToken, setValidToken] = useState(false);
+  const [validToken, setValidToken] = useState();
 
   useEffect(() => {
     console.log("🔍 store.authToken:", store.authToken);

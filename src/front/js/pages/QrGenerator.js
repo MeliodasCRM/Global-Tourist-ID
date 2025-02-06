@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { FaArrowLeft, FaBars, FaHome, FaUser, FaQrcode, FaHistory, FaCheck, FaCalendarAlt } from "react-icons/fa";
+import { FaCheck, FaCalendarAlt } from "react-icons/fa";
 import "../../styles/QrGenerator.css";
-import NavbarHeader from "../component/NavbarHeader";
-import ContactBanner from "../component/ContactBanner";
-import NavbarFooter from "../component/NavbarFooter";
+import NavbarHeader from "../component/NavbarHeader.jsx";
+import ContactBanner from "../component/ContactBanner.jsx";
+import NavbarFooter from "../component/NavbarFooter.jsx";
 
 const isValidDate = (dateStr) => {
    if (!/^\d{2}\/\d{2}\/\d{2}$/.test(dateStr)) {
