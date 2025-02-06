@@ -1,39 +1,48 @@
+/* qrhistory.css */
+
 /* Contenedor principal */
 .qr-history-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* Ocupa toda la altura de la ventana */
-  }
-  
-  /* Contenedor de contenido */
-  .qr-history-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Centrado vertical */
-    align-items: center; /* Centrado horizontal */
-    flex-grow: 1; /* Toma todo el espacio disponible entre el header y el footer */
-    text-align: center; /* Centrar el texto */
-    padding: 20px; /* Espaciado alrededor del contenido */
-  }
-  
-  .qr-history-content h1 {
-    font-size: 2rem;
-    margin-bottom: 15px;
-  }
-  
-  .qr-history-content p {
-    font-size: 1.2rem;
-    color: #6c757d;
-  }
-  
-  @media (min-width: 768px) {
-    .navbar-header,
-    .navbar-footer,
-    .contact-banner {
-      max-width: 100%;
-    }
-  
-    .qr-history-content {
-      margin-bottom: 160px;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header sticky en la parte superior */
+.qr-history-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+  /* Sin margen ni padding */
+}
+
+/* Footer sticky en la parte inferior */
+.qr-history-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background-color: white;
+  height: 50px; /* Ajusta el tamaño del footer */
+}
+
+/* Contenedor del cuerpo */
+.qr-history-body {
+  flex-grow: 1; /* Esto asegura que ocupa el espacio disponible entre el header y el footer */
+  overflow-y: auto; /* Agrega el scroll vertical */
+  padding: 10px; /* Agrega el padding que solicitaste */
+  margin-top: 10px; /* Deja espacio para no solaparse con el header */
+  display: flex;
+  justify-content: center; /* Centra las tarjetas horizontalmente */
+  flex-wrap: wrap;
+}
+
+/* Títulos y textos */
+.qr-history-body h1 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+.qr-history-body p {
+  font-size: 1rem;
+  color: #6c757d;
+}
