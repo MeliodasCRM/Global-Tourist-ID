@@ -36,10 +36,16 @@ const UserInfo = () => {
   return (
     <div className="app-container">
       <NavbarHeader prevLocation={location.state?.from} />
-      <ContactBody
-        contactData={store.contact || []}   // Pasamos los contactos al componente
-        sensitiveData={store.sensitive_data || []}  // Pasamos los datos sensibles
-      />
+      <div className="contact-body">
+        <div className="contact-tabs">
+          {/* Aquí agregarás las pestañas como en la estructura de los tabs */}
+          {/* Las pestañas irían aquí */}
+        </div>
+        <ContactBody
+          contactData={store.contact || []}   // Pasamos los contactos al componente
+          sensitiveData={store.sensitive_data || []}  // Pasamos los datos sensibles
+        />
+      </div>
       <ContactBanner />
       <NavbarFooter />
     </div>

@@ -12,7 +12,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			group: [], // Incializo el array de grupos
 			activeContactId: null, // Inicializo el contacto activo
 			contactToEdit: null, // Inicializo el contacto a editar
-            UserImages: [], //inicializo el array de imagenes aleatorias
+			UserImages: [], //inicializo el array de imagenes aleatorias
+			qr_codes: [], // Inicializo el array de códigos QR
 
 		},
 		actions: {
@@ -25,10 +26,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({ email, password, language }),
 					});
-					
+
 					// Lee el body una sola vez como JSON
 					const data = await resp.json();
-					
+
 					if (resp.ok) {
 						console.log("Usuario registrado exitosamente");
 						const token = data.token; // Asegúrate de que el endpoint retorne el token en data.token
@@ -44,6 +45,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, message: "Error de conexión" };
 				}
 			},
+
 
 			// Use getActions to call a function within a fuction
 			login: async (email, password) => {
@@ -442,13 +444,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const existingSensitiveData = store.sensitive_data.find(
 						item => item.contact_id === contactId
 					);
-			
-					const url = existingSensitiveData 
+
+					const url = existingSensitiveData
 						? `${process.env.BACKEND_URL}/api/sensitive-data/${existingSensitiveData.id}`
 						: `${process.env.BACKEND_URL}/api/sensitive-data`; // Usamos la URL adecuada
-			
+
 					const method = existingSensitiveData ? 'PUT' : 'POST'; // PUT si existe, POST si no existe
-			
+
 					const response = await fetch(url, {
 						method: method,
 						headers: {
@@ -460,22 +462,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 							contact_id: contactId
 						}),
 					});
-			
+
 					const responseData = await response.json();
-					
+
 					if (!response.ok) {
 						throw new Error(responseData.message || "Error al actualizar/crear datos sensibles");
 					}
-			
+
 					// Actualizamos el store según si los datos fueron actualizados o creados
 					setStore({
 						sensitive_data: existingSensitiveData
-							? store.sensitive_data.map(item => 
+							? store.sensitive_data.map(item =>
 								item.contact_id === contactId ? responseData : item
-							  )
+							)
 							: [...store.sensitive_data, responseData]
 					});
-			
+
 					return responseData;
 				} catch (error) {
 					console.error("Error actualizando los datos sensibles:", error);
@@ -494,52 +496,86 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			loadRandomImgs: async () => {
-                console.log("Intentando cargar imagenes aleatorias...");
+				console.log("Intentando cargar imagenes aleatorias...");
 
-                try {
-                    const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
+				try {
+					const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
 
-                    console.log("Estado de la respuesta:", response.status);
-                    if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
-                    const randomImgData = await response.json();
+					console.log("Estado de la respuesta:", response.status);
+					if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
+					const randomImgData = await response.json();
 
-                    if (Array.isArray(randomImgData.results)) {
-                        setStore({ UserImages: randomImgData.results })
-                        console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
+					if (Array.isArray(randomImgData.results)) {
+						setStore({ UserImages: randomImgData.results })
+						console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
 
-                    } else {
-                        console.error("Respuesta inesperada: `results` no es un array", randomImgData);
-                        setStore({ UserImages: [] });
-                    }
-                } catch (error) {
-                    console.error("Error al cargar usuarios aleatorios:", error);
-                }
+					} else {
+						console.error("Respuesta inesperada: `results` no es un array", randomImgData);
+						setStore({ UserImages: [] });
+					}
+				} catch (error) {
+					console.error("Error al cargar usuarios aleatorios:", error);
+				}
 
-            },
+			},
 
 			loadRandomImgs: async () => {
-                console.log("Intentando cargar imagenes aleatorias...");
+				console.log("Intentando cargar imagenes aleatorias...");
 
-                try {
-                    const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
+				try {
+					const response = await fetch("https://randomuser.me/api/?inc=picture&results=100");
 
-                    console.log("Estado de la respuesta:", response.status);
-                    if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
-                    const randomImgData = await response.json();
+					console.log("Estado de la respuesta:", response.status);
+					if (!response.ok) throw new Error("Error en la carga de imágenes aleatoria");
+					const randomImgData = await response.json();
 
-                    if (Array.isArray(randomImgData.results)) {
-                        setStore({ UserImages: randomImgData.results })
-                        console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
+					if (Array.isArray(randomImgData.results)) {
+						setStore({ UserImages: randomImgData.results })
+						console.log("Imagenes Aleatorias cargadas correctamente", randomImgData.results);
 
-                    } else {
-                        console.error("Respuesta inesperada: `results` no es un array", randomImgData);
-                        setStore({ UserImages: [] });
-                    }
-                } catch (error) {
-                    console.error("Error al cargar usuarios aleatorios:", error);
-                }
+					} else {
+						console.error("Respuesta inesperada: `results` no es un array", randomImgData);
+						setStore({ UserImages: [] });
+					}
+				} catch (error) {
+					console.error("Error al cargar usuarios aleatorios:", error);
+				}
 
-            },
+			},
+
+			// Acción para cargar todos los códigos QR del usuario
+			loadQrCodes: async () => {
+				const store = getStore();
+
+				if (!store.authToken) {
+					console.error("Token JWT no disponible");
+					return;
+				}
+
+				try {
+					// Hacemos la solicitud para obtener los códigos QR
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user/${store.user.id}/qrcodes`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${store.authToken}`,  // Enviamos el token JWT para autenticar al usuario
+						},
+					});
+
+					if (response.ok) {
+						const qrCodes = await response.json();
+						console.log("QR Codes cargados:", qrCodes);
+
+						// Filtramos los QR para asegurarnos de que estamos obteniendo solo los de este usuario
+						const userQrCodes = qrCodes.qr_codes || [];
+						setStore({ qr_codes: userQrCodes });
+					} else {
+						console.error("Error al cargar los códigos QR");
+					}
+				} catch (error) {
+					console.error("Error al cargar los códigos QR:", error);
+				}
+			},
 
 		},
 	};

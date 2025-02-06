@@ -20,10 +20,8 @@ body {
     padding-top: 5px; /* Espacio superior */
 }
 
-/* Contenedor de las Tabs (Fijo en la parte superior del contactBody) */
+/* Contenedor de las Tabs (debe estar debajo del navbarHeader) */
 .contact-tabs {
-    position: sticky;
-    z-index: 50;
     width: 100%;
     max-width: 375px;
     display: flex;
@@ -31,6 +29,7 @@ body {
     overflow-x: auto;
     background: white;
     border-bottom: 2px solid #ddd;
+    margin-top: 20px; /* Espacio desde el navbarHeader */
 }
 
 /* Estilo de cada pestaña */
