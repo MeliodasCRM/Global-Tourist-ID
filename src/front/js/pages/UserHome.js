@@ -7,12 +7,10 @@ import ContactBanner from "../component/ContactBanner.jsx";
 import NavbarFooter from "../component/NavbarFooter.jsx";
 import UserQrCard from "../component/UserQrCard.jsx"; // Se asume que este componente se encuentra en la misma carpeta
 import "../../styles/userHome.css";
-
 const UserHome = () => {
   const { actions, store } = useContext(Context);
   const navigate = useNavigate();
   const [lastQr, setLastQr] = useState(null);
-
   useEffect(() => {
     const localToken = localStorage.getItem("authToken");
     if (!localToken || localToken === "null" || localToken === "undefined" || localToken.trim() === "") {
@@ -22,7 +20,6 @@ const UserHome = () => {
       fetchLastQr();
     }
   }, [navigate]);
-
   const fetchLastQr = async () => {
     try {
       const token = localStorage.getItem("authToken");
@@ -42,28 +39,15 @@ const UserHome = () => {
       console.log("Error al obtener el último QR");
     }
   };
-
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: lastQr.nombre,
-          text: `Del ${lastQr.fecha_inicio} al ${lastQr.fecha_fin}`,
-          url: window.location.href
-        });
-      }
-    } catch (error) {
-      console.log("Error al compartir");
-    }
+  const handleNavigation = (path) => {
+    navigate(path); // Navega a la ruta especificada
   };
-
   const handleLogOut = () => {
     console.log("Cerrando Sesión");
     localStorage.removeItem("authToken");
     actions.logout();
     navigate("/login", { replace: true });
   };
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -71,7 +55,6 @@ const UserHome = () => {
     const year = date.getFullYear().toString().slice(2); // Obtener solo las dos últimas cifras del año
     return `${day}/${month}/${year}`;
   };
-
   return (
     <div className="user-home-container">
       <NavbarHeader />
@@ -87,13 +70,11 @@ const UserHome = () => {
                 data={lastQr.data}
               />
             </div>
-
             <div className="qr-info-placeholder">
               <img src={lastQr.data} alt="QR Code" />
             </div>
-
             <div className="qr-info-buttons">
-              <button className="share-button" onClick={handleShare}>
+              <button className="share-button" onClick={() => handleNavigation('/share')}>
                 <FaShare />
               </button>
               <button className="copy-button">
@@ -103,8 +84,9 @@ const UserHome = () => {
           </>
         )}
       </div>
+      <ContactBanner />
+      <NavbarFooter />
     </div>
   );
 };
-
 export default UserHome;
