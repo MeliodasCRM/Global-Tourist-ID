@@ -93,7 +93,6 @@ const ContactBody = () => {
                 {/* ContactCard */}
                 <UserContactCard
                   id={contact.id}
-                  imageUrl={getRandomImage()}
                   nombre={contact.nombre}
                   primer_apellido={contact.primer_apellido}
                   segundo_apellido={contact.segundo_apellido}

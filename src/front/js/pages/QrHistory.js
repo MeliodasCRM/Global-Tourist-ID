@@ -41,7 +41,6 @@ const QrHistory = () => {
                 nombre={qrCode.nombre}
                 fecha_inicio={qrCode.fecha_inicio}
                 fecha_fin={qrCode.fecha_fin}
-                data={qrCode.data}
                 verContacto={handleVerContacto}
               />
             ))

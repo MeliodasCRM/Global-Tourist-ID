@@ -2,89 +2,74 @@
 .user-home-container {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Ocupa toda la altura de la ventana */
+  height: 100vh;
 }
 
 /* Contenedor de contenido */
 .user-home-content {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centrado vertical */
+  justify-content: flex-start; /* Alineación hacia el top */
   align-items: center; /* Centrado horizontal */
-  flex-grow: 1; /* Toma todo el espacio disponible entre el header y el footer */
-  text-align: center; /* Centrar el texto */
-  padding: 20px; /* Espaciado alrededor del contenido */
-}
-
-.user-home-content h1 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-}
-
-.user-home-content p {
-  font-size: 1.2rem;
-  color: #6c757d;
-}
-
-@media (min-width: 768px) {
-  .navbar-header,
-  .navbar-footer,
-  .contact-banner {
-    max-width: 100%;
-  }
-
-  .user-home-content {
-    margin-bottom: 160px;
-  }
-}
-
-/* 📌 CAJA DEL VIAJE (Título) */
-.user-home .trip-info {
+  flex-grow: 0; /* No crecer más allá de la altura que se le asigna */
+  height: 548px; /* Altura específica */
+  padding: 0 20px; /* Eliminamos el margen superior y agregamos solo padding horizontal */
   background-color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 90%;
-  max-width: 450px;
-  margin-top: 50px; /* 🔼 Mueve la caja más arriba */
+  overflow-y: auto; /* Permite el desplazamiento si el contenido es más largo */
+  margin-top: 70px; /* Alinea el contenido pegado al navbarHeader */
 }
 
-/* 📌 CAJA DEL QR */
-.user-home .qr-container {
+/* Ajustar la caja del QR info card */
+.qr-info-card {
+  width: 300px;
+  height: 85px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 1px solid #A4A4A4;
+  background: #FFF;
+  box-shadow: 0px 4px 4px 0px #525AA6;
+  margin-top: 30px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* CAJA DE QR: El placeholder de la imagen del QR */
+.qr-info-placeholder {
+  width: 181px;
+  height: 181px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 4px solid #4D549C;
+  box-shadow: 0px 0px 25px 0px #333;
+  margin-top: 30px;
+  background-size: contain;
+  background-position: center;
+  display: flex;
+  justify-content: center; /* Alineación horizontal */
+  align-items: center; /* Alineación vertical */
+}
+
+.qr-info-placeholder img {
+  width: 100%; /* La imagen ocupará todo el tamaño del contenedor */
+  height: 100%;
+  object-fit: contain; /* Hace que la imagen se ajuste proporcionalmente */
+}
+
+/* BOTONES DE ACCIÓN (Compartir y Copiar) */
+.qr-info-buttons {
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background-color: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-  width: 60%;
-  max-width: 250px;
-  min-height: 200px;
-  margin-top: 40px; /* 🔼 Mueve el QR más arriba */
+  gap: 30px;
+  margin-top: 30px;
 }
 
-
-/* 📌 CÓDIGO QR */
-.user-home .qr-image {
-  width: 150px;
-  height: 150px;
-}
-
-/* 📌 ICONOS DEBAJO DEL QR */
-.user-home .action-buttons {
-  display: flex;
-  justify-content: center; /* ✅ Centra los iconos horizontalmente */
-  gap: 15px;
-  margin-top: 15px;
-}
-
-.user-home .action-button {
+.share-button, .copy-button {
   background-color: #525AA6;
   border: none;
-  border-radius: 10px;
+  border-radius: 50%;
   width: 60px;
   height: 60px;
   display: flex;
@@ -96,38 +81,18 @@
   transition: transform 0.2s ease-in-out;
 }
 
-.user-home .action-button:hover {
-  transform: scale(1.15);
+.share-button:hover, .copy-button:hover {
+  transform: scale(1.1);
 }
 
-/* 📌 BARRA DE NAVEGACIÓN INFERIOR */
-.user-home .bottom-nav {
-  background-color: #525AA6; /* ✅ Color exacto de la imagen */
-  width: 100%;
+/* Estilos para el ContactBanner y NavbarFooter */
+.contact-banner {
+  margin-top: 30px; /* Separación después del contenido */
+}
+
+.navbar-footer {
   position: fixed;
   bottom: 0;
+  width: 100%;
   left: 0;
-  display: flex;
-  justify-content: space-around; /* ✅ Espacia los iconos uniformemente */
-  align-items: center;
-  padding: 5px 0;
-  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* 📌 ICONOS EN LA NAVBAR INFERIOR */
-.user-home .nav-item {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.user-home .nav-item.active {
-  color: yellow; /* ✅ Resalta el icono activo */
-}
-
-.user-home .nav-item:hover {
-  transform: scale(1.1); /* Efecto de escala al pasar el cursor */
-  transition: transform 1.05s ease-in-out;
 }
