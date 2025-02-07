@@ -16,7 +16,7 @@ const QrHistory = () => {
   // Cargar los códigos QR si están vacíos
   useEffect(() => {
     console.log("Ejecutando useEffect para cargar QR codes...");
-    console.log("user.id:", store.user?.id);  // Verifica el valor del ID del usuario
+    console.log("user.id:", store.user?.id); 
 
     if (store.qr_codes.length === 0) {
       actions.loadQrCodes();

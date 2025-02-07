@@ -7,7 +7,11 @@ import NavbarHeader from "../component/NavbarHeader.jsx";
 import ContactBanner from "../component/Banner.jsx";
 import NavbarFooter from "../component/NavbarFooter.jsx";
 import UserQrCard from "../component/UserQrCard.jsx"; // Se asume que este componente se encuentra en la misma carpeta
+import pako from 'pako';
+import { Html5QrcodeScanner, Html5Qrcode } from 'html5-qrcode';
 import "../../styles/userHome.css";
+
+
 const UserHome = () => {
   const { actions, store } = useContext(Context);
   const navigate = useNavigate();
@@ -42,15 +46,18 @@ const UserHome = () => {
       console.log("Error al obtener el último QR");
     }
   };
+
   const handleNavigation = (path) => {
     navigate(path); // Navega a la ruta especificada
   };
+
   const handleLogOut = () => {
     console.log("Cerrando Sesión");
     localStorage.removeItem("authToken");
     actions.logout();
     navigate("/login", { replace: true });
   };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -58,6 +65,33 @@ const UserHome = () => {
     const year = date.getFullYear().toString().slice(2); // Obtener solo las dos últimas cifras del año
     return `${day}/${month}/${year}`;
   };
+
+  const handleCopy = async () => {
+    if (lastQr && lastQr.data) {
+      try {
+        const scannerDiv = document.createElement('div');
+        scannerDiv.id = 'reader';
+        scannerDiv.style.display = 'none';
+        document.body.appendChild(scannerDiv);
+        const html5QrCode = new Html5Qrcode("reader");
+        const response = await fetch(lastQr.data);
+        const blob = await response.blob();
+        const file = new File([blob], "qr.png", { type: "image/png" });
+        try {
+          const decodedText = await html5QrCode.scanFile(file, true);
+          const jsonData = JSON.parse(decodedText);
+          await navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2));
+          alert("Contenido del QR copiado exitosamente");
+        } finally {
+          html5QrCode.clear();
+          document.body.removeChild(scannerDiv);
+        }
+      } catch (error) {
+        console.log("Error al procesar y copiar el QR:", error);
+      }
+    }
+  };
+
   return (
     <div className="view-container">
       <Container fluid className="d-flex flex-column p-0 m-0 h-100">
@@ -86,7 +120,7 @@ const UserHome = () => {
                   <button className="share-button" onClick={() => handleNavigation('/share')}>
                     <FaShare />
                   </button>
-                  <button className="copy-button">
+                  <button className="copy-button" onClick={handleCopy}>
                     <FaCopy />
                   </button>
                 </div>
