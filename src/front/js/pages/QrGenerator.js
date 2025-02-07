@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { FaArrowLeft, FaBars, FaHome, FaUser, FaQrcode, FaHistory, FaCheck, FaCalendarAlt } from "react-icons/fa";
 import NavbarHeader from "../component/NavbarHeader.jsx";
-import ContactBanner from "../component/ContactBanner.jsx";
+import ContactBanner from "../component/Banner.jsx";
 import NavbarFooter from "../component/NavbarFooter.jsx";
 import "../../styles/QrGenerator.css";
 const isValidDate = (dateStr) => {

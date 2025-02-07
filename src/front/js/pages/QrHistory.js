@@ -4,7 +4,7 @@ import { Context } from "../store/appContext";
 import { Container, Row, Col } from "react-bootstrap"; // Usamos react-bootstrap para el layout
 import NavbarHeader from "../component/NavbarHeader.jsx";
 import UserQrCard from "../component/UserQrCard.jsx";
-import ContactBanner from "../component/ContactBanner.jsx";
+import ContactBanner from "../component/Banner.jsx";
 import NavbarFooter from "../component/NavbarFooter.jsx";
 import "../../styles/qrView/qrhistory.css";
 
@@ -43,13 +43,12 @@ const QrHistory = () => {
 
   return (
     <div className="view-container">
-      <Container fluid className="d-flex flex-column p-0 m-0">
-        {/* First Row: Header (Sticky on Top) */}
+      <Container fluid className="d-flex flex-column p-0 m-0 H-100">
+
         <Row className="view-header sticky-top g-0">
           <NavbarHeader prevLocation={location.state?.from} />
         </Row>
 
-        {/* Second Row: View Body */}
         <Row className="view-body g-0">
           {store.qr_codes && store.qr_codes.length > 0 ? (
             store.qr_codes.map((qrCode) => (
@@ -68,13 +67,11 @@ const QrHistory = () => {
           )}
         </Row>
 
-        {/* Third Row: Banner */}
-        <Row className="view-banner sticky-bottom g-0">
+        <Row className="view-banner m-0 g-0">
           <ContactBanner />
         </Row>
 
-        {/* Fourth Row: Footer */}
-        <Row className="view-footer sticky-bottom g-0">
+        <Row className="view-footer m-0 g-0">
           <NavbarFooter />
         </Row>
       </Container>

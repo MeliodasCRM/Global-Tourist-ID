@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { Container, Row } from "react-bootstrap";
 import { FaShare, FaCopy } from "react-icons/fa";  // Usamos los nuevos iconos de react-icons
 import NavbarHeader from "../component/NavbarHeader.jsx";
-import ContactBanner from "../component/ContactBanner.jsx";
+import ContactBanner from "../component/Banner.jsx";
 import NavbarFooter from "../component/NavbarFooter.jsx";
 import UserQrCard from "../component/UserQrCard.jsx"; // Se asume que este componente se encuentra en la misma carpeta
 import "../../styles/userHome.css";
@@ -13,7 +14,7 @@ const UserHome = () => {
   const [lastQr, setLastQr] = useState(null);
   useEffect(() => {
     const localToken = localStorage.getItem("authToken");
-    
+
 
     if (!localToken || localToken === "null" || localToken === "undefined" || localToken.trim() === "") {
       console.log("Token inválido. Redirigiendo a Login...");
@@ -58,36 +59,51 @@ const UserHome = () => {
     return `${day}/${month}/${year}`;
   };
   return (
-    <div className="user-home-container">
-      <NavbarHeader />
-      <div className="user-home-content">
-        {lastQr && (
-          <>
-            <div className="qr-info-card">
-              <UserQrCard
-                id={lastQr.id}
-                nombre={lastQr.nombre}
-                fecha_inicio={formatDate(lastQr.fecha_inicio)}
-                fecha_fin={formatDate(lastQr.fecha_fin)}
-                data={lastQr.data}
-              />
-            </div>
-            <div className="qr-info-placeholder">
-              <img src={lastQr.data} alt="QR Code" />
-            </div>
-            <div className="qr-info-buttons">
-              <button className="share-button" onClick={() => handleNavigation('/share')}>
-                <FaShare />
-              </button>
-              <button className="copy-button">
-                <FaCopy />
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-      <ContactBanner />
-      <NavbarFooter />
+    <div className="view-container">
+      <Container fluid className="d-flex flex-column p-0 m-0 h-100">
+
+        <Row className="view-header sticky-top g-0">
+          <NavbarHeader />
+        </Row>
+
+        <Row className="view-body m-0 p-0 g-0">
+          <div className="user-home-content">
+            {lastQr && (
+              <>
+                <div className="qr-info-card">
+                  <UserQrCard
+                    id={lastQr.id}
+                    nombre={lastQr.nombre}
+                    fecha_inicio={formatDate(lastQr.fecha_inicio)}
+                    fecha_fin={formatDate(lastQr.fecha_fin)}
+                    data={lastQr.data}
+                  />
+                </div>
+                <div className="qr-info-placeholder">
+                  <img src={lastQr.data} alt="QR Code" />
+                </div>
+                <div className="qr-info-buttons">
+                  <button className="share-button" onClick={() => handleNavigation('/share')}>
+                    <FaShare />
+                  </button>
+                  <button className="copy-button">
+                    <FaCopy />
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </Row>
+
+        <Row className="view-banner m-0 p-0 g-0">
+          <ContactBanner />
+        </Row>
+
+        <Row className="view-footer m-0 p-0 g-0">
+          <NavbarFooter />
+        </Row>
+
+      </Container>
     </div>
   );
 };

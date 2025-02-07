@@ -2,20 +2,22 @@
 .view-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  min-width: 375px;  /* Mínimo de 375px de ancho */
+  height: 100vh; /* Ocupa toda la altura de la pantalla */
+  width: 100%; /* Ocupa todo el ancho */
+  padding: 0;
+  margin: 0;
 }
 
-/* Aseguramos que el header tenga un alto de 70px */
+/* El header tiene un alto fijo de 70px */
 .view-header {
   position: sticky;
   top: 0;
-  height: 70px;
-  z-index: 10; /* Asegura que el header esté siempre sobre el contenido */
-  width: 100%; /* Asegura que el header ocupe todo el ancho */
+  height: 70px; /* Alto fijo para el header */
+  z-index: 10;
+  width: 100%; /* Ocupa todo el ancho */
 }
 
+/* Aseguramos que el view-body ocupe el espacio restante */
 .view-body {
   display: flex;
   flex-direction: column;
@@ -23,8 +25,10 @@
   justify-content: flex-start;
   padding-top: 20px;
   overflow-y: auto;
-
+  flex-grow: 1; /* Esto permite que el body ocupe el espacio restante */
+  margin: 0; /* Sin márgenes para ajustarse bien */
 }
+
 /* Eliminamos márgenes y paddings */
 .view-header, .view-footer {
   width: 100%;
@@ -34,13 +38,31 @@
 
 /* Banner fuera del layout */
 .view-banner {
-  position: relative;
   background-color: #f8f9fa; /* Fondo claro para el banner */
   height: 100px;  /* Altura fija para el banner */
+  width: 100%; /* Asegura que el banner ocupe todo el ancho */
+  position: absolute;
+  bottom: 50px; /* Pegado al fondo */
+  left: 0;
 }
 
 /* Footer con altura de 50px */
 .view-footer {
   background-color: #f8f9fa; /* Fondo claro para el footer */
   height: 50px;  /* Altura fija para el footer */
+  width: 100%;  /* Asegura que el footer ocupe todo el ancho */
+  position: relative;
+  bottom: 0; /* Asegura que el footer quede en la parte inferior */
+  margin-top: 0;  /* Asegura que no haya espacio entre el footer y el banner */
+}
+
+/* Estilos del banner y footer en pantallas pequeñas */
+@media (max-width: 768px) {
+  .view-banner {
+    height: 100px; /* Puedes ajustar el tamaño del banner en pantallas pequeñas */
+  }
+
+  .view-footer {
+    height: 50px; /* Puedes ajustar la altura del footer en pantallas pequeñas */
+  }
 }
