@@ -1,6 +1,8 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
 import { FaTrashAlt } from "react-icons/fa"; // Icono de borrar
+import { BsQrCodeScan } from "react-icons/bs";
+
 import "../../styles/qrView/qrcard.css"; // Usamos los estilos desde el archivo CSS
 
 const UserQrCard = ({ id, nombre, fecha_inicio, fecha_fin, verContacto, borrarQR }) => {
@@ -12,11 +14,11 @@ const UserQrCard = ({ id, nombre, fecha_inicio, fecha_fin, verContacto, borrarQR
 
   return (
     <div className="qr-card-container">
-      <Row noGutters className="qr-card-content">
+      <Row noGutters className="qr-card-content m-0">
         {/* Columna 1: Imagen QR */}
         <Col xs="auto" className="qr-img-col">
           <div className="qr-img">
-            <div className="qr-icon">QR</div>
+            <BsQrCodeScan />
           </div>
         </Col>
 

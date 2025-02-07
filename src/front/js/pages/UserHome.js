@@ -13,6 +13,8 @@ const UserHome = () => {
   const [lastQr, setLastQr] = useState(null);
   useEffect(() => {
     const localToken = localStorage.getItem("authToken");
+    
+
     if (!localToken || localToken === "null" || localToken === "undefined" || localToken.trim() === "") {
       console.log("Token inválido. Redirigiendo a Login...");
       navigate("/login", { replace: true });

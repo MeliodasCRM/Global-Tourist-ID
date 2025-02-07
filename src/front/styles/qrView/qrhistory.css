@@ -1,48 +1,46 @@
-/* qrhistory.css */
-
-/* Contenedor principal */
-.qr-history-container {
+/* Contenedor principal para toda la vista */
+.view-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
+  min-width: 375px;  /* Mínimo de 375px de ancho */
 }
 
-/* Header sticky en la parte superior */
-.qr-history-header {
+/* Aseguramos que el header tenga un alto de 70px */
+.view-header {
   position: sticky;
   top: 0;
-  z-index: 10;
-  background-color: white;
-  /* Sin margen ni padding */
+  height: 70px;
+  z-index: 10; /* Asegura que el header esté siempre sobre el contenido */
+  width: 100%; /* Asegura que el header ocupe todo el ancho */
 }
 
-/* Footer sticky en la parte inferior */
-.qr-history-footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  background-color: white;
-  height: 50px; /* Ajusta el tamaño del footer */
-}
-
-/* Contenedor del cuerpo */
-.qr-history-body {
-  flex-grow: 1; /* Esto asegura que ocupa el espacio disponible entre el header y el footer */
-  overflow-y: auto; /* Agrega el scroll vertical */
-  padding: 10px; /* Agrega el padding que solicitaste */
-  margin-top: 10px; /* Deja espacio para no solaparse con el header */
+.view-body {
   display: flex;
-  justify-content: center; /* Centra las tarjetas horizontalmente */
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+  overflow-y: auto;
+
+}
+/* Eliminamos márgenes y paddings */
+.view-header, .view-footer {
+  width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
-/* Títulos y textos */
-.qr-history-body h1 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
+/* Banner fuera del layout */
+.view-banner {
+  position: relative;
+  background-color: #f8f9fa; /* Fondo claro para el banner */
+  height: 100px;  /* Altura fija para el banner */
 }
 
-.qr-history-body p {
-  font-size: 1rem;
-  color: #6c757d;
+/* Footer con altura de 50px */
+.view-footer {
+  background-color: #f8f9fa; /* Fondo claro para el footer */
+  height: 50px;  /* Altura fija para el footer */
 }
