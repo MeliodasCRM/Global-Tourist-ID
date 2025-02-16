@@ -20,8 +20,9 @@ if environment == "both":
     print(f"""
     Welcome to the full-stack template at 4Geeks 😁.
     
-    1. Start by running your 🐍 python backend using the command {blue("$ pipenv run start")}
-    2. Open a new terminal to run your front-end with the following command {blue("$ npm run start")}
+    1. Run database migrations with $ pipenv run flask db migrate && pipenv run flask db upgrade
+    2. Start by running your 🐍 python backend using the command {blue("$ pipenv run start")}
+    3. Open a new terminal to run your front-end with the following command {blue("$ npm run start")}
 
     Note: ⚠️ Please keep in mind you will always need two terminals, one for the front end, one for the back-end.
     🛟 You can find documentation here: https://start.4geeksacademy.com
