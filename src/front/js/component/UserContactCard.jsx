@@ -44,19 +44,6 @@ const UserContactCard = ({
           <span className="contact-name">{nombre} {primer_apellido} {segundo_apellido}</span>
           <span className="contact-text"><FaPhoneAlt /> {telefono_movil}</span>
           <span className="contact-text"><AiTwotoneMail /> {email}</span>
-
-          {/* Fila de botones de acción dentro de la columna de texto */}
-          <div className="contact-actions">
-            <div className="contact-action-btn" onClick={() => verContacto(id)}>
-              <FaEye />
-            </div>
-            <div className="contact-action-btn" onClick={() => handleEditContact(id)}>
-              <FaEdit />
-            </div>
-            <div className="contact-action-btn" onClick={() => handleDeleteContact(id)}>
-              <FaTrash />
-            </div>
-          </div>
         </div>
       </div>
     </li>

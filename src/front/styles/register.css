@@ -45,6 +45,7 @@
 }
 
 .input-icon {
+  margin-top: 8px;
   position: absolute;
   left: 10px;
   top: 50%;
@@ -156,4 +157,13 @@
 .input-wrapper input[type="email"],
 .input-wrapper input[type="password"] {
     padding-left: 50px; /* 🔹 Empuja el texto más a la derecha */
+}
+.underline-blue {
+  text-decoration: underline;
+  color: blue; /* Cambia el color a azul */
+  cursor: pointer; /* Opcional: para que parezca un enlace */
+}
+
+.underline-blue:hover {
+  color: darkblue; /* Cambia el color al pasar el mouse */
 }

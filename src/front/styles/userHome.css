@@ -125,3 +125,29 @@
 .share-button:hover, .copy-button:hover {
   transform: scale(1.1);
 }
+.profile-alert {
+  width: 300px;
+  padding: 15px;
+  background: #525AA6;
+  color: white;
+  border-radius: 6px;
+  text-align: center;
+  margin: 20px auto;
+  box-shadow: 0px 4px 4px 0px rgba(82, 90, 166, 0.3);
+}
+
+.profile-alert button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: white;
+  color: #525AA6;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.profile-alert button:hover {
+  background: #f0f0f0;
+}

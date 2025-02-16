@@ -144,3 +144,33 @@
   align-items: center;
   padding-top: 10px;
 }
+.no-contacts-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+  color: #525aa6;
+}
+
+.no-contacts-message p {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.no-contacts-message .arrow-down {
+  color: #525aa6;
+  font-size: 24px;
+  margin-top: 10px;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}

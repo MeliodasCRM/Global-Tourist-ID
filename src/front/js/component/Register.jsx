@@ -1,34 +1,78 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import "../../styles/register.css";
 
 export const Register = () => {
   const { actions } = useContext(Context);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    language: "es"
+    language: "es",
   });
   const [activeTab, setActiveTab] = useState("login");
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    const newErrors = {};
+  
+    // Validación de email
+    if (!formData.email.trim()) {
+      newErrors.email = "El correo es requerido.";
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Por favor, introduce un correo válido.";
+    }
+  
+    // Validación de contraseña
+    if (!formData.password) {
+      newErrors.password = "La contraseña es requerida.";
+    } else if (activeTab === "signup" && !validatePassword(formData.password)) {
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.";
+    }
+  
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      if (newErrors.email) alert(newErrors.email);
+      if (newErrors.password) alert(newErrors.password);
+      return;
+    }
+  
+    // Lógica de autenticación
     if (activeTab === "login") {
-      await actions.login(formData.email, formData.password);
+      const loginSuccess = await actions.login(formData.email, formData.password);
+      if (!loginSuccess) {
+        alert("Correo o contraseña incorrectos"); // Nueva alerta para login fallido
+      }
     } else {
-      const result = await actions.signup(formData.email, formData.password, formData.language);
+      const result = await actions.signup(
+        formData.email,
+        formData.password,
+        formData.language
+      );
       if (result.success) {
         alert("Registro exitoso. Ahora puedes iniciar sesión.");
-        setActiveTab("login"); // Cambia a la pestaña de login
-        setFormData({ email: "", password: "", language: "es" }); // Limpia los campos
-        navigate("/login"); // Redirige al login
+        setActiveTab("login");
+        setFormData({ email: "", password: "", language: "es" });
+        navigate("/login");
       } else {
         alert("Error en el registro. Inténtalo de nuevo.");
       }
@@ -37,18 +81,19 @@ export const Register = () => {
 
   return (
     <div className="auth-container">
-      {/* 1️⃣ Caja superior (Welcome / Create Account) */}
       <div className="auth-header">
         <h2>{activeTab === "login" ? "Welcome back!" : "Create an account!"}</h2>
         <p>
           {activeTab === "login" ? "Login below or " : "Enter your account details below or "}
-          <span className="switch-tab" onClick={() => setActiveTab(activeTab === "login" ? "signup" : "login")}>
+          <span
+            className="switch-tab underline-blue"
+            onClick={() => setActiveTab(activeTab === "login" ? "signup" : "login")}
+          >
             {activeTab === "login" ? "create an account" : "Log In"}
           </span>
         </p>
       </div>
 
-      {/* 2️⃣ Caja intermedia (Formulario - SOLO INPUTS) */}
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="input-wrapper">
           <label htmlFor="email">Email</label>
@@ -59,9 +104,9 @@ export const Register = () => {
             placeholder="Enter your email"
             value={formData.email}
             onChange={handleChange}
-            required
           />
           <AiOutlineMail className="input-icon" />
+          {errors.email && <span className="error-message">{errors.email}</span>}
         </div>
 
         <div className="input-wrapper">
@@ -73,12 +118,11 @@ export const Register = () => {
             placeholder="Enter your password"
             value={formData.password}
             onChange={handleChange}
-            required
           />
           <AiOutlineLock className="input-icon" />
+          {errors.password && <span className="error-message">{errors.password}</span>}
         </div>
 
-        {/* Selector de idioma solo en Sign Up */}
         {activeTab === "signup" && (
           <div className="input-wrapper">
             <label htmlFor="language">Language</label>
@@ -91,16 +135,12 @@ export const Register = () => {
               <option value="es">Español (es)</option>
               <option value="en">Inglés (en)</option>
             </select>
-
           </div>
         )}
       </form>
 
-      {/* 3️⃣ Caja inferior (QR y Botón - FUERA DEL FORMULARIO) */}
       <div className="auth-footer">
-        <div className="divider"></div> {/* Línea divisora */}
-
-        {/* QR Code en lugar del texto */}
+        <div className="divider"></div>
         <div className="qr-container">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +161,6 @@ export const Register = () => {
           </svg>
         </div>
 
-        {/* Botón de login/signup */}
         <button className="auth-button" onClick={handleSubmit}>
           {activeTab === "login" ? "Login" : "Sign Up"}
         </button>

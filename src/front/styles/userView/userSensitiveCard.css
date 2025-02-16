@@ -1,92 +1,83 @@
-.contact-card {
-    width: 320px;
-    padding: 10px;
-    margin-top: 10px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
+/* userSensitiveCard.css */
+.sensitive-card {
+    width: 90%;
+    max-width: 400px;
+    padding: 16px;
+    margin: 8px auto;
+    background: #fafafa;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(82, 90, 166, 0.08);
+    border: 1px solid #f0f0f0;
 }
 
-/* Contenedor de las dos columnas */
-.contact-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-/* Columna fija para la imagen */
-.contact-image-container {
-    width: 56px;
-    height: 56px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    border-radius: 50%;
-    background: #e0e0e0;
-}
-
-.contact-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-/* Columna flexible para la información y botones */
-.contact-info {
-    flex-grow: 1;
-    padding-left: 10px;
+.sensitive-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    text-align: left;
-    width: calc(100% - 56px); /* Ajuste del ancho restante */
+    gap: 12px;
+    width: 100%;
 }
 
-/* Nombre y apellidos en negrita */
-.contact-name {
-    font-weight: bold;
-    font-size: 16px;
-    color: #333;
+.sensitive-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-/* Espaciado entre líneas */
-.contact-text {
+.sensitive-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #525aa6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sensitive-title svg {
+    font-size: 18px;
+}
+
+.sensitive-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 14px;
     color: #666;
-    display: flex;
-    align-items: center;
-    gap: 5px; /* Espacio entre icono y texto */
-    margin-top: 5px; /* Espaciado entre líneas */
+    padding: 4px 0;
 }
 
-/* Contenedor de los botones dentro de la columna de texto */
-.contact-actions {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 8px;
+.sensitive-text svg {
+    color: #525aa6;
+    min-width: 16px;
+    font-size: 16px;
 }
 
-/* Estilos para los botones de acción */
-.contact-action-btn {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #525aa6;
-    color: white;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s ease-in-out;
+.sensitive-data {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #eee;
 }
 
-.contact-action-btn:hover {
-    background: #0056b3;
+@media (max-width: 360px) {
+    .contact-card,
+    .sensitive-card {
+        width: 95%;
+        padding: 14px;
+        margin: 8px auto;
+    }
+
+    .contact-image-container {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+    }
+
+    .contact-name {
+        font-size: 15px;
+    }
+
+    .contact-text,
+    .sensitive-text {
+        font-size: 13px;
+    }
 }

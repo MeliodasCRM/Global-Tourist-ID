@@ -2,23 +2,27 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Container, Row } from "react-bootstrap";
-import { FaShare, FaCopy } from "react-icons/fa";  // Usamos los nuevos iconos de react-icons
+import { FaShare, FaCopy } from "react-icons/fa";
 import NavbarHeader from "../component/NavbarHeader.jsx";
 import ContactBanner from "../component/Banner.jsx";
 import NavbarFooter from "../component/NavbarFooter.jsx";
-import UserQrCard from "../component/UserQrCard.jsx"; // Se asume que este componente se encuentra en la misma carpeta
+import UserQrCard from "../component/UserQrCard.jsx";
 import pako from 'pako';
 import { Html5QrcodeScanner, Html5Qrcode } from 'html5-qrcode';
+import { useTranslation } from 'react-i18next';
 import "../../styles/userHome.css";
-
 
 const UserHome = () => {
   const { actions, store } = useContext(Context);
   const navigate = useNavigate();
   const [lastQr, setLastQr] = useState(null);
+  const [showProfileAlert, setShowProfileAlert] = useState(true);
+  const { t } = useTranslation();
+
   useEffect(() => {
     const localToken = localStorage.getItem("authToken");
-
+    const hasVisitedProfile = localStorage.getItem('hasVisitedProfile');
+    setShowProfileAlert(!hasVisitedProfile);
 
     if (!localToken || localToken === "null" || localToken === "undefined" || localToken.trim() === "") {
       console.log("Token inválido. Redirigiendo a Login...");
@@ -27,6 +31,7 @@ const UserHome = () => {
       fetchLastQr();
     }
   }, [navigate]);
+
   const fetchLastQr = async () => {
     try {
       const token = localStorage.getItem("authToken");
@@ -48,7 +53,13 @@ const UserHome = () => {
   };
 
   const handleNavigation = (path) => {
-    navigate(path); // Navega a la ruta especificada
+    navigate(path);
+  };
+
+  const handleProfileRedirect = () => {
+    navigate("/userinfo");
+    localStorage.setItem('hasVisitedProfile', 'true');
+    setShowProfileAlert(false);
   };
 
   const handleLogOut = () => {
@@ -61,8 +72,8 @@ const UserHome = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses empiezan desde 0
-    const year = date.getFullYear().toString().slice(2); // Obtener solo las dos últimas cifras del año
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear().toString().slice(2);
     return `${day}/${month}/${year}`;
   };
 
@@ -95,13 +106,20 @@ const UserHome = () => {
   return (
     <div className="view-container">
       <Container fluid className="d-flex flex-column p-0 m-0 h-100">
-
         <Row className="view-header sticky-top g-0">
           <NavbarHeader />
         </Row>
 
         <Row className="view-body m-0 p-0 g-0">
           <div className="user-home-content">
+            {showProfileAlert && (
+              <div className="profile-alert">
+                <p>{t('Para mostrar tu código QR, necesitas completar tu perfil')}</p>
+                <button onClick={handleProfileRedirect}>
+                  {t('Ir a mi perfil')}
+                </button>
+              </div>
+            )}
             {lastQr && (
               <>
                 <div className="qr-info-card">
@@ -141,4 +159,5 @@ const UserHome = () => {
     </div>
   );
 };
+
 export default UserHome;
