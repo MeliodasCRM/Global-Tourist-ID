@@ -2,12 +2,6 @@
 
 Bienvenido a **Global Tourist ID**, un sistema diseñado para simplificar el registro de turistas mediante la generación de identificaciones únicas de acuerdo al Real Decreto 933/2021. Este proyecto facilita la recolección y almacenamiento de datos de viajeros de manera eficiente y segura.
 
-## 🚀 Demo en Vivo
-
-¡Prueba la aplicación en acción! Accede a la versión en vivo en el siguiente enlace:
-
-🔗 [Demo en vivo](#)
-
 ---
 
 ## ⚙️ Tecnologías Implementadas
