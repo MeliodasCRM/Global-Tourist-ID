@@ -1,81 +1,90 @@
-# WebApp boilerplate with React JS and Flask API
+# 🌍 Global Tourist ID
 
-Build web applications using React.js for the front end and python/flask for your backend API.
+Bienvenido a **Global Tourist ID**, un sistema diseñado para simplificar el registro de turistas mediante la generación de identificaciones únicas de acuerdo al Real Decreto 933/2021. Este proyecto facilita la recolección y almacenamiento de datos de viajeros de manera eficiente y segura.
 
-- Documentation can be found here: https://start.4geeksacademy.com/starters/react-flask
-- Here is a video on [how to use this template](https://www.loom.com/share/f37c6838b3f1496c95111e515e83dd9b)
-- Integrated with Pipenv for package managing.
-- Fast deployment to heroku [in just a few steps here](https://start.4geeksacademy.com/backend/deploy-heroku-posgres).
-- Use of .env file.
-- SQLAlchemy integration for database abstraction.
+## 🚀 Demo en Vivo
 
-### 1) Installation:
+¡Prueba la aplicación en acción! Accede a la versión en vivo en el siguiente enlace:
 
-> If you use Github Codespaces (recommended) or Gitpod this template will already come with Python, Node and the Posgres Database installed. If you are working locally make sure to install Python 3.10, Node 
+🔗 [Demo en vivo](#)
 
-It is recomended to install the backend first, make sure you have Python 3.8, Pipenv and a database engine (Posgress recomended)
+---
 
-1. Install the python packages: `$ pipenv install`
-2. Create a .env file based on the .env.example: `$ cp .env.example .env`
-3. Install your database engine and create your database, depending on your database you have to create a DATABASE_URL variable with one of the possible values, make sure you replace the valudes with your database information:
+## ⚙️ Tecnologías Implementadas
 
-| Engine    | DATABASE_URL                                        |
-| --------- | --------------------------------------------------- |
-| SQLite    | sqlite:////test.db                                  |
-| MySQL     | mysql://username:password@localhost:port/example    |
-| Postgress | postgres://username:password@localhost:5432/example |
+Este proyecto utiliza un conjunto de herramientas modernas para garantizar un desarrollo escalable y eficiente:
 
-4. Migrate the migrations: `$ pipenv run migrate` (skip if you have not made changes to the models on the `./src/api/models.py`)
-5. Run the migrations: `$ pipenv run upgrade`
-6. Run the application: `$ pipenv run start`
+- **Flask** 🐍: Framework backend para manejar solicitudes y la lógica del servidor.
+- **SQLAlchemy** 🗄️: ORM utilizado para gestionar la base de datos.
+- **React** ⚛️: Framework de frontend para una experiencia de usuario dinámica.
+- **Bootstrap** 🎨: Para el diseño responsivo y estilizado de la interfaz.
+- **JWT** 🔑: Implementación de autenticación segura con JSON Web Tokens.
 
-> Note: Codespaces users can connect to psql by typing: `psql -h localhost -U gitpod example`
+---
 
-### Undo a migration
+## 🌟 Funcionalidades Principales
 
-You are also able to undo a migration by running
+✅ **Registro y autenticación de usuarios**  
+✅ **Generación de identificaciones únicas para turistas**  
+✅ **Almacenamiento seguro de datos**  
+✅ **Interfaz adaptativa para distintos dispositivos**  
+✅ **Exportación de información en formato QR**  
 
-```sh
-$ pipenv run downgrade
-```
+---
 
-### Backend Populate Table Users
+## 📦 Instalación y Uso
 
-To insert test users in the database execute the following command:
+Para ejecutar este proyecto en tu entorno local, sigue estos pasos:
 
-```sh
-$ flask insert-test-users 5
-```
+1. Clona el repositorio:
+   ```sh
+   git clone https://github.com/MeliodasCRM/Global-Tourist-ID.git
+   ```
+2. Accede al directorio del proyecto:
+   ```sh
+   cd Global-Tourist-ID
+   ```
+3. Instala las dependencias necesarias:
+   ```sh
+   pip install -r requirements.txt
+   ```
+4. Inicia el servidor:
+   ```sh
+   flask run
+   ```
+5. La aplicación estará disponible en `http://localhost:5000` 🚀
 
-And you will see the following message:
+---
 
-```
-  Creating test users
-  test_user1@test.com created.
-  test_user2@test.com created.
-  test_user3@test.com created.
-  test_user4@test.com created.
-  test_user5@test.com created.
-  Users created successfully!
-```
+## 📷 Capturas de Pantalla
 
-### **Important note for the database and the data inside it**
+📌 **Interfaz Principal**  
+📌 **Generación de QR**  
+📌 **Gestión de Usuarios**  
 
-Every Github codespace environment will have **its own database**, so if you're working with more people eveyone will have a different database and different records inside it. This data **will be lost**, so don't spend too much time manually creating records for testing, instead, you can automate adding records to your database by editing ```commands.py``` file inside ```/src/api``` folder. Edit line 32 function ```insert_test_data``` to insert the data according to your model (use the function ```insert_test_users``` above as an example). Then, all you need to do is run ```pipenv run insert-test-data```.
+*(Agregar capturas de pantalla relevantes aquí.)*
 
-### Front-End Manual Installation:
+---
 
--   Make sure you are using node version 14+ and that you have already successfully installed and runned the backend.
+## 🔄 Desarrollo Futuro
 
-1. Install the packages: `$ npm install`
-2. Start coding! start the webpack dev server `$ npm run start`
+🚀 **Optimización del rendimiento**  
+🔐 **Mejoras en la seguridad de autenticación**  
+📱 **Experiencia de usuario mejorada en móviles**  
+📊 **Integración con APIs externas para validaciones adicionales**  
 
-## Publish your website!
+---
 
-This boilerplate it's 100% read to deploy with Render.com and Heroku in a matter of minutes. Please read the [official documentation about it](https://start.4geeksacademy.com/deploy).
+## 👥 Contribuciones
 
-### Contributors
+Si deseas colaborar en este proyecto, sigue estos pasos:
 
-This template was built as part of the 4Geeks Academy [Coding Bootcamp](https://4geeksacademy.com/us/coding-bootcamp) by [Alejandro Sanchez](https://twitter.com/alesanchezr) and many other contributors. Find out more about our [Full Stack Developer Course](https://4geeksacademy.com/us/coding-bootcamps/part-time-full-stack-developer), and [Data Science Bootcamp](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning).
+1. Haz un fork del repositorio.
+2. Crea una nueva rama con tu mejora (`git checkout -b feature/nueva-funcionalidad`).
+3. Realiza tus cambios y súbelos (`git commit -m 'Descripción de la mejora'`).
+4. Envía un Pull Request.
 
-You can find other templates and resources like this at the [school github page](https://github.com/4geeksacademy/).
+---
+
+¡Gracias por visitar este proyecto! Para cualquier consulta o sugerencia, no dudes en abrir un issue. 💬
+
