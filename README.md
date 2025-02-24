@@ -56,7 +56,7 @@ Para ejecutar este proyecto en tu entorno local, sigue estos pasos:
 📌 **Generación de QR**  
 📌 **Gestión de Usuarios**  
 
-*(Agregar capturas de pantalla relevantes aquí.)*
+![image alt](https://github.com/MeliodasCRM/Global-Tourist-ID/blob/main/Post%20instagram%20iphone%20minimal.jpg?raw=true)
 
 ---
 
